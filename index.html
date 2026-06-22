@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>iOS 18 Perfect Control Center - Ultimate Elastic Glass</title>
+    <title>iOS 18 Ultimate Control Center - Heavy Elastic</title>
     <style>
         :root {
             --ios-blur: blur(40px);
-            --card-blur: blur(20px);
-            --card-bg: rgba(255, 255, 255, 0.11);
-            --card-border: rgba(255, 255, 255, 0.07);
-            --ios-blue: #2f89fc;
+            --card-blur: blur(25px);
+            --card-bg: rgba(35, 35, 40, 0.45);
+            --card-border: rgba(255, 255, 255, 0.09);
+            --ios-blue: #007aff;
             --ios-green: #34c759;
-            --ios-grey: rgba(255, 255, 255, 0.15);
+            --ios-orange: #ff9500;
+            --ios-grey: rgba(255, 255, 255, 0.12);
         }
 
         * {
@@ -26,7 +27,7 @@
         }
 
         body {
-            background-color: #0a0a0a;
+            background-color: #050505;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
             display: flex;
             justify-content: center;
@@ -36,7 +37,7 @@
             overflow: hidden;
         }
 
-        /* حاوية الهاتف المطابقة تماماً لـ IMG_20260622_123332_2.jpg */
+        /* حاوية الهاتف الثابتة */
         .phone-frame {
             position: relative;
             width: 393px;
@@ -44,7 +45,7 @@
             background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=393&auto=format&fit=crop') center/cover no-repeat;
             border: 12px solid #e3e3e3;
             border-radius: 55px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
             overflow: hidden;
         }
 
@@ -73,25 +74,24 @@
             z-index: 1009;
         }
 
-        /* ================= الشاشة الرئيسية والتطبيقات (إضافة جديدة) ================= */
+        /* ================= الشاشة الرئيسية مع أيقونات التطبيقات الحقيقية ================= */
         .home-screen {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            padding: 75px 24px 40px 24px;
+            padding: 85px 24px 40px 24px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(6, 1fr);
-            gap: 20px;
+            grid-auto-rows: max-content;
+            gap: 22px;
             z-index: 10;
-            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: transform 0.6s cubic-bezier(0.2, 1, 0.2, 1);
         }
 
-        /* تأثير ابتعاد الشاشة للخلف عند نزول مركز التحكم */
         .phone-frame.panel-open .home-screen {
-            transform: scale(0.93);
+            transform: scale(0.94);
         }
 
         .app-icon {
@@ -105,34 +105,38 @@
         .app-box {
             width: 60px;
             height: 60px;
-            border-radius: 14px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .app-label {
             font-size: 11px;
             font-weight: 500;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+            color: #ffffff;
         }
 
-        /* منطقة السحب العلوية المخفية للنزول */
+        /* منطقة سحب مركز التحكم من أعلى اليمين */
         .drag-zone-top {
             position: absolute;
             top: 0;
             right: 0;
-            width: 150px;
-            height: 60px;
+            width: 160px;
+            height: 65px;
             z-index: 1005;
             cursor: ns-resize;
         }
 
-        /* ================= لوحة مركز التحكم بنظام iOS 18 الشفاف وضبابية الخلفية الكاملة ================= */
+        /* ================= لوحة مركز التحكم المتطورة وضبابية الخلفية الحية ================= */
         .control-center-panel {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            padding: 70px 16px 20px 16px;
+            padding: 75px 16px 20px 16px;
             background: rgba(0, 0, 0, 0);
             backdrop-filter: blur(0px);
             -webkit-backdrop-filter: blur(0px);
@@ -143,16 +147,10 @@
             transform: translateY(-100%);
             pointer-events: none;
             will-change: transform, background, backdrop-filter;
-            transition: transform 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.18), background 0.55s, backdrop-filter 0.55s;
         }
 
-        /* عند الفتح تتفعل الضبابية الكاملة للخلفية */
         .phone-frame.panel-open .control-center-panel {
-            transform: translateY(0);
             pointer-events: auto;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: var(--ios-blur);
-            -webkit-backdrop-filter: var(--ios-blur);
         }
 
         .cc-row-top {
@@ -161,7 +159,7 @@
             gap: 16px;
         }
 
-        /* الكروت والايقونات مضاف لها ضبابية خاصة حقيقية لمنع الشفافية العادية */
+        /* ميزة الضبابية المنعزلة الفخمة لكل كارت لمنع الشفافية العادية عند التراكب */
         .cc-card {
             background: var(--card-bg);
             backdrop-filter: var(--card-blur);
@@ -172,34 +170,31 @@
             padding: 14px;
             position: relative;
             z-index: 20;
-            will-change: transform;
+            will-change: transform, height;
+            transition: height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15);
         }
 
+        /* كارت الموسيقى المكدس القابل للتوسع */
         .music-card {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            cursor: pointer;
+            overflow: hidden;
         }
-        .music-top {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
+        .music-card.expanded {
+            position: absolute;
+            left: 16px;
+            right: 16px;
+            width: calc(100% - 32px);
+            height: 240px;
+            z-index: 99;
         }
-        .music-status {
-            text-align: center;
-            font-size: 13px;
-            color: rgba(255,255,255,0.7);
-            font-weight: 500;
-            margin-top: 10px;
-        }
-        .music-controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 22px;
-            margin-bottom: 8px;
-        }
+        .music-top { display: flex; justify-content: space-between; width: 100%; }
+        .music-status { text-align: center; font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 500; margin-top: 10px; }
+        .music-controls { display: flex; justify-content: center; align-items: center; gap: 24px; margin-bottom: 8px; }
 
+        /* كارت الاتصالات */
         .connectivity-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -214,9 +209,14 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: background 0.3s;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
         }
         .conn-btn.active-blue { background: var(--ios-blue); }
+        .conn-btn.active-orange { background: var(--ios-orange); }
+
+        /* التفاعل البصري عند تفعيل أي خيار (نبضة مطاطية ناعمة) */
+        .conn-btn:active { transform: scale(0.9); }
         
         .mini-conn-box {
             background: rgba(255, 255, 255, 0.06);
@@ -227,12 +227,7 @@
             gap: 4px;
             padding: 4px;
         }
-        .mini-dot {
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+        .mini-dot { border-radius: 50%; display: flex; justify-content: center; align-items: center; }
         .mini-dot.green { background: var(--ios-green); }
         .mini-dot.blue { background: var(--ios-blue); }
         .mini-dot.grey { background: rgba(255,255,255,0.15); }
@@ -249,7 +244,7 @@
             gap: 14px;
         }
 
-        /* السلايدرات مضاف لها ضبابية خاصة حقيقية تمنع الشفافية عند التمطيط المتبادل */
+        /* السلايدرات مع طبقة ضبابية منعزلة ثقيلة */
         .jelly-slider-capsule {
             height: 156px;
             background: var(--card-bg);
@@ -271,7 +266,6 @@
             background: #ffffff;
             height: 50%;
             pointer-events: none;
-            transition: height 0.1s ease-out;
         }
 
         .slider-icon-box {
@@ -284,17 +278,8 @@
             z-index: 25;
         }
 
-        .right-controls-subgrid {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .top-two-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-        }
+        .right-controls-subgrid { display: flex; flex-direction: column; gap: 14px; }
+        .top-two-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
         .circle-action-btn {
             background: var(--card-bg);
@@ -308,6 +293,7 @@
             align-items: center;
             z-index: 20;
             will-change: transform;
+            cursor: pointer;
         }
 
         .focus-capsule {
@@ -323,14 +309,10 @@
             gap: 10px;
             z-index: 20;
             will-change: transform;
+            cursor: pointer;
         }
 
-        .cc-bottom-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
-            margin-top: 4px;
-        }
+        .cc-bottom-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 4px; }
 
         .bottom-tool-btn {
             background: var(--card-bg);
@@ -344,6 +326,7 @@
             align-items: center;
             z-index: 20;
             will-change: transform;
+            cursor: pointer;
         }
 
         .icon-svg {
@@ -367,7 +350,6 @@
 <body>
 
     <div class="phone-frame" id="phoneContainer">
-        <!-- البار العلوي الثابت -->
         <div class="status-bar">
             <span style="display:flex; align-items:center; gap:4px;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M5 12.55a11 11 0 0 1 14.08 0"/></svg>
@@ -377,29 +359,24 @@
         </div>
         <div class="dynamic-island"></div>
 
-        <!-- المنطقة النشطة لسحب لوحة التحكم من الزاوية اليمنى العليا -->
         <div class="drag-zone-top" id="dragZone"></div>
 
-        <!-- ================= واجهة الشاشة الرئيسية بالتطبيقات (إضافة جديدة) ================= -->
         <div class="home-screen">
-            <div class="app-icon"><div class="app-box" style="background:#007aff;"></div><div class="app-label">الرسائل</div></div>
-            <div class="app-icon"><div class="app-box" style="background:#34c759;"></div><div class="app-label">الهاتف</div></div>
-            <div class="app-icon"><div class="app-box" style="background:#ff9500;"></div><div class="app-label">المتصفح</div></div>
-            <div class="app-icon"><div class="app-box" style="background:#5856d6;"></div><div class="app-label">الخرائط</div></div>
-            <div class="app-icon"><div class="app-box" style="background:#ff2d55;"></div><div class="app-label">الموسيقى</div></div>
-            <div class="app-icon"><div class="app-box" style="background:#4cd964;"></div><div class="app-label">الكاميرا</div></div>
+            <div class="app-icon"><div class="app-box" style="background: linear-gradient(135deg, #007aff, #0051a8);"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="app-label">الرسائل</div></div>
+            <div class="app-icon"><div class="app-box" style="background: linear-gradient(135deg, #34c759, #119e2e);"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><div class="app-label">الهاتف</div></div>
+            <div class="app-icon"><div class="app-box" style="background: linear-gradient(135deg, #ff9500, #ff5e00);"><svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10zM2 12h20"/></svg></div><div class="app-label">سفاري</div></div>
+            <div class="app-icon"><div class="app-box" style="background: linear-gradient(135deg, #af52de, #7a1fa2);"><svg class="icon-svg" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div><div class="app-label">المطور</div></div>
         </div>
 
-        <!-- ================= لوحة مركز التحكم iOS 18 الشفافة والضبابية بالكامل طبق الأصل ================= -->
         <div class="control-center-panel" id="ccPanel">
             
             <div class="cc-row-top">
-                <!-- يسار: كارت الموسيقى والميديا -->
-                <div class="cc-card music-card jelly-drag-target">
+                <div class="cc-card music-card jelly-drag-target" id="musicFolder">
                     <div class="music-top">
-                        <svg class="icon-svg" viewBox="0 0 24 24" style="width:18px; height:18px;"><circle cx="12" cy="12" r="3"/><path d="M12 2a10 10 0 1 0 10 10"/></svg>
+                        <svg class="icon-svg" viewBox="0 0 24 24" style="width:18px; height:18px; stroke:#ff2d55;"><circle cx="12" cy="12" r="3"/><path d="M12 2a10 10 0 1 0 10 10"/></svg>
+                        <span style="font-size:10px; color:#ff2d55; font-weight:700;">LIVE</span>
                     </div>
-                    <div class="music-status">متوقف</div>
+                    <div class="music-status">مشغل الموسيقى</div>
                     <div class="music-controls">
                         <svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:#fff;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
                         <svg viewBox="0 0 24 24" style="width:22px; height:22px; fill:#fff;"><path d="M8 5v14l11-7z"/></svg>
@@ -407,11 +384,10 @@
                     </div>
                 </div>
 
-                <!-- يمين: كارت الاتصالات المطور آيفون 18 -->
                 <div class="cc-card connectivity-grid jelly-drag-target">
-                    <div class="conn-btn"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 16v-2l-8.5-5V3.5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5V9L2 14v2l8.5-2.5V19L8 20.5V22l4-1 4 1v-1.5L13.5 19v-5.5L22 16z"/></svg></div>
-                    <div class="conn-btn active-blue"><svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3a9 9 0 0 1 9 9/M3 12a9 9 0 0 1 9-9"/></svg></div>
-                    <div class="conn-btn active-blue"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0"/></svg></div>
+                    <div class="conn-btn" onclick="triggerToggleNode(this, 'active-orange')"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 16v-2l-8.5-5V3.5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5V9L2 14v2l8.5-2.5V19L8 20.5V22l4-1 4 1v-1.5L13.5 19v-5.5L22 16z"/></svg></div>
+                    <div class="conn-btn active-blue" onclick="triggerToggleNode(this, 'active-blue')"><svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3a9 9 0 0 1 9 9/M3 12a9 9 0 0 1 9-9"/></svg></div>
+                    <div class="conn-btn active-blue" onclick="triggerToggleNode(this, 'active-blue')"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0"/></svg></div>
                     <div class="mini-conn-box">
                         <div class="mini-dot green"><svg viewBox="0 0 24 24" style="width:10px; height:10px; fill:#fff;"><path d="M2 22h20V2z"/></svg></div>
                         <div class="mini-dot blue"><svg viewBox="0 0 24 24" style="width:10px; height:10px; stroke:#fff; stroke-width:3; fill:none;"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></svg></div>
@@ -422,7 +398,6 @@
             </div>
 
             <div class="cc-middle-section">
-                <!-- السلايدرات الطولية باليسار -->
                 <div class="sliders-subgrid">
                     <div class="jelly-slider-capsule" data-type="volume">
                         <div class="slider-fill" style="height: 65%;"></div>
@@ -438,24 +413,22 @@
                     </div>
                 </div>
 
-                <!-- الأزرار والتركيز باليمين -->
                 <div class="right-controls-subgrid">
                     <div class="top-two-buttons">
-                        <div class="circle-action-btn jelly-drag-target">
+                        <div class="circle-action-btn jelly-drag-target" onclick="triggerToggleNode(this, 'active-blue')">
                             <svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                         </div>
-                        <div class="circle-action-btn jelly-drag-target">
+                        <div class="circle-action-btn jelly-drag-target" onclick="triggerToggleNode(this, 'active-blue')">
                             <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                         </div>
                     </div>
                     <div class="focus-capsule jelly-drag-target">
-                        <svg class="icon-svg icon-filled" viewBox="0 0 24 24" style="width:18px; height:18px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                        <svg class="icon-svg icon-filled" viewBox="0 0 24 24" style="width:18px; height:18px; stroke:#5856d6; fill:#5856d6;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                         <span style="font-size:13px; font-weight:600;">التركيز</span>
                     </div>
                 </div>
             </div>
 
-            <!-- الصف السفلي للأدوات الأربعة -->
             <div class="cc-bottom-row">
                 <div class="bottom-tool-btn jelly-drag-target">
                     <svg class="icon-svg" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="14" r="2"/></svg>
@@ -475,17 +448,17 @@
         </div>
     </div>
 
-    <!-- هندسة السوائل والارتداد الدقيق (Ultra Fluid Spring & Blur Engine) -->
     <script>
         const container = document.getElementById('phoneContainer');
         const ccPanel = document.getElementById('ccPanel');
         const dragZone = document.getElementById('dragZone');
         const closeHandle = document.getElementById('closeHandle');
+        const musicFolder = document.getElementById('musicFolder');
 
         let isDraggingCC = false;
         let startYCC = 0;
 
-        // سحب لوحة التحكم من أعلى اليمين للأسفل مع أنيميشن التمطيط والضبابية المتدرجة
+        // 1. أنيميشن سحب ونزول القائمة الفعلي لايف بالإصبع مع الضبابية المتدرجة
         dragZone.addEventListener('pointerdown', (e) => {
             isDraggingCC = true;
             startYCC = e.clientY;
@@ -499,8 +472,7 @@
             if (currentMoveY >= 0 && currentMoveY <= 852) {
                 let progress = currentMoveY / 852;
                 ccPanel.style.transform = `translateY(${-852 + currentMoveY}px)`;
-                container.style.backgroundBlendMode = 'overlay';
-                ccPanel.style.background = `rgba(0, 0, 0, ${progress * 0.4})`;
+                ccPanel.style.background = `rgba(0, 0, 0, ${progress * 0.55})`;
                 ccPanel.style.backdropFilter = `blur(${progress * 40}px)`;
                 ccPanel.style.webkitBackdropFilter = `blur(${progress * 40}px)`;
             }
@@ -510,24 +482,45 @@
             if (!isDraggingCC) return;
             isDraggingCC = false;
             let finalMoveY = e.clientY - startYCC;
-            if (finalMoveY > 120) {
+            if (finalMoveY > 100) {
                 container.classList.add('panel-open');
-                ccPanel.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.15)';
+                // ارتداد ثقيل واحترافي مستقر جداً
+                ccPanel.style.transition = 'transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), background 0.5s, backdrop-filter 0.5s';
                 ccPanel.style.transform = 'translateY(0)';
+                ccPanel.style.background = 'rgba(0, 0, 0, 0.55)';
+                ccPanel.style.backdropFilter = 'var(--ios-blur)';
+                ccPanel.style.webkitBackdropFilter = 'var(--ios-blur)';
             } else {
                 closeCC();
             }
         });
 
         closeHandle.addEventListener('click', () => { closeCC(); });
-
         function closeCC() {
             container.classList.remove('panel-open');
-            ccPanel.style.transition = 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)';
+            ccPanel.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
             ccPanel.style.transform = 'translateY(-100%)';
+            if(musicFolder.classList.contains('expanded')) musicFolder.classList.remove('expanded');
         }
 
-        // تصحيح معادلة ارتداد ومطاطية السلايدرات (الحل النهائي للمشكلة العكسية)
+        // 2. ميزة فتح وتوسيع القائمة المكدسة (الموسيقى) عند الضغط
+        musicFolder.addEventListener('click', (e) => {
+            if (e.target.closest('.music-controls') || isDraggingCC) return;
+            musicFolder.classList.toggle('expanded');
+        });
+
+        // 3. التفاعل النبضي المرن عند تفعيل الأزرار
+        function triggerToggleNode(btn, className) {
+            btn.classList.toggle(className);
+            btn.style.transform = 'scale(0.85)';
+            setTimeout(() => {
+                btn.style.transition = 'transform 0.5s cubic-bezier(0.25, 1.5, 0.4, 1)';
+                btn.style.transform = 'scale(1.08)';
+                setTimeout(() => { btn.style.transform = ''; btn.style.transition = ''; }, 150);
+            }, 80);
+        }
+
+        // 4. السلايدرات الطولية مع وزن مطاطي أثقل وأكثر استقراراً عند الرجوع
         document.querySelectorAll('.jelly-slider-capsule').forEach(slider => {
             let sY = 0, sX = 0, active = false;
 
@@ -542,20 +535,19 @@
             slider.addEventListener('pointermove', (e) => {
                 if (!active) return;
                 updateFill(e, slider);
-
                 let dY = e.clientY - sY;
                 let dX = e.clientX - sX;
 
-                // مطاطية مطابقة لاتجاه حركة الإصبع تماماً بدون انعكاس
-                let scaleY = 1 + Math.min(Math.abs(dY) * 0.0008, 0.08);
-                let scaleX = 1 - Math.min(Math.abs(dX) * 0.0006, 0.05);
+                // قفل الوزن المطاطي ليكون أثقل وأكثر فخامة
+                let scaleY = 1 + Math.min(Math.abs(dY) * 0.0004, 0.05);
+                let scaleX = 1 - Math.min(Math.abs(dX) * 0.0003, 0.03);
                 slider.style.transform = `scale(${scaleX}, ${scaleY})`;
             });
 
             slider.addEventListener('pointerup', () => {
                 active = false;
-                // ارتداد هادئ وانسيابي (Fluid Spring Back) يمنع الهزة القاسية والتوقف المفاجئ
-                slider.style.transition = 'transform 0.6s cubic-bezier(0.25, 1.25, 0.4, 1)';
+                // إخماد حركي ناعم يمنع الرجفة تماماً لراحة نفسية أعمق
+                slider.style.transition = 'transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)';
                 slider.style.transform = 'scale(1, 1)';
             });
         });
@@ -567,16 +559,17 @@
             fill.style.height = Math.max(0, Math.min(100, p)) + '%';
         }
 
-        // هندسة السحب والضبابية المنعزلة لجميع الكروت والأزرار (Jelly Drag Target)
+        // 5. السحب والضبابية المنعزلة الفخمة لباقي الأزرار والكروت الثقيلة
         document.querySelectorAll('.jelly-drag-target').forEach(el => {
             let aY = 0, aX = 0, drag = false;
 
             el.addEventListener('pointerdown', (e) => {
+                if(el.classList.contains('expanded')) return;
                 drag = true;
                 aY = e.clientY; aX = e.clientX;
                 el.setPointerCapture(e.pointerId);
                 el.style.transition = 'none';
-                el.style.zIndex = '50'; // رفع الطبقة فوق الكل عند السحب لتبين الضبابية الخاصة بها
+                el.style.zIndex = '50';
             });
 
             el.addEventListener('pointermove', (e) => {
@@ -584,20 +577,21 @@
                 let dY = e.clientY - aY;
                 let dX = e.clientX - aX;
 
-                let sX = 1 + (dX * 0.0008);
-                let sY = 1 + (dY * 0.0008);
-                let mX = dX * 0.25;
-                let mY = dY * 0.25;
+                let sX = 1 + (dX * 0.0004);
+                let sY = 1 + (dY * 0.0004);
+                let mX = dX * 0.15; // حركة رزيانة وثقيلة تتبع الإصبع
+                let mY = dY * 0.15;
 
                 el.style.transform = `translate(${mX}px, ${mY}px) scale(${sX}, ${sY})`;
             });
 
             el.addEventListener('pointerup', () => {
+                if (!drag) return;
                 drag = false;
-                // ارتداد ناعم وسلس للغاية يحاكي حركة السوائل الحقيقية للراحة النفسية
-                el.style.transition = 'transform 0.65s cubic-bezier(0.23, 1.35, 0.45, 1)';
+                // ارتداد مخمد رصين جداً
+                el.style.transition = 'transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)';
                 el.style.transform = 'translate(0px, 0px) scale(1, 1)';
-                setTimeout(() => { el.style.zIndex = '20'; }, 650);
+                setTimeout(() => { if(!el.classList.contains('expanded')) el.style.zIndex = '20'; }, 700);
             });
         });
     </script>
