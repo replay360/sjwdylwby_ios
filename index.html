@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>iOS Ultimate Control Center - Liquid Jelly</title>
+    <title>iOS Control Center - Perfect Elastic Jelly</title>
     <style>
         :root {
-            --ios-bg: linear-gradient(135deg, #0b1326 0%, #1c2a4a 50%, #2a3c66 100%);
-            --glass-bg: rgba(255, 255, 255, 0.08);
-            --glass-active: rgba(255, 255, 255, 0.22);
-            --glass-border: rgba(255, 255, 255, 0.05);
-            --neon-blue: #007aff;
-            --neon-orange: #ff9500;
+            --ios-blur: blur(35px);
+            --card-bg: rgba(30, 30, 35, 0.45);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --icon-active-blue: #007aff;
+            --icon-active-orange: #ff9500;
+            --icon-active-green: #34c759;
         }
 
         * {
@@ -20,13 +20,13 @@
             box-sizing: border-box;
             user-select: none;
             -webkit-user-select: none;
-            touch-action: none; /* يمنع غلق المتصفح الافتراضي لتأمين السحب الحر */
+            touch-action: none;
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: #000000;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -35,182 +35,173 @@
             color: #ffffff;
         }
 
-        /* قالب الهاتف بأبعاد حقيقية ونسبة عرض مرنة لتفادي المشاكل */
+        /* حاوية الهاتف الذكي بأبعاد الآيفون المثالية */
         .phone-frame {
             position: relative;
             width: 393px;
             height: 852px;
-            background: var(--ios-bg);
-            border: 10px solid #22252c;
-            border-radius: 50px;
-            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.9);
+            background: linear-gradient(180deg, #1f2d5a 0%, #0d1326 100%);
+            border: 11px solid #2d3139;
+            border-radius: 54px;
+            box-shadow: 0 25px 65px rgba(0, 0, 0, 0.85);
             overflow: hidden;
             display: flex;
             flex-direction: column;
         }
 
-        /* الجزيرة التفاعلية الثابتة */
+        /* الجزيرة التفاعلية (Dynamic Island) */
         .dynamic-island {
             position: absolute;
-            top: 11px;
+            top: 12px;
             left: 50%;
             transform: translateX(-50%);
-            width: 110px;
-            height: 30px;
+            width: 115px;
+            height: 32px;
             background-color: #000000;
-            border-radius: 20px;
+            border-radius: 22px;
             z-index: 1000;
         }
 
-        /* الشاشة الخلفية والتطبيقات */
-        .home-screen {
-            width: 100%;
-            height: 100%;
-            padding: 80px 24px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1), filter 0.6s ease;
-        }
-
-        .phone-frame.panel-open .home-screen {
-            transform: scale(0.94);
-            filter: blur(25px) brightness(0.5);
-        }
-
-        /* تطبيقات الشاشة الرئيسية الفخمة المرسومة بالـ CSS */
-        .home-app {
-            width: 60px;
-            height: 60px;
-            border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-        }
-
-        /* ==================== محرك تأثير الجلي والمطاط السائل ==================== */
-        /* الفلتر السحري الي يخلي العناصر تمط مثل الزئبق أو الجلي عند التداخل */
-        .liquid-container {
-            filter: url('#liquid-jelly-filter');
+        /* نظام البار العلوي (الساعة والبطارية) */
+        .status-bar {
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 16px;
             width: 100%;
-            height: 100%;
-            z-index: 900;
-            pointer-events: none;
+            padding: 0 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 999;
+            opacity: 0.9;
         }
 
-        /* لوحة مركز التحكم - الزجاج السائل المتماسك */
+        /* ==================== لوحة مركز التحكم (Liquid CC) ==================== */
         .control-center-panel {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            padding: 60px 16px 30px 16px;
+            padding: 55px 16px 20px 16px;
             display: flex;
             flex-direction: column;
-            background: rgba(10, 14, 23, 0.4);
+            background-color: rgba(0, 0, 0, 0.15);
             backdrop-filter: blur(0px);
             -webkit-backdrop-filter: blur(0px);
             transform: translateY(-100%);
-            pointer-events: auto;
-            will-change: transform;
+            will-change: transform, backdrop-filter;
+            z-index: 900;
+            transition: transform 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.25);
         }
 
-        /* شبكة الكروت الأساسية المطابقة للايفون */
-        .cc-layout-grid {
+        .phone-frame.panel-open .control-center-panel {
+            transform: translateY(0);
+            backdrop-filter: var(--ios-blur);
+            -webkit-backdrop-filter: var(--ios-blur);
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        /* تنسيق الشبكة والأبعاد المماثلة تماماً للآيفون */
+        .cc-grid-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 14px;
-            margin-top: 20px;
+            margin-top: 24px;
         }
 
-        /* تصميم الكروت الزجاجية (Liquid Glassmorphism) */
+        /* كروت الزجاج السائل الفخمة */
         .cc-glass-card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
             border-radius: 24px;
-            padding: 12px;
             height: 142px;
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+            padding: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
         }
 
-        /* كارت الشبكات والاتصالات */
-        .network-card {
+        /* كارت الاتصالات المطور */
+        .connectivity-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
             gap: 12px;
-            align-items: center;
-            justify-items: center;
+            height: 100%;
         }
 
-        /* أزرار الاتصالات الدائرية المتفاعلة والمطاطية هندسياً */
-        .cc-circle-node {
+        /* ==================== تأثير الجلي والمطاط الحرفي (الأزرار الدائرية) ==================== */
+        .jelly-btn {
             width: 52px;
             height: 52px;
-            background-color: rgba(255, 255, 255, 0.08);
+            background-color: rgba(255, 255, 255, 0.09);
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.3s;
+            position: relative;
+            /* توقيت ارتداد مرن جداً للراحة النفسية الممتدة */
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.42, 1.45), background-color 0.3s, box-shadow 0.3s;
             will-change: transform;
         }
 
-        .cc-circle-node:active {
-            transform: scale(0.85);
+        /* تأثير العصر والامتطاط (Jelly Distortion) عند الضغط المطول أو اللمس */
+        .jelly-btn:active {
+            transform: scale(0.82, 1.12) rotate(-3deg);
         }
 
-        /* الألوان الرسمية المشعة عند التفعيل */
-        .cc-circle-node.active.wifi { background-color: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); }
-        .cc-circle-node.active.bluetooth { background-color: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); }
-        .cc-circle-node.active.airplane { background-color: var(--neon-orange); box-shadow: 0 0 15px var(--neon-orange); }
-        .cc-circle-node.active.airdrop { background-color: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); }
+        /* ألوان التفعيل النيونية الأصلية المطابقة لـ iOS */
+        .jelly-btn.active.airplane { background-color: var(--icon-active-orange); box-shadow: 0 0 16px rgba(255, 149, 0, 0.45); }
+        .jelly-btn.active.airdrop { background-color: var(--icon-active-blue); box-shadow: 0 0 16px rgba(0, 122, 255, 0.45); }
+        .jelly-btn.active.wifi { background-color: var(--icon-active-blue); box-shadow: 0 0 16px rgba(0, 122, 255, 0.45); }
+        .jelly-btn.active.bluetooth { background-color: var(--icon-active-blue); box-shadow: 0 0 16px rgba(0, 122, 255, 0.45); }
 
-        /* ==================== سلايدرات الكبسولة السائلة (الصوت والسطوع) ==================== */
-        .cc-slider-row {
+        /* ==================== سلايدرات الكبسولة السائلة الطولية ==================== */
+        .sliders-container-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 14px;
             margin-top: 14px;
         }
 
-        .capsule-slider-container {
+        .jelly-capsule-slider {
             position: relative;
             height: 142px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 30px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 32px;
             overflow: hidden;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
+            /* تأثير تمدد كبسولي كامل عند التفاعل */
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.42, 1.45);
             will-change: transform;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* مادة الجلي السائل المعبأة داخل السلايدر */
-        .slider-liquid-fill {
+        /* من تسحب الكبسولة تمط يميناً ويساراً بشكل مريح جداً */
+        .jelly-capsule-slider:active {
+            transform: scale(0.96, 1.05);
+        }
+
+        .slider-fluid-fill {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 50%; /* القيمة الافتراضية للسطوع والصوت */
+            height: 50%;
             background-color: #ffffff;
             pointer-events: none;
-            transition: height 0.1s cubic-bezier(0.1, 0.8, 0.2, 1);
+            /* أنيميشن ناعم جداً يحاكي حركة السوائل */
+            transition: height 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
             will-change: height;
         }
 
-        /* الأيقونات المدمجة بذكاء بداخل السلايدر المتغير */
-        .slider-embedded-icon {
+        .slider-center-icon {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -220,243 +211,292 @@
             mix-blend-mode: difference;
         }
 
-        /* ==================== الأيقونات التفاعلية الاحترافية (SVG هندسي صافي) ==================== */
-        .svg-icon {
-            width: 22px;
-            height: 22px;
-            fill: none;
-            stroke: #ffffff;
-            stroke-width: 2.3;
-            stroke-linecap: round;
-            stroke-linejoin: round;
+        /* الأزرار المربعة المتوسطة (الجرس والقفل) */
+        .utility-grid-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 14px;
         }
 
-        /* أزرار الأدوات الدائرية السفلية (ريموت، كاميرا، فلاش) */
-        .bottom-tools-grid {
+        .square-jelly-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 22px;
+            height: 64px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.42, 1.45);
+        }
+
+        .square-jelly-card:active {
+            transform: scale(0.88, 1.08);
+        }
+
+        .square-jelly-card.active-bell {
+            background-color: #ffffff;
+        }
+        .square-jelly-card.active-bell .svg-icon {
+            stroke: #ff3b30;
+        }
+
+        /* كارت التركيز (Focus Mode) البيضوي المطابق */
+        .focus-jelly-bar {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 22px;
+            height: 54px;
+            margin-top: 14px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.42, 1.45);
+        }
+        .focus-jelly-bar:active { transform: scale(0.95, 1.04); }
+
+        /* الصف السفلي للأدوات الدائرية (الريموت، الفلاش، الكاميرا) */
+        .bottom-tools-flex {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 12px;
             margin-top: 14px;
         }
 
-        .tool-node-circle {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
+        .bottom-circle-node {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
             height: 62px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.42, 1.45);
         }
 
-        .tool-node-circle:active {
-            transform: scale(0.85);
+        .bottom-circle-node:active {
+            transform: scale(0.82, 1.15); /* مطاطية عمودية فائقة الراحة */
         }
 
-        .tool-node-circle.active {
+        .bottom-circle-node.active {
             background-color: #ffffff;
         }
-        .tool-node-circle.active .svg-icon {
+        .bottom-circle-node.active .svg-icon {
             stroke: #000000;
+            fill: #000000;
         }
 
-        /* مناطق السحب الحساسة للمس السلس السريع */
-        .top-active-pull-zone {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 60px;
-            z-index: 999;
-            cursor: ns-resize;
+        /* ==================== رسم الأيقونات الاحترافية جداً بالـ SVG الصافي ==================== */
+        .svg-icon {
+            width: 22px;
+            height: 22px;
+            fill: none;
+            stroke: #ffffff;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: transform 0.2s;
         }
 
-        .bottom-active-close-bar {
-            width: 50px;
-            height: 5px;
-            background-color: rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
+        /* منطقة الحواف الذكية للسحب الفعلي بالإصبع */
+        .top-sensor-handle {
             position: absolute;
-            bottom: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            cursor: ns-resize;
-            z-index: 950;
+            top: 0; left: 0; width: 100%; height: 50px;
+            z-index: 1001; cursor: ns-resize;
+        }
+
+        .bottom-close-slider-line {
+            width: 46px; height: 5px; background-color: rgba(255, 255, 255, 0.4);
+            border-radius: 10px; position: absolute; bottom: 12px; left: 50%;
+            transform: translateX(-50%); cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-        <defs>
-            <filter id="liquid-jelly-filter">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
-                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo" />
-                <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-            </filter>
-        </defs>
-    </svg>
-
-    <div class="phone-frame" id="phoneContainer">
-        <div class="dynamic-island"></div>
-        
-        <div class="top-active-pull-zone" id="pullZone"></div>
-
-        <div class="home-screen">
-            <div class="home-app" style="background: linear-gradient(135deg, #00b4db, #0083b0);"></div>
-            <div class="home-app" style="background: linear-gradient(135deg, #f857a6, #ff5858);"></div>
-            <div class="home-app" style="background: linear-gradient(135deg, #11998e, #38ef7d);"></div>
-            <div class="home-app" style="background: linear-gradient(135deg, #ff9966, #ff5e62);"></div>
+    <div class="phone-frame" id="iphoneDevice">
+        <div class="status-bar">
+            <div>١٢:٤٨</div>
+            <div style="display:flex; align-items:center; gap:4px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M5 12.55a11 11 0 0 1 14.08 0"/></svg>
+                <span>%١٠٠</span>
+            </div>
         </div>
 
-        <div class="control-center-panel" id="controlPanel">
+        <div class="dynamic-island"></div>
+        
+        <div class="top-sensor-handle" id="pullTrigger"></div>
+
+        <div class="control-center-panel" id="ccPanel">
             
-            <div class="cc-layout-grid">
-                <div class="cc-glass-card" style="display:flex; flex-direction:column; justify-content:center; align-items:center; gap:8px;">
-                    <span style="font-size:12px; color:rgba(255,255,255,0.4); font-weight:700; letter-spacing: 0.5px;">متوقف</span>
-                    <svg class="svg-icon" style="width:26px; height:26px; fill:#fff;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <div class="cc-grid-row">
+                <div class="cc-glass-card" style="display:flex; flex-direction:column; justify-content:center; align-items:center; gap:6px;">
+                    <span style="font-size:11px; color:rgba(255,255,255,0.4); font-weight:700; letter-spacing:0.5px;">متوقف</span>
+                    <div style="display:flex; gap:16px; align-items:center; margin-top:4px;">
+                        <svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:#fff;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                        <svg viewBox="0 0 24 24" style="width:26px; height:26px; fill:#fff;"><path d="M8 5v14l11-7z"/></svg>
+                        <svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:#fff;"><path d="M6 5v14l11-7z"/></svg>
+                    </div>
                 </div>
 
-                <div class="cc-glass-card network-card">
-                    <div class="cc-circle-node" onclick="triggerNode(this)"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 16v-2l-8.5-5V3.5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5V9L2 14v2l8.5-2.5V19L8 20.5V22l4-1 4 1v-1.5L13.5 19v-5.5L22 16z"/></svg></div>
-                    <div class="cc-circle-node active airdrop" onclick="triggerNode(this)"><svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3a9 9 0 0 1 9 9/M3 12a9 9 0 0 1 9-9"/></svg></div>
-                    <div class="cc-circle-node active wifi" onclick="triggerNode(this)"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a5.5 5.5 0 0 1 6.95 0"/></svg></div>
-                    <div class="cc-circle-node active bluetooth" onclick="triggerNode(this)"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></svg></div>
+                <div class="cc-glass-card connectivity-grid">
+                    <div class="jelly-btn" onclick="toggleJellyNode(this)"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 16v-2l-8.5-5V3.5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5V9L2 14v2l8.5-2.5V19L8 20.5V22l4-1 4 1v-1.5L13.5 19v-5.5L22 16z"/></svg></div>
+                    <div class="jelly-btn active airdrop" onclick="toggleJellyNode(this)"><svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3a9 9 0 0 1 9 9/M3 12a9 9 0 0 1 9-9"/></svg></div>
+                    <div class="jelly-btn active wifi" onclick="toggleJellyNode(this)"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a5.5 5.5 0 0 1 6.95 0"/></svg></div>
+                    <div class="jelly-btn active bluetooth" onclick="toggleJellyNode(this)"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></svg></div>
                 </div>
             </div>
 
-            <div class="cc-slider-row">
-                <div class="capsule-slider-container" onpointerdown="activateSlider(event, this)">
-                    <div class="slider-liquid-fill" style="height: 65%;"></div>
-                    <div class="slider-embedded-icon">
+            <div class="sliders-container-row">
+                <div class="jelly-capsule-slider" onpointerdown="runJellySlider(event, this)">
+                    <div class="slider-fluid-fill" style="height: 70%;"></div>
+                    <div class="slider-center-icon">
                         <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2"/></svg>
                     </div>
                 </div>
-                <div class="capsule-slider-container" onpointerdown="activateSlider(event, this)">
-                    <div class="slider-liquid-fill" style="height: 40%;"></div>
-                    <div class="slider-embedded-icon">
-                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                <div class="jelly-capsule-slider" onpointerdown="runJellySlider(event, this)">
+                    <div class="slider-fluid-fill" style="height: 45%;"></div>
+                    <div class="slider-center-icon">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
                     </div>
                 </div>
             </div>
 
-            <div class="bottom-tools-grid">
-                <div class="tool-node-circle" onclick="this.classList.toggle('active')">
-                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M18 2H6v3l4 4v9a2 2 0 0 0 2 2 2 2 0 0 0 2-2v-9l4-4V2z"/></svg>
+            <div class="utility-grid-row">
+                <div class="square-jelly-card" onclick="this.classList.toggle('active-bell')">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                 </div>
-                <div class="tool-node-circle">
-                    <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                </div>
-                <div class="tool-node-circle">
-                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                </div>
-                <div class="tool-node-circle">
-                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/></svg>
+                <div class="square-jelly-card" onclick="this.style.background=this.style.background==''?'rgba(255,255,255,0.2)':'';">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                 </div>
             </div>
 
-            <div class="bottom-active-close-bar" id="closeBar"></div>
-        </div>
+            <div class="focus-jelly-bar">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <svg class="svg-icon" viewBox="0 0 24 24" style="stroke:#5856d6; fill:#5856d6;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    <span style="font-size:13px; font-weight:600; color:#fff;">التركيز</span>
+                </div>
+                <svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:#fff;"><path d="M12 5.5l6 6H6z" transform="rotate(180 12 12)"/></svg>
+            </div>
 
+            <div class="bottom-tools-flex">
+                <div class="bottom-circle-node" onclick="this.classList.toggle('active')">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M18 2H6v3l4 4v9a2 2 0 0 0 2 2 2 2 0 0 0 2-2v-9l4-4V2z"/></svg>
+                </div>
+                <div class="bottom-circle-node">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="14" r="2"/></svg>
+                </div>
+                <div class="bottom-circle-node">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                </div>
+                <div class="bottom-circle-node">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/></svg>
+                </div>
+            </div>
+
+            <div class="bottom-close-slider-line" id="closeBar"></div>
+        </div>
     </div>
 
     <script>
-        const container = document.getElementById('phoneContainer');
-        const panel = document.getElementById('controlPanel');
-        const pullZone = document.getElementById('pullZone');
+        const device = document.getElementById('iphoneDevice');
+        const ccPanel = document.getElementById('ccPanel');
+        const pullTrigger = document.getElementById('pullTrigger');
         const closeBar = document.getElementById('closeBar');
 
-        let isDragging = false;
-        let startY = 0;
-        let currentY = 0;
-        const totalHeight = 852;
+        let touchStartY = 0;
+        let touchMoveY = 0;
+        let isDraggingPanel = false;
 
-        // التقاط حركة الإصبع الحقيقية ومحاكاة تمدد مادة الجلي هندسياً
-        pullZone.addEventListener('pointerdown', (e) => {
-            isDragging = true;
-            startY = e.clientY;
-            panel.style.transition = 'none';
-            container.style.transition = 'none';
-            pullZone.setPointerCapture(e.pointerId);
+        // التقاط السحب والنزول المباشر المتجاوب
+        pullTrigger.addEventListener('pointerdown', (e) => {
+            isDraggingPanel = true;
+            touchStartY = e.clientY;
+            ccPanel.style.transition = 'none';
+            pullTrigger.setPointerCapture(e.pointerId);
         });
 
-        pullZone.addEventListener('pointermove', (e) => {
-            if (!isDragging) return;
-            currentY = e.clientY - startY;
+        pullTrigger.addEventListener('pointermove', (e) => {
+            if (!isDraggingPanel) return;
+            touchMoveY = e.clientY - touchStartY;
 
-            if (currentY >= 0 && currentY <= totalHeight) {
-                // تمدد ومط الجلي الفعلي: نضرب القيمة بمعامل مرن يتغير مع المسافة (Deformation Ratio)
-                let stretchFactor = 1 + (currentY / totalHeight) * 0.08; 
-                panel.style.transform = `translateY(${-totalHeight + currentY}px) scaleY(${stretchFactor})`;
-                
-                // تأثير ضبابية خلفية الزجاج السائل يزداد تدريجياً
-                let progress = currentY / totalHeight;
-                panel.style.backdropFilter = `blur(${progress * 35}px)`;
-                panel.style.webkitBackdropFilter = `blur(${progress * 35}px)`;
+            if (touchMoveY >= 0 && touchMoveY <= 852) {
+                // تمطيط اللوحة طولياً بالكامل لمحاكاة نزول السوائل الزجاجية
+                let stretchFactor = 1 + (touchMoveY / 852) * 0.05;
+                ccPanel.style.transform = `translateY(${-852 + touchMoveY}px) scaleY(${stretchFactor})`;
             }
         });
 
-        pullZone.addEventListener('pointerup', () => {
-            if (!isDragging) return;
-            isDragging = false;
+        pullTrigger.addEventListener('pointerup', () => {
+            if (!isDraggingPanel) return;
+            isDraggingPanel = false;
 
-            // إذا تعدت السحبة ربع المسافة، يستقر مركز التحكم ويشتغل اهتزاز الجلي عند التثبيت
-            if (currentY > 180) {
-                container.classList.add('panel-open');
-                // توقيت الـ cubic-bezier هذا يحاكي الارتداد الزنبركي السائل (Liquid Spring Elasticity)
-                panel.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.42, 1.35), backdrop-filter 0.3s';
-                panel.style.transform = 'translateY(0) scaleY(1)';
-                panel.style.backdropFilter = 'blur(35px)';
-                panel.style.webkitBackdropFilter = 'blur(35px)';
+            if (touchMoveY > 140) {
+                device.classList.add('panel-open');
+                // تفعيل المظهر المطاطي المستقر عند الفتح
+                ccPanel.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.42, 1.32)';
+                ccPanel.style.transform = 'translateY(0) scaleY(1)';
             } else {
-                dismissPanel();
+                dismissCC();
             }
         });
 
-        closeBar.addEventListener('pointerdown', () => {
-            dismissPanel();
+        closeBar.addEventListener('click', () => {
+            dismissCC();
         });
 
-        function dismissPanel() {
-            container.classList.remove('panel-open');
-            panel.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
-            panel.style.transform = 'translateY(-100%) scaleY(1)';
-            panel.style.backdropFilter = 'blur(0px)';
-            panel.style.webkitBackdropFilter = 'blur(0px)';
-            currentY = 0;
+        function dismissCC() {
+            device.classList.remove('panel-open');
+            ccPanel.style.transition = 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)';
+            ccPanel.style.transform = 'translateY(-100%) scaleY(1)';
+            touchMoveY = 0;
         }
 
-        function triggerNode(node) {
-            node.classList.toggle('active');
-            // تأثير مطاطي جانبي صغير جداً عند لمس الأزرار الدائرية
-            node.style.transform = 'scale(1.15)';
-            setTimeout(() => { node.style.transform = ''; }, 150);
+        // تفاعل أزرار الاتصالات الجلي
+        function toggleJellyNode(element) {
+            element.classList.toggle('active');
+            // إحداث انضغاط وارتداد فوري "راحة نفسية" بالـ CSS ملموس جداً
+            element.style.transform = 'scale(1.25, 0.85)';
+            setTimeout(() => {
+                element.style.transform = 'scale(0.95, 1.05)';
+                setTimeout(() => { element.style.transform = ''; }, 100);
+            }, 150);
         }
 
-        // تحريك سوائل الصوت والسطوع داخل الكبسولات الدقيقة بلمس الماوس أو الإصبع
-        function activateSlider(e, element) {
-            const fill = element.querySelector('.slider-liquid-fill');
-            const box = element.getBoundingClientRect();
-            element.setPointerCapture(e.pointerId);
+        // هندسة السلايدرات الكبسولية المتفاعلة كلياً بالإصبع
+        function runJellySlider(e, slider) {
+            const fill = slider.querySelector('.slider-fluid-fill');
+            const rect = slider.getBoundingClientRect();
+            slider.setPointerCapture(e.pointerId);
 
-            function modifyFill(clientY) {
-                let positionY = clientY - box.top;
-                let pct = 100 - (positionY / box.height * 100);
-                pct = Math.max(0, Math.min(100, pct));
-                fill.style.height = pct + '%';
+            function calcAndFill(clientY) {
+                let yPos = clientY - rect.top;
+                let percent = 100 - (yPos / rect.height * 100);
+                percent = Math.max(0, Math.min(100, percent));
+                fill.style.height = percent + '%';
             }
 
-            modifyFill(e.clientY);
+            calcAndFill(e.clientY);
 
-            element.onpointermove = (ev) => modifyFill(ev.clientY);
-            element.onpointerup = () => {
-                element.onpointermove = null;
-                element.onpointerup = null;
-                // ارتداد مطاطي للكبسولة عند ترك السلايدر
-                element.style.transform = 'scale(1.05)';
-                setTimeout(() => element.style.transform = '', 120);
+            slider.onpointermove = (ev) => {
+                calcAndFill(ev.clientY);
+                // تمدد مرن طفيف أثناء السحب لأعلى وأسفل
+                slider.style.transform = 'scale(0.97, 1.03)';
+            };
+
+            slider.onpointerup = () => {
+                slider.onpointermove = null;
+                slider.onpointerup = null;
+                // ارتداد الجلي المطاطي النهائي اللطيف عند الإفلات
+                slider.style.transform = 'scale(1.06, 0.94)';
+                setTimeout(() => {
+                    slider.style.transform = 'scale(0.98, 1.02)';
+                    setTimeout(() => { slider.style.transform = ''; }, 100);
+                }, 120);
             };
         }
     </script>
