@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>iOS 18 Perfect Control Center - Real Jelly Drag</title>
+    <title>iOS 18 Perfect Control Center - Ultimate Elastic Glass</title>
     <style>
         :root {
             --ios-blur: blur(40px);
+            --card-blur: blur(20px);
             --card-bg: rgba(255, 255, 255, 0.11);
             --card-border: rgba(255, 255, 255, 0.07);
             --ios-blue: #2f89fc;
@@ -40,7 +41,7 @@
             position: relative;
             width: 393px;
             height: 852px;
-            background: linear-gradient(180deg, #182848 0%, #2b5876 100%);
+            background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=393&auto=format&fit=crop') center/cover no-repeat;
             border: 12px solid #e3e3e3;
             border-radius: 55px;
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
@@ -56,7 +57,7 @@
             height: 30px;
             background-color: #000000;
             border-radius: 20px;
-            z-index: 1000;
+            z-index: 1010;
         }
 
         .status-bar {
@@ -69,10 +70,62 @@
             align-items: center;
             font-size: 12px;
             font-weight: 600;
-            z-index: 999;
+            z-index: 1009;
         }
 
-        /* لوحة مركز التحكم بنظام iOS 18 الشفاف */
+        /* ================= الشاشة الرئيسية والتطبيقات (إضافة جديدة) ================= */
+        .home-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 75px 24px 40px 24px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            gap: 20px;
+            z-index: 10;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* تأثير ابتعاد الشاشة للخلف عند نزول مركز التحكم */
+        .phone-frame.panel-open .home-screen {
+            transform: scale(0.93);
+        }
+
+        .app-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .app-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        .app-label {
+            font-size: 11px;
+            font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* منطقة السحب العلوية المخفية للنزول */
+        .drag-zone-top {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 60px;
+            z-index: 1005;
+            cursor: ns-resize;
+        }
+
+        /* ================= لوحة مركز التحكم بنظام iOS 18 الشفاف وضبابية الخلفية الكاملة ================= */
         .control-center-panel {
             position: absolute;
             top: 0;
@@ -80,34 +133,48 @@
             width: 100%;
             height: 100%;
             padding: 70px 16px 20px 16px;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: var(--ios-blur);
-            -webkit-backdrop-filter: var(--ios-blur);
+            background: rgba(0, 0, 0, 0);
+            backdrop-filter: blur(0px);
+            -webkit-backdrop-filter: blur(0px);
             display: flex;
             flex-direction: column;
             gap: 16px;
+            z-index: 1000;
+            transform: translateY(-100%);
+            pointer-events: none;
+            will-change: transform, background, backdrop-filter;
+            transition: transform 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.18), background 0.55s, backdrop-filter 0.55s;
         }
 
-        /* تقسيم الصفوف لتطابق الشبكة الأصلية */
+        /* عند الفتح تتفعل الضبابية الكاملة للخلفية */
+        .phone-frame.panel-open .control-center-panel {
+            transform: translateY(0);
+            pointer-events: auto;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: var(--ios-blur);
+            -webkit-backdrop-filter: var(--ios-blur);
+        }
+
         .cc-row-top {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
         }
 
+        /* الكروت والايقونات مضاف لها ضبابية خاصة حقيقية لمنع الشفافية العادية */
         .cc-card {
             background: var(--card-bg);
+            backdrop-filter: var(--card-blur);
+            -webkit-backdrop-filter: var(--card-blur);
             border: 1px solid var(--card-border);
             border-radius: 28px;
             height: 156px;
             padding: 14px;
             position: relative;
-            /* سلاسة الارتداد عند الإفلات */
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 20;
             will-change: transform;
         }
 
-        /* تفاصيل كارت الموسيقى (يسار) */
         .music-card {
             display: flex;
             flex-direction: column;
@@ -133,7 +200,6 @@
             margin-bottom: 8px;
         }
 
-        /* تفاصيل كارت الاتصالات المطور (يمين) */
         .connectivity-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -142,18 +208,16 @@
             height: 100%;
         }
 
-        /* أزرار الاتصالات الدائرية الكبيرة */
         .conn-btn {
             background: var(--ios-grey);
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s;
+            transition: background 0.3s;
         }
         .conn-btn.active-blue { background: var(--ios-blue); }
         
-        /* المربع المصغر السفلي (بلوتوث وبيانات) */
         .mini-conn-box {
             background: rgba(255, 255, 255, 0.06);
             border-radius: 14px;
@@ -173,7 +237,6 @@
         .mini-dot.blue { background: var(--ios-blue); }
         .mini-dot.grey { background: rgba(255,255,255,0.15); }
 
-        /* ================= المنطقة الوسطى (السلايدرات يمينها الأزرار) ================= */
         .cc-middle-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -186,10 +249,12 @@
             gap: 14px;
         }
 
-        /* السلايدرات الكبسولية فائقة المطاطية الحية */
+        /* السلايدرات مضاف لها ضبابية خاصة حقيقية تمنع الشفافية عند التمطيط المتبادل */
         .jelly-slider-capsule {
             height: 156px;
             background: var(--card-bg);
+            backdrop-filter: var(--card-blur);
+            -webkit-backdrop-filter: var(--card-blur);
             border: 1px solid var(--card-border);
             border-radius: 35px;
             position: relative;
@@ -197,6 +262,7 @@
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
+            z-index: 20;
             will-change: transform;
         }
 
@@ -215,10 +281,9 @@
             transform: translateX(-50%);
             pointer-events: none;
             mix-blend-mode: difference;
-            z-index: 5;
+            z-index: 25;
         }
 
-        /* القسم الأيمن من الوسط (الأزرار والتركيز) */
         .right-controls-subgrid {
             display: flex;
             flex-direction: column;
@@ -233,18 +298,22 @@
 
         .circle-action-btn {
             background: var(--card-bg);
+            backdrop-filter: var(--card-blur);
+            -webkit-backdrop-filter: var(--card-blur);
             border: 1px solid var(--card-border);
             height: 64px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
+            z-index: 20;
             will-change: transform;
         }
 
-        /* كبسولة التركيز العريضة المطابقة */
         .focus-capsule {
             background: var(--card-bg);
+            backdrop-filter: var(--card-blur);
+            -webkit-backdrop-filter: var(--card-blur);
             border: 1px solid var(--card-border);
             height: 54px;
             border-radius: 27px;
@@ -252,10 +321,10 @@
             align-items: center;
             padding: 0 16px;
             gap: 10px;
+            z-index: 20;
             will-change: transform;
         }
 
-        /* ================= الصف السفلي الدائري للأدوات ================= */
         .cc-bottom-row {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -265,16 +334,18 @@
 
         .bottom-tool-btn {
             background: var(--card-bg);
+            backdrop-filter: var(--card-blur);
+            -webkit-backdrop-filter: var(--card-blur);
             border: 1px solid var(--card-border);
             height: 68px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
+            z-index: 20;
             will-change: transform;
         }
 
-        /* الأيقونات النظيفة بالـ SVG */
         .icon-svg {
             width: 22px;
             height: 22px;
@@ -284,15 +355,19 @@
             stroke-linecap: round;
             stroke-linejoin: round;
         }
-        .icon-filled {
-            fill: #ffffff;
+        .icon-filled { fill: #ffffff; }
+
+        .bottom-close-line {
+            width: 46px; height: 5px; background-color: rgba(255, 255, 255, 0.4);
+            border-radius: 10px; position: absolute; bottom: 12px; left: 50%;
+            transform: translateX(-50%); cursor: pointer; z-index: 1001;
         }
     </style>
 </head>
 <body>
 
-    <div class="phone-frame">
-        <!-- البار العلوي كأنه حقيقي -->
+    <div class="phone-frame" id="phoneContainer">
+        <!-- البار العلوي الثابت -->
         <div class="status-bar">
             <span style="display:flex; align-items:center; gap:4px;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M5 12.55a11 11 0 0 1 14.08 0"/></svg>
@@ -302,16 +377,27 @@
         </div>
         <div class="dynamic-island"></div>
 
-        <!-- اللوحة المتكاملة والمنظمة طبق الأصل لـ IMG_20260622_123332_2.jpg -->
-        <div class="control-center-panel">
+        <!-- المنطقة النشطة لسحب لوحة التحكم من الزاوية اليمنى العليا -->
+        <div class="drag-zone-top" id="dragZone"></div>
+
+        <!-- ================= واجهة الشاشة الرئيسية بالتطبيقات (إضافة جديدة) ================= -->
+        <div class="home-screen">
+            <div class="app-icon"><div class="app-box" style="background:#007aff;"></div><div class="app-label">الرسائل</div></div>
+            <div class="app-icon"><div class="app-box" style="background:#34c759;"></div><div class="app-label">الهاتف</div></div>
+            <div class="app-icon"><div class="app-box" style="background:#ff9500;"></div><div class="app-label">المتصفح</div></div>
+            <div class="app-icon"><div class="app-box" style="background:#5856d6;"></div><div class="app-label">الخرائط</div></div>
+            <div class="app-icon"><div class="app-box" style="background:#ff2d55;"></div><div class="app-label">الموسيقى</div></div>
+            <div class="app-icon"><div class="app-box" style="background:#4cd964;"></div><div class="app-label">الكاميرا</div></div>
+        </div>
+
+        <!-- ================= لوحة مركز التحكم iOS 18 الشفافة والضبابية بالكامل طبق الأصل ================= -->
+        <div class="control-center-panel" id="ccPanel">
             
-            <!-- الصف العلوي -->
             <div class="cc-row-top">
                 <!-- يسار: كارت الموسيقى والميديا -->
                 <div class="cc-card music-card jelly-drag-target">
                     <div class="music-top">
                         <svg class="icon-svg" viewBox="0 0 24 24" style="width:18px; height:18px;"><circle cx="12" cy="12" r="3"/><path d="M12 2a10 10 0 1 0 10 10"/></svg>
-                        <div></div>
                     </div>
                     <div class="music-status">متوقف</div>
                     <div class="music-controls">
@@ -326,7 +412,6 @@
                     <div class="conn-btn"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 16v-2l-8.5-5V3.5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5V9L2 14v2l8.5-2.5V19L8 20.5V22l4-1 4 1v-1.5L13.5 19v-5.5L22 16z"/></svg></div>
                     <div class="conn-btn active-blue"><svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3a9 9 0 0 1 9 9/M3 12a9 9 0 0 1 9-9"/></svg></div>
                     <div class="conn-btn active-blue"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0"/></svg></div>
-                    <!-- المربع الصغير رباعي الأيقونات داخلياً -->
                     <div class="mini-conn-box">
                         <div class="mini-dot green"><svg viewBox="0 0 24 24" style="width:10px; height:10px; fill:#fff;"><path d="M2 22h20V2z"/></svg></div>
                         <div class="mini-dot blue"><svg viewBox="0 0 24 24" style="width:10px; height:10px; stroke:#fff; stroke-width:3; fill:none;"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></svg></div>
@@ -336,18 +421,15 @@
                 </div>
             </div>
 
-            <!-- المنطقة الوسطى الكبرى -->
             <div class="cc-middle-section">
-                <!-- السلايدرات الطولية باليسار تماماً -->
+                <!-- السلايدرات الطولية باليسار -->
                 <div class="sliders-subgrid">
-                    <!-- سلايدر الصوت -->
                     <div class="jelly-slider-capsule" data-type="volume">
                         <div class="slider-fill" style="height: 65%;"></div>
                         <div class="slider-icon-box">
                             <svg class="icon-svg" viewBox="0 0 24 24" style="stroke: #00bcd4;"><path d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
                         </div>
                     </div>
-                    <!-- سلايدر السطوع -->
                     <div class="jelly-slider-capsule" data-type="brightness">
                         <div class="slider-fill" style="height: 45%;"></div>
                         <div class="slider-icon-box">
@@ -356,7 +438,7 @@
                     </div>
                 </div>
 
-                <!-- الأزرار والتركيز باليمين تماماً -->
+                <!-- الأزرار والتركيز باليمين -->
                 <div class="right-controls-subgrid">
                     <div class="top-two-buttons">
                         <div class="circle-action-btn jelly-drag-target">
@@ -366,7 +448,6 @@
                             <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                         </div>
                     </div>
-                    <!-- كبسولة التركيز العريضة -->
                     <div class="focus-capsule jelly-drag-target">
                         <svg class="icon-svg icon-filled" viewBox="0 0 24 24" style="width:18px; height:18px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                         <span style="font-size:13px; font-weight:600;">التركيز</span>
@@ -374,7 +455,7 @@
                 </div>
             </div>
 
-            <!-- الصف السفلي للأدوات الدائرية الأربعة -->
+            <!-- الصف السفلي للأدوات الأربعة -->
             <div class="cc-bottom-row">
                 <div class="bottom-tool-btn jelly-drag-target">
                     <svg class="icon-svg" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="14" r="2"/></svg>
@@ -390,92 +471,133 @@
                 </div>
             </div>
 
+            <div class="bottom-close-line" id="closeHandle"></div>
         </div>
     </div>
 
-    <!-- جافاسكريبت متطور لهندسة السحب والتمطيط اللحظي (Interactive Jelly Drag Engine) -->
+    <!-- هندسة السوائل والارتداد الدقيق (Ultra Fluid Spring & Blur Engine) -->
     <script>
-        // أولاً: تفعيل ميزة امتطاط الكبسولات الطولية والتحكم بها أثناء السحب الفعلي
+        const container = document.getElementById('phoneContainer');
+        const ccPanel = document.getElementById('ccPanel');
+        const dragZone = document.getElementById('dragZone');
+        const closeHandle = document.getElementById('closeHandle');
+
+        let isDraggingCC = false;
+        let startYCC = 0;
+
+        // سحب لوحة التحكم من أعلى اليمين للأسفل مع أنيميشن التمطيط والضبابية المتدرجة
+        dragZone.addEventListener('pointerdown', (e) => {
+            isDraggingCC = true;
+            startYCC = e.clientY;
+            ccPanel.style.transition = 'none';
+            dragZone.setPointerCapture(e.pointerId);
+        });
+
+        dragZone.addEventListener('pointermove', (e) => {
+            if (!isDraggingCC) return;
+            let currentMoveY = e.clientY - startYCC;
+            if (currentMoveY >= 0 && currentMoveY <= 852) {
+                let progress = currentMoveY / 852;
+                ccPanel.style.transform = `translateY(${-852 + currentMoveY}px)`;
+                container.style.backgroundBlendMode = 'overlay';
+                ccPanel.style.background = `rgba(0, 0, 0, ${progress * 0.4})`;
+                ccPanel.style.backdropFilter = `blur(${progress * 40}px)`;
+                ccPanel.style.webkitBackdropFilter = `blur(${progress * 40}px)`;
+            }
+        });
+
+        dragZone.addEventListener('pointerup', (e) => {
+            if (!isDraggingCC) return;
+            isDraggingCC = false;
+            let finalMoveY = e.clientY - startYCC;
+            if (finalMoveY > 120) {
+                container.classList.add('panel-open');
+                ccPanel.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.15)';
+                ccPanel.style.transform = 'translateY(0)';
+            } else {
+                closeCC();
+            }
+        });
+
+        closeHandle.addEventListener('click', () => { closeCC(); });
+
+        function closeCC() {
+            container.classList.remove('panel-open');
+            ccPanel.style.transition = 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)';
+            ccPanel.style.transform = 'translateY(-100%)';
+        }
+
+        // تصحيح معادلة ارتداد ومطاطية السلايدرات (الحل النهائي للمشكلة العكسية)
         document.querySelectorAll('.jelly-slider-capsule').forEach(slider => {
-            let startY = 0;
-            let startX = 0;
-            let isDragging = false;
+            let sY = 0, sX = 0, active = false;
 
             slider.addEventListener('pointerdown', (e) => {
-                isDragging = true;
-                startY = e.clientY;
-                startX = e.clientX;
+                active = true;
+                sY = e.clientY; sX = e.clientX;
                 slider.setPointerCapture(e.pointerId);
-                updateSliderFill(e, slider);
+                slider.style.transition = 'none';
+                updateFill(e, slider);
             });
 
             slider.addEventListener('pointermove', (e) => {
-                if (!isDragging) return;
-                updateSliderFill(e, slider);
+                if (!active) return;
+                updateFill(e, slider);
 
-                // حساب مسافة حركة الإصبع لحظياً لعمل تشويه ومطاطية حية (Live Distortion)
-                let deltaY = e.clientY - startY;
-                let deltaX = e.clientX - startX;
-                
-                // تمطيط العنصر باتجاه السحب الفعلي لإعطاء إحساس الجلي السائل
-                let scaleY = 1 + Math.abs(deltaY) * 0.0012;
-                let scaleX = 1 - Math.abs(deltaX) * 0.0008;
-                let skew = deltaX * 0.04; // ميلان خفيف مع السحب الجانبي للراحة النفسية
+                let dY = e.clientY - sY;
+                let dX = e.clientX - sX;
 
-                slider.style.transform = `scale(${scaleX}, ${scaleY}) skewX(${skew}deg)`;
+                // مطاطية مطابقة لاتجاه حركة الإصبع تماماً بدون انعكاس
+                let scaleY = 1 + Math.min(Math.abs(dY) * 0.0008, 0.08);
+                let scaleX = 1 - Math.min(Math.abs(dX) * 0.0006, 0.05);
+                slider.style.transform = `scale(${scaleX}, ${scaleY})`;
             });
 
             slider.addEventListener('pointerup', () => {
-                isDragging = false;
-                // ارتداد مرن رائع كأنها قطعة جلي تفلتها وترجع لمكانها المستقر
-                slider.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.42, 1.45)';
-                slider.style.transform = 'scale(1, 1) skewX(0deg)';
-                setTimeout(() => { slider.style.transition = ''; }, 500);
+                active = false;
+                // ارتداد هادئ وانسيابي (Fluid Spring Back) يمنع الهزة القاسية والتوقف المفاجئ
+                slider.style.transition = 'transform 0.6s cubic-bezier(0.25, 1.25, 0.4, 1)';
+                slider.style.transform = 'scale(1, 1)';
             });
         });
 
-        function updateSliderFill(e, slider) {
+        function updateFill(e, slider) {
             const fill = slider.querySelector('.slider-fill');
             const rect = slider.getBoundingClientRect();
-            let yPos = e.clientY - rect.top;
-            let percent = 100 - (yPos / rect.height * 100);
-            percent = Math.max(0, Math.min(100, percent));
-            fill.style.height = percent + '%';
+            let p = 100 - ((e.clientY - rect.top) / rect.height * 100);
+            fill.style.height = Math.max(0, Math.min(100, p)) + '%';
         }
 
-        // ثانياً: هندسة التمطيط والسحب لجميع الكروت والأزرار الدائرية الأخرى (Jelly Drag Target)
-        document.querySelectorAll('.jelly-drag-target').forEach(element => {
-            let anchorY = 0;
-            let anchorX = 0;
-            let activeDrag = false;
+        // هندسة السحب والضبابية المنعزلة لجميع الكروت والأزرار (Jelly Drag Target)
+        document.querySelectorAll('.jelly-drag-target').forEach(el => {
+            let aY = 0, aX = 0, drag = false;
 
-            element.addEventListener('pointerdown', (e) => {
-                activeDrag = true;
-                anchorY = e.clientY;
-                anchorX = e.clientX;
-                element.setPointerCapture(e.pointerId);
-                element.style.transition = 'none';
+            el.addEventListener('pointerdown', (e) => {
+                drag = true;
+                aY = e.clientY; aX = e.clientX;
+                el.setPointerCapture(e.pointerId);
+                el.style.transition = 'none';
+                el.style.zIndex = '50'; // رفع الطبقة فوق الكل عند السحب لتبين الضبابية الخاصة بها
             });
 
-            element.addEventListener('pointermove', (e) => {
-                if (!activeDrag) return;
-                let currentDeltaY = e.clientY - anchorY;
-                let currentDeltaX = e.clientX - anchorX;
+            el.addEventListener('pointermove', (e) => {
+                if (!drag) return;
+                let dY = e.clientY - aY;
+                let dX = e.clientX - aX;
 
-                // معادلة فيزيائية ناعمة جداً لامتطاط الكرت أو الزر بالكامل مع حركة إصبعك
-                let dynamicScaleX = 1 + (currentDeltaX * 0.001);
-                let dynamicScaleY = 1 + (currentDeltaY * 0.001);
-                let moveX = currentDeltaX * 0.2; // إزاحة موضعية خفيفة تتبع إصبعك
-                let moveY = currentDeltaY * 0.2;
+                let sX = 1 + (dX * 0.0008);
+                let sY = 1 + (dY * 0.0008);
+                let mX = dX * 0.25;
+                let mY = dY * 0.25;
 
-                element.style.transform = `translate(${moveX}px, ${moveY}px) scale(${dynamicScaleX}, ${dynamicScaleY})`;
+                el.style.transform = `translate(${mX}px, ${mY}px) scale(${sX}, ${sY})`;
             });
 
-            element.addEventListener('pointerup', () => {
-                activeDrag = false;
-                // تأثير الارتداد العكسي الفخم المتطابق مع حركة واجهات آبل السيالة
-                element.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.42, 1.35)';
-                element.style.transform = 'translate(0px, 0px) scale(1, 1)';
+            el.addEventListener('pointerup', () => {
+                drag = false;
+                // ارتداد ناعم وسلس للغاية يحاكي حركة السوائل الحقيقية للراحة النفسية
+                el.style.transition = 'transform 0.65s cubic-bezier(0.23, 1.35, 0.45, 1)';
+                el.style.transform = 'translate(0px, 0px) scale(1, 1)';
+                setTimeout(() => { el.style.zIndex = '20'; }, 650);
             });
         });
     </script>
