@@ -2,20 +2,21 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>واجهة تحكم مستقبلي احترافي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مركز التحكم الخارق - جلي ومطاط</title>
     <style>
-        /* تصنيفات عامة لتصفير المسافات */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             user-select: none;
             -webkit-user-select: none;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: #0b0f19;
+            background-color: #05070c;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             justify-content: center;
@@ -25,23 +26,21 @@
             color: #ffffff;
         }
 
-        /* هيكل التلفون الخارجي الذكي */
+        /* حاوية الهاتف الذكي */
         .phone-container {
             position: relative;
             width: 393px;
-            height: 852px; /* أبعاد الآيفون القياسية */
-            background: url('1000023143.png') no-repeat center/cover; /* أو خلفية ناعمة إذا لم تتوفر الصورة */
-            background-color: #1a233a;
+            height: 852px;
+            background: linear-gradient(180deg, #1a2a6c, #b21f1f, #fdbb2d);
             border: 12px solid #2d3139;
             border-radius: 55px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
-        /* الكاميرا الأمامية الجزيرة التفاعلية (Dynamic Island) */
+        /* الجزيرة التفاعلية */
         .dynamic-island {
             position: absolute;
             top: 15px;
@@ -51,39 +50,35 @@
             height: 30px;
             background-color: #000000;
             border-radius: 20px;
-            z-index: 100;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 200;
+            pointer-events: none;
         }
 
         /* الشاشة الرئيسية والتطبيقات */
         .screen-content {
             width: 100%;
             height: 100%;
-            padding: 60px 20px 40px 20px;
+            padding: 70px 25px 40px 25px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             grid-auto-rows: max-content;
-            gap: 25px 20px;
-            transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1), filter 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+            gap: 30px 20px;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.1), filter 0.5s ease;
+            will-change: transform, filter;
         }
 
-        /* حالة الابتعاد والضبابية عند فتح مركز التحكم */
-        .phone-container.control-active .screen-content {
-            transform: scale(0.92);
-            filter: blur(20px);
+        /* تأثير الابتعاد والضبابية للشاشة الخلفية */
+        .phone-container.panel-active .screen-content {
+            transform: scale(0.93);
+            filter: blur(25px) brightness(0.7);
         }
 
-        /* تصميم أيقونات التطبيقات يدوياً بالـ CSS */
+        /* تصميم أيقونات التطبيقات بالـ CSS النظيف */
         .app-icon-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
             cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-
-        .app-icon-wrapper:active {
-            transform: scale(0.88);
         }
 
         .app-icon {
@@ -95,155 +90,383 @@
             align-items: center;
             position: relative;
             box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* رسم أيقونة الهاتف بـ CSS */
-        .icon-phone {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        .app-icon-wrapper:active .app-icon {
+            transform: scale(0.85);
         }
+
+        .icon-phone { background: linear-gradient(135deg, #2ecc71, #27ae60); }
         .icon-phone::before {
-            content: '';
-            width: 26px;
-            height: 26px;
-            border: 4px solid white;
-            border-radius: 50px 50px 0 0;
-            transform: rotate(-45deg);
-            display: block;
-            position: absolute;
-            border-bottom: none;
-            border-left: none;
+            content: ''; width: 22px; height: 12px; border: 4px solid white;
+            border-radius: 6px 6px 0 0; transform: rotate(-45deg); position: absolute; border-bottom: none;
         }
 
-        /* رسم أيقونة الرسائل بـ CSS */
-        .icon-messages {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-        }
+        .icon-messages { background: linear-gradient(135deg, #3498db, #2980b9); }
         .icon-messages::before {
-            content: '';
-            width: 28px;
-            height: 20px;
-            border: 3px solid white;
-            border-radius: 6px;
-            position: absolute;
-        }
-        .icon-messages::after {
-            content: '';
-            position: absolute;
-            bottom: 16px;
-            left: 22px;
-            width: 0;
-            height: 0;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-top: 8px solid white;
-            transform: rotate(45deg);
+            content: ''; width: 24px; height: 16px; border: 3px solid white; border-radius: 5px; position: absolute;
         }
 
-        /* رسم أيقونة الإعدادات بـ CSS (الترس) */
-        .icon-settings {
-            background: linear-gradient(135deg, #7f8c8d, #95a5a6);
-        }
+        .icon-settings { background: linear-gradient(135deg, #7f8c8d, #95a5a6); }
         .icon-settings::before {
-            content: '';
-            width: 24px;
-            height: 24px;
-            border: 5px dashed white;
-            border-radius: 50%;
-            position: absolute;
-            animation: rotateSettings 10s linear infinite;
-        }
-        .icon-settings::after {
-            content: '';
-            width: 10px;
-            height: 10px;
-            background-color: #7f8c8d;
-            border-radius: 50%;
-            position: absolute;
-            border: 3px solid white;
-        }
-
-        @keyframes rotateSettings {
-            100% { transform: rotate(360deg); }
+            content: ''; width: 22px; height: 22px; border: 4px dashed white; border-radius: 50%; position: absolute;
         }
 
         .app-label {
-            font-size: 11px;
-            margin-top: 6px;
-            text-align: center;
-            font-weight: 500;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            font-size: 11px; margin-top: 6px; text-align: center; font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
         }
 
-        /* منطقة السحب العلوية غير المرئية لتنزيل مركز التحكم */
-        .drag-zone-top {
+        /* ==================== مركز التحكم الفخم (العنصر العملاق) ==================== */
+        .control-center-panel {
             position: absolute;
-            top: 0;
+            top: -100%; /* مخفي فوق الشاشة */
             left: 0;
             width: 100%;
-            height: 50px;
-            z-index: 110;
-            cursor: translateY-resize;
+            height: 100%;
+            background-color: rgba(10, 15, 26, 0.65);
+            backdrop-filter: blur(0px); /* يتغير برمجياً مع السحب */
+            -webkit-backdrop-filter: blur(0px);
+            z-index: 150;
+            padding: 80px 24px 40px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            pointer-events: none;
+            /* تأثير المطاط والجلي الأساسي عبر cubic-bezier مخصص للارتداد */
+            transition: top 0.5s cubic-bezier(0.175, 0.885, 0.42, 1.35), backdrop-filter 0.5s ease;
+            will-change: top, transform;
         }
 
-        .drag-indicator {
-            width: 40px;
-            height: 5px;
-            background-color: rgba(255, 255, 255, 0.4);
-            border-radius: 10px;
+        /* عند التفعيل */
+        .phone-container.panel-active .control-center-panel {
+            top: 0;
+            pointer-events: auto;
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+        }
+
+        /* تأثير المطاط الحركي الإضافي (Jelly Animation) للأزرار عند النزول */
+        @keyframes jelly-bounce {
+            0% { transform: scale(0.9, 1.1) translateY(-20px); }
+            50% { transform: scale(1.05, 0.95) translateY(5px); }
+            75% { transform: scale(0.98, 1.02) translateY(-2px); }
+            100% { transform: scale(1, 1) translateY(0); }
+        }
+
+        .phone-container.panel-active .cc-grid-2x2,
+        .phone-container.panel-active .cc-sliders-row,
+        .phone-container.panel-active .cc-bottom-row {
+            animation: jelly-bounce 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+        }
+
+        /* شبكة العناصر العلوية (الموسيقى والاتصالات) */
+        .cc-grid-2x2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* الحاويات الكبيرة المقسمة */
+        .cc-card {
+            background: rgba(255, 255, 255, 0.11);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
+            padding: 16px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 12px;
+            justify-items: center;
+            align-items: center;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.5);
+        }
+
+        /* تأثير مطاطي عند لمس الكروت الكبيرة */
+        .cc-card:active {
+            transform: scale(0.94) skewX(1deg);
+        }
+
+        /* أزرار مركز التحكم الدائرية المتفاعلة */
+        .cc-btn {
+            width: 48px;
+            height: 48px;
+            background-color: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.5);
+        }
+
+        .cc-btn:active {
+            transform: scale(0.8);
+        }
+
+        /* حالات التفعيل للأزرار مع ألوان نيون فخمة */
+        .cc-btn.active.wifi { background-color: #007aff; box-shadow: 0 0 15px #007aff; }
+        .cc-btn.active.bluetooth { background-color: #5856d6; box-shadow: 0 0 15px #5856d6; }
+        .cc-btn.active.airplane { background-color: #ff9500; box-shadow: 0 0 15px #ff9500; }
+        .cc-btn.active.cellular { background-color: #34c759; box-shadow: 0 0 15px #34c759; }
+
+        /* رسم الأيقونات داخل مركز التحكم بـ CSS نقي */
+        .icon-wifi::before {
+            content: ''; width: 18px; height: 18px; border: 3px solid white;
+            border-radius: 50%; position: absolute; border-bottom: transparent; border-left: transparent;
+            transform: rotate(-45deg); top: 16px;
+        }
+        .icon-bluetooth::before {
+            content: ''; width: 2px; height: 20px; background-color: white; position: absolute;
+        }
+        .icon-bluetooth::after {
+            content: ''; width: 8px; height: 10px; border: 2px solid white; border-left: none;
+            position: absolute; transform: rotate(45deg); top: 14px;
+        }
+        .icon-airplane::before {
+            content: ''; width: 14px; height: 4px; background-color: white; position: absolute; border-radius: 2px;
+        }
+        .icon-airplane::after {
+            content: ''; width: 4px; height: 16px; background-color: white; position: absolute; border-radius: 2px;
+        }
+
+        /* كارت الموسيقى */
+        .cc-music-card {
+            background: rgba(255, 255, 255, 0.11);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .music-text { font-size: 13px; color: rgba(255,255,255,0.6); font-weight: 500; }
+        .music-controls { display: flex; gap: 20px; }
+        .play-btn {
+            width: 0; height: 0; border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent; border-left: 14px solid white; margin-left: 4px;
+        }
+
+        /* قواطع الصوت والسطوع الطولية المتطابقة مع الصورة */
+        .cc-sliders-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            height: 150px;
+        }
+
+        .cc-slider-container {
+            position: relative;
+            background: rgba(255, 255, 255, 0.11);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 16px;
+            cursor: ns-resize;
+            transition: transform 0.2s ease;
+        }
+
+        .cc-slider-fill {
             position: absolute;
-            top: 42px;
-            left: 50%;
-            transform: translateX(-50%);
+            bottom: 0; left: 0; width: 100%; height: 70px; /* نسبة الملء الابتدائية */
+            background-color: #ffffff;
+            border-radius: 0 0 24px 24px;
+            transition: height 0.1s ease;
             pointer-events: none;
+        }
+
+        .cc-slider-container:active {
+            transform: scale(0.97);
+        }
+
+        .slider-icon {
+            z-index: 2; width: 24px; height: 24px; position: relative; pointer-events: none;
+            mix-blend-mode: difference;
+        }
+        /* رسم أيقونة الشمس للصوت/السطوع */
+        .icon-sun::before {
+            content: ''; width: 14px; height: 14px; background-color: white;
+            border-radius: 50%; position: absolute; top: 5px; left: 5px; box-shadow: 0 0 8px white;
+        }
+
+        /* صف الأزرار السفلي (الكشاف، الكاميرا...) قابلية تحرك تفاعلية */
+        .cc-bottom-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .cc-bottom-btn {
+            background: rgba(255, 255, 255, 0.11);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            height: 65px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.6), background-color 0.3s;
+        }
+
+        .cc-bottom-btn:active {
+            transform: scale(0.82) rotate(-3deg); /* تأثير جلي مائل خفيف عند الضغط المطول */
+        }
+        .cc-bottom-btn.active {
+            background-color: #ffffff;
+        }
+        .cc-bottom-btn.active .btn-mesh {
+            background-color: #000000;
+        }
+
+        /* رسم أيقونة الفلاش (الكشاف) */
+        .icon-torch {
+            width: 10px; height: 18px; background-color: white; transform: skewX(-15deg); position: relative;
+        }
+        .cc-bottom-btn.active .icon-torch { background-color: #000000; }
+
+        /* منطقة السحب الحقيقية الفخمة بالإصبع */
+        .drag-handle-trigger {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 40px;
+            z-index: 300; cursor: ns-resize;
+        }
+        .close-handle-trigger {
+            width: 60px; height: 5px; background-color: rgba(255,255,255,0.3);
+            border-radius: 10px; position: absolute; bottom: 15px; left: 50%;
+            transform: translateX(-50%); cursor: ns-resize;
         }
     </style>
 </head>
 <body>
 
-    <!-- حاوية التلفون -->
-    <div class="phone-container" id="phoneContainer">
+    <div class="phone-container" id="mainPhone">
         
-        <!-- الجزيرة التفاعلية -->
         <div class="dynamic-island"></div>
         
-        <!-- منطقة السحب لمركز التحكم -->
-        <div class="drag-zone-top" id="dragZone">
-            <div class="drag-indicator"></div>
-        </div>
+        <div class="drag-handle-trigger" id="topDragZone"></div>
 
-        <!-- الشاشة الرئيسية والتطبيقات -->
         <div class="screen-content">
-            
-            <!-- تطبيق الهاتف -->
             <div class="app-icon-wrapper">
                 <div class="app-icon icon-phone"></div>
                 <div class="app-label">الهاتف</div>
             </div>
-
-            <!-- تطبيق الرسائل -->
             <div class="app-icon-wrapper">
                 <div class="app-icon icon-messages"></div>
                 <div class="app-label">الرسائل</div>
             </div>
-
-            <!-- تطبيق الإعدادات -->
             <div class="app-icon-wrapper">
                 <div class="app-icon icon-settings"></div>
                 <div class="app-label">الإعدادات</div>
             </div>
+        </div>
 
+        <div class="control-center-panel" id="controlPanel">
+            
+            <div class="cc-grid-2x2">
+                <div class="cc-card">
+                    <div class="cc-btn active wifi" onclick="toggleBtn(this)"><div class="icon-wifi"></div></div>
+                    <div class="cc-btn active bluetooth" onclick="toggleBtn(this)"><div class="icon-bluetooth"></div></div>
+                    <div class="cc-btn airplane" onclick="toggleBtn(this)"><div class="icon-airplane"></div></div>
+                    <div class="cc-btn active cellular" onclick="toggleBtn(this)"><div class="icon-cellular"></div></div>
+                </div>
+
+                <div class="cc-music-card">
+                    <div class="music-text">متوقف</div>
+                    <div class="music-controls">
+                        <div class="play-btn"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cc-sliders-row">
+                <div class="cc-slider-container" onpointerdown="initSlider(event, this)">
+                    <div class="cc-slider-fill" style="height: 75%;"></div>
+                    <div class="slider-icon icon-sun"></div>
+                </div>
+                <div class="cc-slider-container" onpointerdown="initSlider(event, this)">
+                    <div class="cc-slider-fill" style="height: 50%;"></div>
+                    <div class="slider-icon icon-sun" style="transform: scale(0.9);"></div>
+                </div>
+            </div>
+
+            <div class="cc-bottom-row">
+                <div class="cc-bottom-btn" onclick="this.classList.toggle('active')">
+                    <div class="icon-torch id-mesh"></div>
+                </div>
+                <div class="cc-bottom-btn">
+                    <div style="width:16px; height:16px; border:3px solid white; border-radius:50%;"></div>
+                </div>
+                <div class="cc-bottom-btn">
+                    <div style="width:18px; height:12px; border:2px solid white; border-radius:4px;"></div>
+                </div>
+                <div class="cc-bottom-btn">
+                    <div style="width:14px; height:14px; background-color:white; border-radius:3px;"></div>
+                </div>
+            </div>
+
+            <div class="close-handle-trigger" id="bottomCloseZone"></div>
         </div>
 
     </div>
 
     <script>
-        // اختبار أولي للأنيميشن بالضغط على منطقة السحب
-        const container = document.getElementById('phoneContainer');
-        const dragZone = document.getElementById('dragZone');
+        const phone = document.getElementById('mainPhone');
+        const panel = document.getElementById('controlPanel');
+        const topDrag = document.getElementById('topDragZone');
+        const bottomClose = document.getElementById('bottomCloseZone');
 
-        dragZone.addEventListener('click', () => {
-            container.classList.toggle('control-active');
+        // أحداث تفعيل وغلق مركز التحكم بتأثير الارتداد الجلي والمطاط السريع
+        topDrag.addEventListener('pointerdown', () => {
+            phone.classList.add('panel-active');
         });
+
+        bottomClose.addEventListener('pointerdown', () => {
+            phone.classList.remove('panel-active');
+        });
+
+        // تشغيل وإطفاء أزرار الاتصالات
+        function toggleBtn(btn) {
+            btn.classList.toggle('active');
+            // تأثير ارتداد مطاطي صغير خاص بالزر عند الضغط والتفعيل
+            btn.style.transform = 'scale(1.2)';
+            setTimeout(() => { btn.style.transform = ''; }, 200);
+        }
+
+        // تشغيل سلايدرات الصوت والسطوع الطولية الذكية بسحب الإصبع الحقيقي
+        function initSlider(e, container) {
+            const fill = container.querySelector('.cc-slider-fill');
+            const rect = container.getBoundingClientRect();
+            
+            function updateSlider(clientY) {
+                let offsetY = clientY - rect.top;
+                let percentage = 100 - (offsetY / rect.height * 100);
+                percentage = Math.max(0, Math.min(100, percentage));
+                fill.style.height = percentage + '%';
+            }
+
+            updateSlider(e.clientY);
+            container.setPointerCapture(e.pointerId);
+
+            container.onpointermove = function(ev) {
+                updateSlider(ev.clientY);
+            };
+
+            container.onpointerup = function() {
+                container.onpointermove = null;
+                container.onpointerup = null;
+                // تأثير مطاطي (ارتداد خفيف) عند ترك الإصبع من السلايدر
+                container.style.transform = 'scale(1.04)';
+                setTimeout(() => { container.style.transform = ''; }, 150);
+            };
+        }
     </script>
 </body>
 </html>
