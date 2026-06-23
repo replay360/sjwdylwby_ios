@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>iOS 26 Liquid Settings Profile - Pro Engine</title>
+    <title>iOS 26 Ultimate Liquid Settings</title>
     <style>
         :root {
             --ios-bg: #000000;
-            --card-glass: rgba(22, 22, 23, 0.65);
-            --card-border: rgba(255, 255, 255, 0.08);
+            --card-glass: rgba(22, 22, 23, 0.6);
+            --card-border: rgba(255, 255, 255, 0.07);
             --text-main: rgba(255, 255, 255, 0.95);
-            --text-muted: rgba(255, 255, 255, 0.5);
+            --text-muted: rgba(255, 255, 255, 0.55);
             --ios-blue: #0a84ff;
             --ios-radius: 14px;
         }
@@ -22,12 +22,11 @@
             user-select: none;
             -webkit-user-select: none;
             touch-action: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: #08080a;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+            background-color: #0a0a0c;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -36,7 +35,7 @@
             overflow: hidden;
         }
 
-        /* حاوية الآيفون الفخمة */
+        /* حاوية الآيفون */
         .phone-shell {
             position: relative;
             width: 393px;
@@ -44,14 +43,32 @@
             background: var(--ios-bg);
             border: 11px solid #1c1c1e;
             border-radius: 54px;
-            box-shadow: 0 50px 100px rgba(0,0,0,0.8);
+            box-shadow: 0 50px 120px rgba(0,0,0,0.9);
             overflow: hidden;
             display: flex;
             flex-direction: column;
         }
 
-        /* البار العلوي وكاميرا الجزيرة */
+        /* البار العلوي الثابت مع الضبابية المتدرجة الذكية */
+        .blur-header-wrapper {
+            position: absolute;
+            top: 0; left: 0; width: 100%;
+            height: 100px;
+            z-index: 100;
+            pointer-events: none; /* يسمح بمرور اللمس للخلفية */
+        }
+        .blur-gradient-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.85) 40%, rgba(0,0,0,0) 100%);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            /* تأثير التدرج في الضبابية لمنع الحواف الحادة */
+            -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+            mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+        }
+
         .status-bar {
+            position: relative;
             height: 44px;
             padding: 0 32px;
             display: flex;
@@ -59,76 +76,59 @@
             align-items: center;
             font-size: 13px;
             font-weight: 600;
-            z-index: 100;
-            background: transparent;
+            z-index: 102;
+            color: #fff;
         }
         .dynamic-island {
             position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
-            width: 110px; height: 30px; background: #000; border-radius: 20px; z-index: 101;
+            width: 110px; height: 30px; background: #000; border-radius: 20px; z-index: 103;
         }
 
-        /* حاوية التمرير الرئيسية السلسة */
+        /* حاوية التمرير الرئيسية */
         .scrollable-content {
             flex: 1;
             overflow-y: auto;
-            padding: 16px 16px 100px 16px;
+            padding: 70px 16px 120px 16px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 18px;
             scrollbar-width: none;
+            transition: filter 0.4s ease, transform 0.4s ease;
         }
         .scrollable-content::-webkit-scrollbar { display: none; }
+        
+        /* تأثير تغويش الخلفية عند فتح الخيارات */
+        .scrollable-content.dimmed {
+            filter: blur(15px) brightness(0.4);
+            transform: scale(0.96);
+            pointer-events: none;
+        }
 
-        /* ترويسة الملف الشخصي حسب الصورة */
+        /* ترويسة الحساب */
         .profile-header {
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
             margin-top: 10px;
-            position: relative;
         }
-
         .header-actions {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            padding: 0 8px;
-            margin-bottom: 10px;
+            width: 100%; display: flex; justify-content: space-between;
+            padding: 0 8px; margin-bottom: 12px;
         }
-        .btn-text { color: var(--ios-blue); font-size: 16px; cursor: pointer; font-weight: 500; }
-        .btn-icon-grid { width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2; cursor: pointer; }
+        .btn-text { color: var(--ios-blue); font-size: 16px; cursor: pointer; }
+        .avatar-container { width: 92px; height: 92px; margin-bottom: 12px; }
+        .avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 1.5px solid rgba(255,255,255,0.15); }
+        .profile-name { font-size: 22px; font-weight: 700; color: var(--text-main); }
+        .profile-meta { font-size: 13px; color: var(--text-muted); margin-top: 5px; direction: ltr; }
 
-        .avatar-container {
-            position: relative;
-            width: 100px;
-            height: 100px;
-            margin-bottom: 14px;
-        }
-        .avatar-img {
-            width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
-            border: 2px solid rgba(255,255,255,0.1);
-        }
-
-        .profile-name { font-size: 22px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; }
-        .profile-meta { font-size: 13px; color: var(--text-muted); margin-top: 6px; font-weight: 500; direction: ltr; }
-
-        /* أزرار الإجراءات السريعة تحت الهيدر */
         .action-link-row {
-            width: 100%;
-            background: var(--card-glass);
-            border: 1px solid var(--card-border);
-            border-radius: var(--ios-radius);
-            padding: 14px;
-            text-align: center;
-            color: var(--ios-blue);
-            font-weight: 600;
-            font-size: 15px;
-            cursor: pointer;
-            margin-top: 16px;
+            background: var(--card-glass); border: 1px solid var(--card-border);
+            border-radius: var(--ios-radius); padding: 14px; text-align: center;
+            color: var(--ios-blue); font-weight: 600; font-size: 15px; cursor: pointer;
         }
 
-        /* ================= محرك الخيارات المطاطية الهلامية ================= */
+        /* مجموعات الإعدادات بنظام الكرت المطاطي */
         .settings-group {
             background: var(--card-glass);
             border: 1px solid var(--card-border);
@@ -136,10 +136,9 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            perspective: 1000px;
+            will-change: transform;
         }
 
-        /* الخيار الفردي المشوه حركياً */
         .settings-row {
             position: relative;
             padding: 14px 16px;
@@ -148,76 +147,93 @@
             justify-content: space-between;
             cursor: pointer;
             will-change: transform;
-            transform-origin: center center;
+            transform-style: preserve-3d;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            transition: background 0.2s;
         }
         .settings-row:last-child { border-bottom: none; }
 
         .row-left { display: flex; align-items: center; gap: 14px; pointer-events: none; }
         .icon-box {
-            width: 28px; height: 28px; border-radius: 7px;
+            width: 30px; height: 30px; border-radius: 8px;
             display: flex; justify-content: center; align-items: center;
         }
+        .icon-box svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2.2; }
         .row-label { font-size: 15px; font-weight: 500; color: var(--text-main); }
         
         .row-right { display: flex; align-items: center; gap: 8px; color: var(--text-muted); pointer-events: none; }
         .row-badge { background: #0a84ff; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; }
-        .arrow-icon { width: 16px; height: 16px; fill: none; stroke: var(--text-muted); stroke-width: 2.5; }
+        .arrow-icon { width: 16px; height: 16px; fill: none; stroke: var(--text-muted); stroke-width: 2.5; transform: rotate(180deg); }
 
-        /* ================= القوائم الداخلية المتداخلة (Sub-menus) ================= */
-        .sub-menu-layer {
-            position: absolute; top: 44px; left: 0; width: 100%; height: calc(100% - 44px);
-            background: #000; padding: 20px 16px;
-            display: flex; flex-direction: column; gap: 16px;
-            transform: translateX(100%);
-            transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-            z-index: 50;
+        /* ================= نافذة التوسع الهلامي الاحترافي (Liquid Expand Overlay) ================= */
+        .liquid-overlay {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 40px; height: 40px;
+            background: #1c1c1e;
+            border-radius: 30px;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 150;
+            transform: translate(-50%, -50%) scale(1);
+            transition: none;
+            display: flex;
+            flex-direction: column;
+            padding: 44px 20px 20px 20px;
         }
-        .sub-menu-layer.active { transform: translateX(0); }
-        .sub-menu-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; cursor: pointer; color: var(--ios-blue); font-weight: 500; }
+        
+        /* أنيميشن التمدد المتشوه الفاخر */
+        .liquid-overlay.expanding {
+            opacity: 1;
+            top: 0 !important; left: 0 !important;
+            width: 100% !important; height: 100% !important;
+            border-radius: 43px !important;
+            transform: translate(0, 0) scale(1) !important;
+            pointer-events: auto;
+            transition: top 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                        left 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                        width 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                        height 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                        border-radius 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                        opacity 0.2s ease;
+        }
 
-        /* ================= قائمة التنقل الزجاجية السائلة (Liquid Glass TabBar) ================= */
+        .overlay-close {
+            color: var(--ios-blue); font-size: 16px; font-weight: 500; cursor: pointer;
+            display: flex; align-items: center; gap: 4px; margin-bottom: 24px;
+            opacity: 0; transform: translateX(10px);
+        }
+        .liquid-overlay.expanding .overlay-close {
+            opacity: 1; transform: translateX(0); transition: all 0.3s 0.2s ease;
+        }
+
+        /* ================= التاب بار السفلي الزجاجي السائل ================= */
         .liquid-tabbar {
             position: absolute; bottom: 0; left: 0; width: 100%; height: 85px;
-            background: rgba(15, 15, 17, 0.4);
+            background: rgba(10, 10, 12, 0.35);
             backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
             display: grid; grid-template-columns: repeat(5, 1fr);
-            padding: 8px 10px 24px 10px; z-index: 90;
+            padding: 8px 10px 24px 10px; z-index: 110;
         }
-
-        /* تأثير اللمعان المتحرك للزجاج السائل */
-        .liquid-shine {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at var(--shine-x, 50%) var(--shine-y, 0%), rgba(255, 255, 255, 0.08) 0%, transparent 50%);
-            pointer-events: none;
-        }
-
-        .tab-item {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 4px; color: var(--text-muted); cursor: pointer; position: relative;
-        }
+        .tab-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--text-muted); }
         .tab-item.active { color: var(--ios-blue); }
         .tab-icon { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; }
         .tab-label { font-size: 10px; font-weight: 500; }
-
-        /* مؤشر الهوم الثابت للآيفون */
-        .home-indicator {
-            width: 140px; height: 5px; background: rgba(255,255,255,0.3); border-radius: 3px;
-            position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); z-index: 100;
-        }
+        .home-indicator { width: 140px; height: 5px; background: rgba(255,255,255,0.3); border-radius: 3px; position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); z-index: 111; }
     </style>
 </head>
 <body>
 
     <div class="phone-shell">
         <div class="dynamic-island"></div>
+        
+        <div class="blur-header-wrapper">
+            <div class="blur-gradient-layer"></div>
+        </div>
         <div class="status-bar">
-            <span>٢:٠١</span>
-            <span style="display:flex; align-items:center; gap:4px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M5 12.55a11 11 0 0 1 14.08 0"/></svg>
-                <span>٦٢٪</span>
-            </span>
+            <span>٢:١٠</span>
+            <span style="display:flex; align-items:center; gap:4px;">🛡️ ٤G+</span>
         </div>
 
         <div class="scrollable-content" id="mainScroll">
@@ -225,7 +241,7 @@
             <div class="profile-header">
                 <div class="header-actions">
                     <span class="btn-text">تحرير</span>
-                    <svg class="btn-icon-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                    <span class="btn-text" style="color:#fff; font-size:20px;">⋮</span>
                 </div>
                 <div class="avatar-container">
                     <img class="avatar-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop" alt="Avatar">
@@ -234,14 +250,12 @@
                 <p class="profile-meta">🛡️ +964 785 921 6909 • @ox_98</p>
             </div>
 
-            <div class="action-link-row elastic-row">
-                تغيير صورة الملف الشخصي
-            </div>
+            <div class="action-link-row elastic-row">تغيير صورة الملف الشخصي</div>
 
             <div class="settings-group">
                 <div class="settings-row elastic-row">
                     <div class="row-left">
-                        <div class="icon-box" style="background: #222;"><svg class="arrow-icon" style="stroke:#fff" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
+                        <div class="icon-box" style="background: #2c2c2e;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
                         <span class="row-label">Aiplex Official Account</span>
                     </div>
                     <div class="row-right">
@@ -251,7 +265,7 @@
                 </div>
                 <div class="settings-row elastic-row">
                     <div class="row-left">
-                        <div class="icon-box" style="background: rgba(10,132,255,0.15);"><svg class="arrow-icon" style="stroke:#0a84ff" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+                        <div class="icon-box" style="background: rgba(10,132,255,0.15);"><svg style="stroke:#0a84ff" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
                         <span class="row-label" style="color: #0a84ff;">إضافة حساب</span>
                     </div>
                     <div class="row-right"></div>
@@ -259,9 +273,9 @@
             </div>
 
             <div class="settings-group">
-                <div class="settings-row elastic-row" onclick="openSubMenu('personalMenu')">
+                <div class="settings-row elastic-row trigger-expand" data-title="ملفي الشخصي" data-color="#ff453a">
                     <div class="row-left">
-                        <div class="icon-box" style="background: #ff453a;"><svg class="arrow-icon" style="stroke:#fff" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+                        <div class="icon-box" style="background: #ff453a;"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
                         <span class="row-label">ملفي الشخصي</span>
                     </div>
                     <div class="row-right">
@@ -269,9 +283,9 @@
                     </div>
                 </div>
 
-                <div class="settings-row elastic-row" onclick="openSubMenu('messagesMenu')">
+                <div class="settings-row elastic-row trigger-expand" data-title="الرسائل المحفوظة" data-color="#34c759">
                     <div class="row-left">
-                        <div class="icon-box" style="background: #34c759;"><svg class="arrow-icon" style="stroke:#fff" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2z"/></svg></div>
+                        <div class="icon-box" style="background: #34c759;"><svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2z"/></svg></div>
                         <span class="row-label">الرسائل المحفوظة</span>
                     </div>
                     <div class="row-right">
@@ -279,9 +293,9 @@
                     </div>
                 </div>
 
-                <div class="settings-row elastic-row">
+                <div class="settings-row elastic-row trigger-expand" data-title="أحدث المكالمات" data-color="#30b0c7">
                     <div class="row-left">
-                        <div class="icon-box" style="background: #30b0c7;"><svg class="arrow-icon" style="stroke:#fff" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+                        <div class="icon-box" style="background: #30b0c7;"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
                         <span class="row-label">أحدث المكالمات</span>
                     </div>
                     <div class="row-right">
@@ -289,9 +303,9 @@
                     </div>
                 </div>
 
-                <div class="settings-row elastic-row">
+                <div class="settings-row elastic-row trigger-expand" data-title="الأجهزة المتصلة" data-color="#ff9500">
                     <div class="row-left">
-                        <div class="icon-box" style="background: #ff9500;"><svg class="arrow-icon" style="stroke:#fff" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+                        <div class="icon-box" style="background: #ff9500;"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/></svg></div>
                         <span class="row-label">الأجهزة</span>
                     </div>
                     <div class="row-right">
@@ -301,116 +315,133 @@
                 </div>
             </div>
 
+            <div class="settings-group">
+                <div class="settings-row elastic-row">
+                    <div class="row-left">
+                        <div class="icon-box" style="background: #af52de;"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                        <span class="row-label">الخصوصية والأمان</span>
+                    </div>
+                    <div class="row-right"><svg class="arrow-icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+                </div>
+                <div class="settings-row elastic-row">
+                    <div class="row-left">
+                        <div class="icon-box" style="background: #5ac8fa;"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+                        <span class="row-label">إعدادات المحادثات</span>
+                    </div>
+                    <div class="row-right"><svg class="arrow-icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+                </div>
+                <div class="settings-row elastic-row">
+                    <div class="row-left">
+                        <div class="icon-box" style="background: #ff2d55;"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg></div>
+                        <span class="row-label">الإشعارات والأصوات</span>
+                    </div>
+                    <div class="row-right"><svg class="arrow-icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+                </div>
+            </div>
+
         </div>
 
-        <div class="sub-menu-layer" id="personalMenu">
-            <div class="sub-menu-header" onclick="closeSubMenu('personalMenu')">
-                <svg class="arrow-icon" style="stroke:var(--ios-blue); transform: rotate(180deg);" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-                <span>رجوع</span>
+        <div class="liquid-overlay" id="liquidOverlay">
+            <div class="overlay-close" onclick="closeLiquidMenu()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ios-blue)" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+                <span>إعدادات النظام</span>
             </div>
-            <h3 style="margin-top:10px; margin-bottom:15px;">ملفي الشخصي</h3>
+            <h2 id="overlayTitle" style="font-size:26px; font-weight:700; margin-bottom:20px;">اسم الخيار</h2>
+            
             <div class="settings-group">
-                <div class="settings-row elastic-row"><span class="row-label">الاسم الأول</span><span class="row-right">ألياسري</span></div>
-                <div class="settings-row elastic-row"><span class="row-label">اسم المستخدم</span><span class="row-right">@ox_98</span></div>
-                <div class="settings-row elastic-row"><span class="row-label">نبذة تعيرفية</span><span class="row-right">iOS Dev</span></div>
-            </div>
-        </div>
-
-        <div class="sub-menu-layer" id="messagesMenu">
-            <div class="sub-menu-header" onclick="closeSubMenu('messagesMenu')">
-                <svg class="arrow-icon" style="stroke:var(--ios-blue); transform: rotate(180deg);" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-                <span>رجوع</span>
-            </div>
-            <h3 style="margin-top:10px; margin-bottom:15px;">الرسائل المحفوظة</h3>
-            <div class="settings-group">
-                <div class="settings-row elastic-row"><span class="row-label">الوسائط</span><span class="row-right">٢٤٥ ملف</span></div>
-                <div class="settings-row elastic-row"><span class="row-label">المستندات</span><span class="row-right">١٢ ملف</span></div>
-                <div class="settings-row elastic-row" onclick="alert('خيارات إضافية داخل المحفوظات!')">
-                    <span class="row-label" style="color:var(--ios-blue)">خيارات متقدمة للمحفوظات</span>
-                    <svg class="arrow-icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+                <div class="settings-row elastic-row">
+                    <span class="row-label">التحكم المتقدم المخصص</span>
+                    <span style="color:var(--ios-blue); font-size:14px;">مفعّل</span>
+                </div>
+                <div class="settings-row elastic-row">
+                    <span class="row-label">درجة مرونة التشوه الموضعي</span>
+                    <span style="color:var(--text-muted); font-size:14px;">٩٥٪</span>
                 </div>
             </div>
         </div>
 
-        <div class="liquid-tabbar" id="tabBar">
-            <div class="liquid-shine"></div>
+        <div class="liquid-tabbar">
             <div class="tab-item"><svg class="tab-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span class="tab-label">جهات الاتصال</span></div>
             <div class="tab-item"><svg class="tab-icon" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span class="tab-label">المكالمات</span></div>
-            <div class="tab-item"><svg class="tab-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="tab-label">المحادثات</span><span class="row-badge" style="position:absolute; top:2px; right:20px; padding:1px 5px; font-size:10px;">3</span></div>
+            <div class="tab-item"><svg class="tab-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="tab-label">المحادثات</span></div>
             <div class="tab-item active"><svg class="tab-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span class="tab-label">الإعدادات</span></div>
-            <div class="tab-item" onclick="alert('البحث الفخم متاح')"><svg class="tab-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span class="tab-label">بحث</span></div>
         </div>
-
         <div class="home-indicator"></div>
     </div>
 
     <script>
-        // 1. محرك تتبع حركة الإصبع لإنتاج انعكاسات الزجاج السائل (Liquid Glass Engine)
-        const tabBar = document.getElementById('tabBar');
-        tabBar.addEventListener('pointermove', (e) => {
-            const rect = tabBar.getBoundingClientRect();
-            const x = ((e.clientX - rect.left) / rect.width) * 100;
-            const y = ((e.clientY - rect.top) / rect.height) * 100;
-            tabBar.style.setProperty('--shine-x', `${x}%`);
-            tabBar.style.setProperty('--shine-y', `${y}%`);
-        });
-
-        // 2. محرك التمدد والتشوه الموضعي من نقطة اللمس (Local Point-Based Rubber Distortion Engine)
+        // محرك فيزيائي حقيقي للمطاط الموضعي (Pointer Local Distort Engine)
         document.querySelectorAll('.elastic-row').forEach(row => {
-            let isPressing = false;
+            let activePointer = null;
 
             row.addEventListener('pointerdown', (e) => {
-                isPressing = true;
+                activePointer = e.pointerId;
                 row.setPointerCapture(e.pointerId);
-
-                const rect = row.getBoundingClientRect();
-                // حساب نقطة الضغط بالنسبة المئوية داخل العنصر لإحداث التشوه الموضعي المباشر
-                const touchX = ((e.clientX - rect.left) / rect.width) * 100;
-                
                 row.style.transition = 'none';
-                // محاكاة سحب هلامي موضعي عميق (Matrix3D Scale and Skew localized)
-                row.style.transform = `scale(0.96) skewX(${(touchX - 50) * 0.1}deg) translateZ(0)`;
-                row.style.background = 'rgba(255, 255, 255, 0.12)';
+                updateElasticDeform(row, e);
             });
 
             row.addEventListener('pointermove', (e) => {
-                if (!isPressing) return;
-                const rect = row.getBoundingClientRect();
-                const currentTouchX = ((e.clientX - rect.left) / rect.width) * 100;
-                const currentTouchY = ((e.clientY - rect.top) / rect.height) * 100;
-
-                // إذا سحب صبعه يمنة ويسرة يتشوه الكارت ديناميكياً حسب موضع الإصبع بالتمام
-                let skewFactor = (currentTouchX - 50) * 0.15;
-                let liftFactor = Math.min(Math.max((currentTouchY - 50) * 0.1, -5), 5);
-
-                row.style.transform = `matrix3d(0.97, 0, 0, 0, ${skewFactor * 0.002}, 0.97, 0, 0, 0, ${liftFactor * 0.01}, 1, 0, 0, ${liftFactor}, 0, 1)`;
+                if (activePointer === null) return;
+                updateElasticDeform(row, e);
             });
 
             row.addEventListener('pointerup', () => {
-                isPressing = false;
-                // الإخماد الفيزيائي العالي التردد لإعادة الكارت لوضعه الطبيعي بدون اهتزازات بدائية الرخص
-                row.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s';
+                activePointer = null;
+                // إخماد مطاطي فوري فخم يرجع للموضع الأصلي بنعومة فائقة
+                row.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.42, 1.35), background 0.3s';
                 row.style.transform = 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)';
-                row.style.background = '';
-            });
-
-            row.addEventListener('pointercancel', () => {
-                isPressing = false;
-                row.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
-                row.style.transform = '';
-                row.style.background = '';
             });
         });
 
-        // 3. محرك النوافذ المتداخلة والأنيميشن التفاعلي الرصين لجعل التطبيق يبدو حقيقياً
-        function openSubMenu(id) {
-            const menu = document.getElementById(id);
-            menu.classList.add('active');
+        function updateElasticDeform(element, event) {
+            const rect = element.getBoundingClientRect();
+            // حساب الإحداثيات بالنسبة لمركز العنصر نفسه لخلق تمدد وتشوه موضعي من مكان صبعك
+            const x = event.clientX - rect.left - rect.width / 2;
+            const y = event.clientY - rect.top - rect.height / 2;
+            
+            const strengthX = (x / rect.width) * 22; 
+            const strengthY = (y / rect.height) * 8;
+
+            // تطبيق Matrix3D للتواء موضعي يعطي إحساس السائل المطاطي
+            element.style.transform = `matrix3d(0.97, 0, 0, 0, ${strengthX * 0.001}, 0.98, 0, 0, 0, 0, 1, 0, ${strengthX * 0.4}, ${strengthY * 0.3}, 0, 1)`;
         }
 
-        function closeSubMenu(id) {
-            const menu = document.getElementById(id);
-            menu.classList.remove('active');
+        // محرك الأنيميشن الهلامي لفتح الخيارات مع تغويش الخلفية تدريجياً
+        const overlay = document.getElementById('liquidOverlay');
+        const mainScroll = document.getElementById('mainScroll');
+
+        document.querySelectorAll('.trigger-expand').forEach(row => {
+            row.addEventListener('click', (e) => {
+                const rect = row.getBoundingClientRect();
+                const shellRect = document.querySelector('.phone-shell').getBoundingClientRect();
+                
+                // تحديد موضع البداية للأنيميشن السائل من مكان الضغطة بالضبط
+                const startTop = rect.top - shellRect.top + (rect.height / 2);
+                const startLeft = rect.left - shellRect.left + (rect.width / 2);
+
+                overlay.style.transition = 'none';
+                overlay.style.top = `${startTop}px`;
+                overlay.style.left = `${startLeft}px`;
+                overlay.style.width = '40px';
+                overlay.style.height = '40px';
+                overlay.style.borderRadius = '30px';
+                
+                // تفعيل تغويش وتظليم الخلفية تدريجياً
+                mainScroll.classList.add('dimmed');
+
+                requestAnimationFrame(() => {
+                    overlay.classList.add('expanding');
+                });
+            });
+        });
+
+        function closeLiquidMenu() {
+            overlay.classList.remove('expanding');
+            mainScroll.classList.remove('dimmed');
+            setTimeout(() => {
+                overlay.style.transition = 'none';
+            }, 450);
         }
     </script>
 </body>
