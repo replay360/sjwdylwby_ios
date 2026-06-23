@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>iOS 18 Ultimate Control Center - Heavy Elastic</title>
+    <title>iOS 18 Ultimate Control Center - Liquid & Heavy Rubber Physics</title>
     <style>
         :root {
-            --ios-blur: blur(40px);
-            --card-blur: blur(25px);
-            --card-bg: rgba(35, 35, 40, 0.45);
-            --card-border: rgba(255, 255, 255, 0.09);
+            --ios-blur: blur(45px);
+            --card-blur: blur(30px);
+            --card-bg: rgba(25, 25, 30, 0.45);
+            --card-border: rgba(255, 255, 255, 0.11);
             --ios-blue: #007aff;
             --ios-green: #34c759;
             --ios-orange: #ff9500;
-            --ios-grey: rgba(255, 255, 255, 0.12);
+            --ios-grey: rgba(255, 255, 255, 0.14);
+            --glass-glow: rgba(255, 255, 255, 0.15);
         }
 
         * {
@@ -27,7 +28,7 @@
         }
 
         body {
-            background-color: #050505;
+            background-color: #030303;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
             display: flex;
             justify-content: center;
@@ -37,7 +38,7 @@
             overflow: hidden;
         }
 
-        /* حاوية الهاتف الثابتة */
+        /* حاوية الهاتف الذكي الفخمة - أبعاد آيفون 15/16 برو ماكس */
         .phone-frame {
             position: relative;
             width: 393px;
@@ -45,8 +46,9 @@
             background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=393&auto=format&fit=crop') center/cover no-repeat;
             border: 12px solid #e3e3e3;
             border-radius: 55px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.9);
             overflow: hidden;
+            perspective: 1000px;
         }
 
         .dynamic-island {
@@ -72,33 +74,35 @@
             font-size: 12px;
             font-weight: 600;
             z-index: 1009;
+            letter-spacing: -0.2px;
         }
 
-        /* ================= الشاشة الرئيسية مع أيقونات التطبيقات الحقيقية ================= */
+        /* ================= الشاشة الرئيسية والأيقونات المصممة بدقة وبألوان متدرجة ================= */
         .home-screen {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            padding: 85px 24px 40px 24px;
+            padding: 90px 24px 40px 24px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             grid-auto-rows: max-content;
             gap: 22px;
             z-index: 10;
-            transition: transform 0.6s cubic-bezier(0.2, 1, 0.2, 1);
+            transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform;
         }
 
         .phone-frame.panel-open .home-screen {
-            transform: scale(0.94);
+            transform: scale(0.93) translateZ(-20px);
         }
 
         .app-icon {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
             cursor: pointer;
         }
 
@@ -106,19 +110,28 @@
             width: 60px;
             height: 60px;
             border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.35);
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
+            overflow: hidden;
         }
+        
+        /* لمعان خفيف على الأيقونات */
+        .app-box::before {
+            content: ''; position: absolute; top:0; left:0; width:100%; height:50%;
+            background: linear-gradient(rgba(255,255,255,0.15), transparent);
+        }
+
         .app-label {
             font-size: 11px;
             font-weight: 500;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
-            color: #ffffff;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.7);
+            color: rgba(255,255,255,0.92);
         }
 
-        /* منطقة سحب مركز التحكم من أعلى اليمين */
+        /* منطقة استشعار السحب العلوية اليمنى السلسة مخصصة لمركز التحكم */
         .drag-zone-top {
             position: absolute;
             top: 0;
@@ -129,7 +142,7 @@
             cursor: ns-resize;
         }
 
-        /* ================= لوحة مركز التحكم المتطورة وضبابية الخلفية الحية ================= */
+        /* ================= لوحة مركز التحكم بنظام الزجاج السائل والانكسار المتقدم ================= */
         .control-center-panel {
             position: absolute;
             top: 0;
@@ -159,7 +172,7 @@
             gap: 16px;
         }
 
-        /* ميزة الضبابية المنعزلة الفخمة لكل كارت لمنع الشفافية العادية عند التراكب */
+        /* الزجاج السائل المنعزل المطور مع طبقة عكس الضوء اللحظي الحقيقي الحواف */
         .cc-card {
             background: var(--card-bg);
             backdrop-filter: var(--card-blur);
@@ -167,20 +180,36 @@
             border: 1px solid var(--card-border);
             border-radius: 28px;
             height: 156px;
-            padding: 14px;
+            padding: 16px;
             position: relative;
             z-index: 20;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.1);
             will-change: transform, height;
-            transition: height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+            transform-origin: center center;
+            transition: height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* كارت الموسيقى المكدس القابل للتوسع */
+        /* طبقة تتبع الضوء المخصص للـ Liquid Glass Effect */
+        .cc-card::after, .jelly-slider-capsule::after, .circle-action-btn::after, .bottom-tool-btn::after {
+            content: '';
+            position: absolute;
+            top: var(--mouse-y, 0);
+            left: var(--mouse-x, 0);
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* كارت الموسيقى والوسائط المكدس الفاخر والقابل للتمدد */
         .music-card {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             cursor: pointer;
-            overflow: hidden;
         }
         .music-card.expanded {
             position: absolute;
@@ -190,11 +219,11 @@
             height: 240px;
             z-index: 99;
         }
-        .music-top { display: flex; justify-content: space-between; width: 100%; }
-        .music-status { text-align: center; font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 500; margin-top: 10px; }
-        .music-controls { display: flex; justify-content: center; align-items: center; gap: 24px; margin-bottom: 8px; }
+        .music-top { display: flex; justify-content: space-between; width: 100%; z-index: 2; }
+        .music-status { text-align: center; font-size: 13px; color: rgba(255,255,255,0.75); font-weight: 500; margin-top: 10px; z-index: 2; }
+        .music-controls { display: flex; justify-content: center; align-items: center; gap: 26px; margin-bottom: 4px; z-index: 2; }
 
-        /* كارت الاتصالات */
+        /* شبكة الاتصالات */
         .connectivity-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -210,16 +239,15 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            transition: background 0.3s, transform 0.2s;
+            z-index: 2;
+            will-change: transform;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
         .conn-btn.active-blue { background: var(--ios-blue); }
         .conn-btn.active-orange { background: var(--ios-orange); }
 
-        /* التفاعل البصري عند تفعيل أي خيار (نبضة مطاطية ناعمة) */
-        .conn-btn:active { transform: scale(0.9); }
-        
         .mini-conn-box {
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.07);
             border-radius: 14px;
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -244,7 +272,7 @@
             gap: 14px;
         }
 
-        /* السلايدرات مع طبقة ضبابية منعزلة ثقيلة */
+        /* كبسولة السلايدر الزجاجية السائلة المتفاعلة بالكامل مع التمطيط الثقيل */
         .jelly-slider-capsule {
             height: 156px;
             background: var(--card-bg);
@@ -258,7 +286,9 @@
             flex-direction: column;
             justify-content: flex-end;
             z-index: 20;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.35), inset 0 1px 1px rgba(255,255,255,0.1);
             will-change: transform;
+            transform-origin: center center;
         }
 
         .slider-fill {
@@ -266,6 +296,7 @@
             background: #ffffff;
             height: 50%;
             pointer-events: none;
+            will-change: height;
         }
 
         .slider-icon-box {
@@ -292,7 +323,9 @@
             justify-content: center;
             align-items: center;
             z-index: 20;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             will-change: transform;
+            transform-origin: center center;
             cursor: pointer;
         }
 
@@ -305,10 +338,12 @@
             border-radius: 27px;
             display: flex;
             align-items: center;
-            padding: 0 16px;
-            gap: 10px;
+            padding: 0 18px;
+            gap: 12px;
             z-index: 20;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             will-change: transform;
+            transform-origin: center center;
             cursor: pointer;
         }
 
@@ -325,7 +360,9 @@
             justify-content: center;
             align-items: center;
             z-index: 20;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             will-change: transform;
+            transform-origin: center center;
             cursor: pointer;
         }
 
@@ -334,14 +371,15 @@
             height: 22px;
             fill: none;
             stroke: #ffffff;
-            stroke-width: 2.2;
+            stroke-width: 2.3;
             stroke-linecap: round;
             stroke-linejoin: round;
+            z-index: 2;
         }
         .icon-filled { fill: #ffffff; }
 
         .bottom-close-line {
-            width: 46px; height: 5px; background-color: rgba(255, 255, 255, 0.4);
+            width: 48px; height: 5px; background-color: rgba(255, 255, 255, 0.45);
             border-radius: 10px; position: absolute; bottom: 12px; left: 50%;
             transform: translateX(-50%); cursor: pointer; z-index: 1001;
         }
@@ -362,10 +400,10 @@
         <div class="drag-zone-top" id="dragZone"></div>
 
         <div class="home-screen">
-            <div class="app-icon"><div class="app-box" style="background: linear-gradient(135deg, #007aff, #0051a8);"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="app-label">الرسائل</div></div>
-            <div class="app-icon"><div class="app-box" style="background: linear-gradient(135deg, #34c759, #119e2e);"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><div class="app-label">الهاتف</div></div>
-            <div class="app-icon"><div class="app-box" style="background: linear-gradient(135deg, #ff9500, #ff5e00);"><svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10zM2 12h20"/></svg></div><div class="app-label">سفاري</div></div>
-            <div class="app-icon"><div class="app-box" style="background: linear-gradient(135deg, #af52de, #7a1fa2);"><svg class="icon-svg" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div><div class="app-label">المطور</div></div>
+            <div class="app-icon"><div class="app-box" style="background: linear-gradient(135deg, #2f9fff, #0051d4);"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="app-label">الرسائل</div></div>
+            <div class="app-icon"><div class="app-box" style="background: linear-gradient(135deg, #3cf06e, #0fa82d);"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><div class="app-label">الهاتف</div></div>
+            <div class="app-icon"><div class="app-box" style="background: linear-gradient(135deg, #ffb300, #e65100);"><svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10zM2 12h20"/></svg></div><div class="app-label">سفاري</div></div>
+            <div class="app-icon"><div class="app-box" style="background: linear-gradient(135deg, #cc66ff, #6600cc);"><svg class="icon-svg" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div><div class="app-label">المطور</div></div>
         </div>
 
         <div class="control-center-panel" id="ccPanel">
@@ -374,7 +412,7 @@
                 <div class="cc-card music-card jelly-drag-target" id="musicFolder">
                     <div class="music-top">
                         <svg class="icon-svg" viewBox="0 0 24 24" style="width:18px; height:18px; stroke:#ff2d55;"><circle cx="12" cy="12" r="3"/><path d="M12 2a10 10 0 1 0 10 10"/></svg>
-                        <span style="font-size:10px; color:#ff2d55; font-weight:700;">LIVE</span>
+                        <span style="font-size:10px; color:#ff2d55; font-weight:800; letter-spacing: 0.5px;">LIVE</span>
                     </div>
                     <div class="music-status">مشغل الموسيقى</div>
                     <div class="music-controls">
@@ -385,9 +423,9 @@
                 </div>
 
                 <div class="cc-card connectivity-grid jelly-drag-target">
-                    <div class="conn-btn" onclick="triggerToggleNode(this, 'active-orange')"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 16v-2l-8.5-5V3.5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5V9L2 14v2l8.5-2.5V19L8 20.5V22l4-1 4 1v-1.5L13.5 19v-5.5L22 16z"/></svg></div>
-                    <div class="conn-btn active-blue" onclick="triggerToggleNode(this, 'active-blue')"><svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3a9 9 0 0 1 9 9/M3 12a9 9 0 0 1 9-9"/></svg></div>
-                    <div class="conn-btn active-blue" onclick="triggerToggleNode(this, 'active-blue')"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0"/></svg></div>
+                    <div class="conn-btn" onclick="triggerElasticToggle(this, 'active-orange')"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 16v-2l-8.5-5V3.5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5V9L2 14v2l8.5-2.5V19L8 20.5V22l4-1 4 1v-1.5L13.5 19v-5.5L22 16z"/></svg></div>
+                    <div class="conn-btn active-blue" onclick="triggerElasticToggle(this, 'active-blue')"><svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3a9 9 0 0 1 9 9/M3 12a9 9 0 0 1 9-9"/></svg></div>
+                    <div class="conn-btn active-blue" onclick="triggerElasticToggle(this, 'active-blue')"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0"/></svg></div>
                     <div class="mini-conn-box">
                         <div class="mini-dot green"><svg viewBox="0 0 24 24" style="width:10px; height:10px; fill:#fff;"><path d="M2 22h20V2z"/></svg></div>
                         <div class="mini-dot blue"><svg viewBox="0 0 24 24" style="width:10px; height:10px; stroke:#fff; stroke-width:3; fill:none;"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></svg></div>
@@ -415,14 +453,14 @@
 
                 <div class="right-controls-subgrid">
                     <div class="top-two-buttons">
-                        <div class="circle-action-btn jelly-drag-target" onclick="triggerToggleNode(this, 'active-blue')">
+                        <div class="circle-action-btn jelly-drag-target" onclick="triggerElasticToggle(this, 'active-blue')">
                             <svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                         </div>
-                        <div class="circle-action-btn jelly-drag-target" onclick="triggerToggleNode(this, 'active-blue')">
+                        <div class="circle-action-btn jelly-drag-target" onclick="triggerElasticToggle(this, 'active-blue')">
                             <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                         </div>
                     </div>
-                    <div class="focus-capsule jelly-drag-target">
+                    <div class="focus-capsule jelly-drag-target" onclick="triggerElasticToggle(this, 'active-blue')">
                         <svg class="icon-svg icon-filled" viewBox="0 0 24 24" style="width:18px; height:18px; stroke:#5856d6; fill:#5856d6;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                         <span style="font-size:13px; font-weight:600;">التركيز</span>
                     </div>
@@ -430,16 +468,16 @@
             </div>
 
             <div class="cc-bottom-row">
-                <div class="bottom-tool-btn jelly-drag-target">
+                <div class="bottom-tool-btn jelly-drag-target" onclick="triggerElasticToggle(this, 'active-blue')">
                     <svg class="icon-svg" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="14" r="2"/></svg>
                 </div>
-                <div class="bottom-tool-btn jelly-drag-target">
+                <div class="bottom-tool-btn jelly-drag-target" onclick="triggerElasticToggle(this, 'active-blue')">
                     <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
                 </div>
-                <div class="bottom-tool-btn jelly-drag-target">
+                <div class="bottom-tool-btn jelly-drag-target" onclick="triggerElasticToggle(this, 'active-blue')">
                     <svg class="icon-svg" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/></svg>
                 </div>
-                <div class="bottom-tool-btn jelly-drag-target">
+                <div class="bottom-tool-btn jelly-drag-target" onclick="triggerElasticToggle(this, 'active-blue')">
                     <svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 2H6v3l4 4v9a2 2 0 0 0 2 2 2 2 0 0 0 2-2v-9l4-4V2z"/></svg>
                 </div>
             </div>
@@ -458,7 +496,18 @@
         let isDraggingCC = false;
         let startYCC = 0;
 
-        // 1. أنيميشن سحب ونزول القائمة الفعلي لايف بالإصبع مع الضبابية المتدرجة
+        // تفعيل تتبع حركة الماوس أو اللمس لصنع تأثير الزجاج السائل المتفاعل (Liquid Glass Real Refraction)
+        document.querySelectorAll('.cc-card, .jelly-slider-capsule, .circle-action-btn, .bottom-tool-btn').forEach(card => {
+            card.addEventListener('pointermove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        // 1. هندسة سحب اللوحة الحية ومحاكاة التسارع اللحظي
         dragZone.addEventListener('pointerdown', (e) => {
             isDraggingCC = true;
             startYCC = e.clientY;
@@ -471,10 +520,11 @@
             let currentMoveY = e.clientY - startYCC;
             if (currentMoveY >= 0 && currentMoveY <= 852) {
                 let progress = currentMoveY / 852;
+                // استخدام تحويل ثنائي الأبعاد فائق السرعة عبر كرت الشاشة
                 ccPanel.style.transform = `translateY(${-852 + currentMoveY}px)`;
-                ccPanel.style.background = `rgba(0, 0, 0, ${progress * 0.55})`;
-                ccPanel.style.backdropFilter = `blur(${progress * 40}px)`;
-                ccPanel.style.webkitBackdropFilter = `blur(${progress * 40}px)`;
+                ccPanel.style.background = `rgba(0, 0, 0, ${progress * 0.58})`;
+                ccPanel.style.backdropFilter = `blur(${progress * 45}px)`;
+                ccPanel.style.webkitBackdropFilter = `blur(${progress * 45}px)`;
             }
         });
 
@@ -484,10 +534,9 @@
             let finalMoveY = e.clientY - startYCC;
             if (finalMoveY > 100) {
                 container.classList.add('panel-open');
-                // ارتداد ثقيل واحترافي مستقر جداً
                 ccPanel.style.transition = 'transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), background 0.5s, backdrop-filter 0.5s';
                 ccPanel.style.transform = 'translateY(0)';
-                ccPanel.style.background = 'rgba(0, 0, 0, 0.55)';
+                ccPanel.style.background = 'rgba(0, 0, 0, 0.58)';
                 ccPanel.style.backdropFilter = 'var(--ios-blur)';
                 ccPanel.style.webkitBackdropFilter = 'var(--ios-blur)';
             } else {
@@ -503,24 +552,24 @@
             if(musicFolder.classList.contains('expanded')) musicFolder.classList.remove('expanded');
         }
 
-        // 2. ميزة فتح وتوسيع القائمة المكدسة (الموسيقى) عند الضغط
+        // 2. تمدد وتوسيع المجلدات المكدسة (كارت الموسيقى)
         musicFolder.addEventListener('click', (e) => {
             if (e.target.closest('.music-controls') || isDraggingCC) return;
             musicFolder.classList.toggle('expanded');
         });
 
-        // 3. التفاعل النبضي المرن عند تفعيل الأزرار
-        function triggerToggleNode(btn, className) {
+        // 3. التفاعل البصري المطاطي الفخم للأزرار لتقليد الـ Haptic Feedback
+        function triggerElasticToggle(btn, className) {
             btn.classList.toggle(className);
-            btn.style.transform = 'scale(0.85)';
+            btn.style.transform = 'scale(0.86)';
             setTimeout(() => {
-                btn.style.transition = 'transform 0.5s cubic-bezier(0.25, 1.5, 0.4, 1)';
-                btn.style.transform = 'scale(1.08)';
-                setTimeout(() => { btn.style.transform = ''; btn.style.transition = ''; }, 150);
+                btn.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.3)';
+                btn.style.transform = 'scale(1.06)';
+                setTimeout(() => { btn.style.transform = ''; btn.style.transition = ''; }, 160);
             }, 80);
         }
 
-        // 4. السلايدرات الطولية مع وزن مطاطي أثقل وأكثر استقراراً عند الرجوع
+        // 4. محرك المطاط الثقيل وتصحيح التشويه العكسي للسلايدرات (Squash & Stretch Math Engine)
         document.querySelectorAll('.jelly-slider-capsule').forEach(slider => {
             let sY = 0, sX = 0, active = false;
 
@@ -538,15 +587,17 @@
                 let dY = e.clientY - sY;
                 let dX = e.clientX - sX;
 
-                // قفل الوزن المطاطي ليكون أثقل وأكثر فخامة
-                let scaleY = 1 + Math.min(Math.abs(dY) * 0.0004, 0.05);
-                let scaleX = 1 - Math.min(Math.abs(dX) * 0.0003, 0.03);
-                slider.style.transform = `scale(${scaleX}, ${scaleY})`;
+                // معادلة دقيقة لحساب التمدد الطردي الحقيقي ومقاومة التشويه العكسي المتزن بالمليم
+                let stretchY = 1 + Math.min(Math.abs(dY) * 0.00045, 0.06);
+                let squeezeX = 1 - Math.min(Math.abs(dY) * 0.0003, 0.04);
+                
+                // تطبيق مصفوفة التحويل ثلاثي الأبعاد لضمان أعلى مستويات الأداء 60fps
+                slider.style.transform = `scale(${squeezeX}, ${stretchY})`;
             });
 
             slider.addEventListener('pointerup', () => {
                 active = false;
-                // إخماد حركي ناعم يمنع الرجفة تماماً لراحة نفسية أعمق
+                // ارتداد مخمد نهائي واحترافي يمنع تماماً أي هزة قاسية أو وقوف مفاجئ
                 slider.style.transition = 'transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)';
                 slider.style.transform = 'scale(1, 1)';
             });
@@ -559,7 +610,7 @@
             fill.style.height = Math.max(0, Math.min(100, p)) + '%';
         }
 
-        // 5. السحب والضبابية المنعزلة الفخمة لباقي الأزرار والكروت الثقيلة
+        // 5. محرك السحب والارتداد الفيزيائي للكروت وباقي الأزرار بنقاء معزول كامل
         document.querySelectorAll('.jelly-drag-target').forEach(el => {
             let aY = 0, aX = 0, drag = false;
 
@@ -569,7 +620,7 @@
                 aY = e.clientY; aX = e.clientX;
                 el.setPointerCapture(e.pointerId);
                 el.style.transition = 'none';
-                el.style.zIndex = '50';
+                el.style.zIndex = '50'; // رفع طبقة العنصر النشط ليظهر تأثير الزجاج المعزول فوق بقية المكونات
             });
 
             el.addEventListener('pointermove', (e) => {
@@ -577,21 +628,20 @@
                 let dY = e.clientY - aY;
                 let dX = e.clientX - aX;
 
-                let sX = 1 + (dX * 0.0004);
-                let sY = 1 + (dY * 0.0004);
-                let mX = dX * 0.15; // حركة رزيانة وثقيلة تتبع الإصبع
-                let mY = dY * 0.15;
+                let sX = 1 + (dX * 0.0003);
+                let sY = 1 + (dY * 0.0003);
+                let mX = dX * 0.16; // حركة رصينة وثقيلة تلحق الإصبع بفخامة ثقيلة
+                let mY = dY * 0.16;
 
-                el.style.transform = `translate(${mX}px, ${mY}px) scale(${sX}, ${sY})`;
+                el.style.transform = `translate3d(${mX}px, ${mY}px, 0) scale(${sX}, ${sY})`;
             });
 
             el.addEventListener('pointerup', () => {
                 if (!drag) return;
                 drag = false;
-                // ارتداد مخمد رصين جداً
-                el.style.transition = 'transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)';
-                el.style.transform = 'translate(0px, 0px) scale(1, 1)';
-                setTimeout(() => { if(!el.classList.contains('expanded')) el.style.zIndex = '20'; }, 700);
+                el.style.transition = 'transform 0.68s cubic-bezier(0.16, 1, 0.3, 1)';
+                el.style.transform = 'translate3d(0px, 0px, 0) scale(1, 1)';
+                setTimeout(() => { if(!el.classList.contains('expanded')) el.style.zIndex = '20'; }, 680);
             });
         });
     </script>
