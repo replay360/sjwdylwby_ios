@@ -3,18 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>iOS 18 Ultimate Control Center - Liquid & Heavy Rubber Physics</title>
+    <title>iOS 18 Ultimate Control Center - Production Grade Engine</title>
     <style>
         :root {
-            --ios-blur: blur(45px);
-            --card-blur: blur(30px);
-            --card-bg: rgba(25, 25, 30, 0.45);
-            --card-border: rgba(255, 255, 255, 0.11);
-            --ios-blue: #007aff;
-            --ios-green: #34c759;
-            --ios-orange: #ff9500;
-            --ios-grey: rgba(255, 255, 255, 0.14);
-            --glass-glow: rgba(255, 255, 255, 0.15);
+            --ios-radius-large: 26px;
+            --ios-radius-medium: 20px;
+            --ios-radius-circle: 50%;
+            --bg-blur: blur(50px);
+            --card-glass: rgba(28, 28, 32, 0.45);
+            --card-border: rgba(255, 255, 255, 0.12);
+            --active-blue: #007aff;
+            --active-green: #34c759;
+            --active-orange: #ff9500;
+            --active-purple: #5856d6;
+            --text-primary: rgba(255, 255, 255, 0.96);
+            --text-secondary: rgba(255, 255, 255, 0.55);
         }
 
         * {
@@ -28,8 +31,8 @@
         }
 
         body {
-            background-color: #030303;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+            background-color: #000000;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -38,246 +41,195 @@
             overflow: hidden;
         }
 
-        /* حاوية الهاتف الذكي الفخمة - أبعاد آيفون 15/16 برو ماكس */
-        .phone-frame {
+        /* حاوية الهاتف الفخمة الفنية */
+        .phone-container {
             position: relative;
             width: 393px;
             height: 852px;
             background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=393&auto=format&fit=crop') center/cover no-repeat;
-            border: 12px solid #e3e3e3;
-            border-radius: 55px;
-            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.9);
+            border: 12px solid #1c1c1e;
+            border-radius: 56px;
+            box-shadow: 0 40px 90px rgba(0, 0, 0, 0.95), inset 0 0 4px rgba(255,255,255,0.2);
             overflow: hidden;
-            perspective: 1000px;
+            transform: translateZ(0);
         }
 
-        .dynamic-island {
+        /* الشاشة الرئيسية الخلفية */
+        .home-screen-layer {
             position: absolute;
-            top: 11px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 110px;
-            height: 30px;
-            background-color: #000000;
-            border-radius: 20px;
-            z-index: 1010;
-        }
-
-        .status-bar {
-            position: absolute;
-            top: 16px;
-            width: 100%;
-            padding: 0 36px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
-            font-weight: 600;
-            z-index: 1009;
-            letter-spacing: -0.2px;
-        }
-
-        /* ================= الشاشة الرئيسية والأيقونات المصممة بدقة وبألوان متدرجة ================= */
-        .home-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            padding: 90px 24px 40px 24px;
+            top: 0; left: 0; width: 100%; height: 100%;
+            padding: 95px 20px 40px 20px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             grid-auto-rows: max-content;
-            gap: 22px;
-            z-index: 10;
-            transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+            gap: 24px;
+            z-index: 1;
             will-change: transform;
         }
 
-        .phone-frame.panel-open .home-screen {
-            transform: scale(0.93) translateZ(-20px);
-        }
-
-        .app-icon {
+        .home-app {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 7px;
-            cursor: pointer;
+            gap: 8px;
         }
 
-        .app-box {
+        .home-app-icon {
             width: 60px;
             height: 60px;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.35);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        /* لمعان خفيف على الأيقونات */
-        .app-box::before {
-            content: ''; position: absolute; top:0; left:0; width:100%; height:50%;
-            background: linear-gradient(rgba(255,255,255,0.15), transparent);
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            display: flex; justify-content: center; align-items: center;
         }
 
-        .app-label {
+        .home-app-label {
             font-size: 11px;
+            color: var(--text-primary);
             font-weight: 500;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.7);
-            color: rgba(255,255,255,0.92);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
 
-        /* منطقة استشعار السحب العلوية اليمنى السلسة مخصصة لمركز التحكم */
-        .drag-zone-top {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 160px;
-            height: 65px;
-            z-index: 1005;
-            cursor: ns-resize;
+        /* الكاميرا العلوية (Dynamic Island) والبار */
+        .dynamic-island {
+            position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
+            width: 110px; height: 30px; background: #000; border-radius: 20px; z-index: 1000;
         }
 
-        /* ================= لوحة مركز التحكم بنظام الزجاج السائل والانكسار المتقدم ================= */
+        .status-bar {
+            position: absolute; top: 18px; width: 100%; padding: 0 32px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 13px; font-weight: 600; z-index: 999; color: #fff;
+        }
+
+        /* منطقة استشعار السحب المخفية الفخمة */
+        .cc-trigger-zone {
+            position: absolute; top: 0; right: 0; width: 180px; height: 65px;
+            z-index: 995; cursor: ns-resize;
+        }
+
+        /* ================= لوحة مركز التحكم المتقدمة ================= */
         .control-center-panel {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            padding: 75px 16px 20px 16px;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            padding: 80px 16px 30px 16px;
             background: rgba(0, 0, 0, 0);
-            backdrop-filter: blur(0px);
-            -webkit-backdrop-filter: blur(0px);
+            backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px);
+            z-index: 900;
             display: flex;
             flex-direction: column;
             gap: 16px;
-            z-index: 1000;
             transform: translateY(-100%);
+            will-change: transform, background-color, backdrop-filter;
             pointer-events: none;
-            will-change: transform, background, backdrop-filter;
         }
 
-        .phone-frame.panel-open .control-center-panel {
+        .phone-container.cc-open .control-center-panel {
             pointer-events: auto;
         }
 
-        .cc-row-top {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-
-        /* الزجاج السائل المنعزل المطور مع طبقة عكس الضوء اللحظي الحقيقي الحواف */
-        .cc-card {
-            background: var(--card-bg);
-            backdrop-filter: var(--card-blur);
-            -webkit-backdrop-filter: var(--card-blur);
+        /* هيكلة الكروت الزجاجية السائلة */
+        .ios-card {
+            background: var(--card-glass);
             border: 1px solid var(--card-border);
-            border-radius: 28px;
-            height: 156px;
-            padding: 16px;
+            border-radius: var(--ios-radius-large);
             position: relative;
-            z-index: 20;
             overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.1);
-            will-change: transform, height;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.15);
+            display: flex;
+            flex-direction: column;
             transform-origin: center center;
-            transition: height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, width, height;
         }
 
-        /* طبقة تتبع الضوء المخصص للـ Liquid Glass Effect */
-        .cc-card::after, .jelly-slider-capsule::after, .circle-action-btn::after, .bottom-tool-btn::after {
-            content: '';
-            position: absolute;
-            top: var(--mouse-y, 0);
-            left: var(--mouse-x, 0);
-            width: 120px;
-            height: 120px;
-            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
-            transform: translate(-50%, -50%);
+        /* تأثير لمعان وحواف الزجاج السائل المتفاعل حركياً */
+        .liquid-glass-specular {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at var(--shine-x, 50%) var(--shine-y, 50%), rgba(255,255,255,0.12) 0%, transparent 60%);
             pointer-events: none;
             z-index: 1;
         }
 
-        /* كارت الموسيقى والوسائط المكدس الفاخر والقابل للتمدد */
-        .music-card {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            cursor: pointer;
+        /* شبكة الصف العلوي */
+        .cc-grid-top {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            height: 156px;
         }
-        .music-card.expanded {
-            position: absolute;
-            left: 16px;
-            right: 16px;
-            width: calc(100% - 32px);
-            height: 240px;
-            z-index: 99;
-        }
-        .music-top { display: flex; justify-content: space-between; width: 100%; z-index: 2; }
-        .music-status { text-align: center; font-size: 13px; color: rgba(255,255,255,0.75); font-weight: 500; margin-top: 10px; z-index: 2; }
-        .music-controls { display: flex; justify-content: center; align-items: center; gap: 26px; margin-bottom: 4px; z-index: 2; }
 
-        /* شبكة الاتصالات */
-        .connectivity-grid {
+        /* كارت الاتصالات المتطور */
+        .connectivity-module {
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
             gap: 12px;
-            height: 100%;
+            padding: 12px;
         }
 
-        .conn-btn {
-            background: var(--ios-grey);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            z-index: 2;
+        .cc-btn-circle {
+            background: rgba(255, 255, 255, 0.09);
+            border-radius: var(--ios-radius-circle);
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; position: relative; z-index: 2;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             will-change: transform;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
-        .conn-btn.active-blue { background: var(--ios-blue); }
-        .conn-btn.active-orange { background: var(--ios-orange); }
+        .cc-btn-circle.active-blue { background: var(--active-blue); }
+        .cc-btn-circle.active-green { background: var(--active-green); }
+        .cc-btn-circle.active-orange { background: var(--active-orange); }
 
-        .mini-conn-box {
-            background: rgba(255, 255, 255, 0.07);
-            border-radius: 14px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            gap: 4px;
-            padding: 4px;
+        /* كارت الميديا التفاعلي القابل للتوسع الفوري */
+        .media-module {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: height 0.45s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .mini-dot { border-radius: 50%; display: flex; justify-content: center; align-items: center; }
-        .mini-dot.green { background: var(--ios-green); }
-        .mini-dot.blue { background: var(--ios-blue); }
-        .mini-dot.grey { background: rgba(255,255,255,0.15); }
+        .media-header { display: flex; justify-content: space-between; align-items: center; z-index: 2; }
+        .media-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .media-artist { font-size: 11px; color: var(--text-secondary); }
+        .media-controls { display: flex; justify-content: center; align-items: center; gap: 24px; z-index: 2; }
+        .media-btn { cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-        .cc-middle-section {
+        /* منطقة التوسع لكارت الميديا */
+        .media-expanded-content {
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 14px;
+            z-index: 2;
+        }
+        .media-module.expanded .media-expanded-content { display: flex; }
+        .media-module.expanded {
+            position: absolute; left: 16px; right: 16px; width: calc(100% - 32px); height: 260px; z-index: 100;
+        }
+
+        .timeline-bar {
+            width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; position: relative;
+        }
+        .timeline-progress {
+            width: 35%; height: 100%; background: #fff; border-radius: 2px;
+        }
+
+        /* الصف الأوسط: السلايدرات والأزرار الفرعية */
+        .cc-grid-middle {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
+            height: 156px;
         }
 
-        .sliders-subgrid {
+        .sliders-layout {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 14px;
         }
 
-        /* كبسولة السلايدر الزجاجية السائلة المتفاعلة بالكامل مع التمطيط الثقيل */
-        .jelly-slider-capsule {
+        /* كبسولة السلايدر الرأسية الممتازة */
+        .ios-slider-capsule {
             height: 156px;
-            background: var(--card-bg);
-            backdrop-filter: var(--card-blur);
-            -webkit-backdrop-filter: var(--card-blur);
+            background: var(--card-glass);
             border: 1px solid var(--card-border);
             border-radius: 35px;
             position: relative;
@@ -285,363 +237,377 @@
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            z-index: 20;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.35), inset 0 1px 1px rgba(255,255,255,0.1);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
             will-change: transform;
             transform-origin: center center;
         }
 
-        .slider-fill {
-            width: 100%;
-            background: #ffffff;
-            height: 50%;
+        .slider-fill-layer {
+            width: 100%; height: 50%;
+            background: rgba(255, 255, 255, 0.95);
             pointer-events: none;
             will-change: height;
         }
 
-        .slider-icon-box {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            pointer-events: none;
-            mix-blend-mode: difference;
-            z-index: 25;
+        .slider-icon-holder {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            pointer-events: none; mix-blend-mode: difference; z-index: 5;
         }
 
-        .right-controls-subgrid { display: flex; flex-direction: column; gap: 14px; }
-        .top-two-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-
-        .circle-action-btn {
-            background: var(--card-bg);
-            backdrop-filter: var(--card-blur);
-            -webkit-backdrop-filter: var(--card-blur);
-            border: 1px solid var(--card-border);
-            height: 64px;
-            border-radius: 50%;
+        /* مجمع أدوات اليمين */
+        .right-tools-layout {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 20;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            will-change: transform;
-            transform-origin: center center;
-            cursor: pointer;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .two-buttons-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
         }
 
-        .focus-capsule {
-            background: var(--card-bg);
-            backdrop-filter: var(--card-blur);
-            -webkit-backdrop-filter: var(--card-blur);
+        .ios-action-circle {
+            height: 71px;
+            background: var(--card-glass);
             border: 1px solid var(--card-border);
-            height: 54px;
-            border-radius: 27px;
-            display: flex;
-            align-items: center;
-            padding: 0 18px;
-            gap: 12px;
-            z-index: 20;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            will-change: transform;
-            transform-origin: center center;
-            cursor: pointer;
+            border-radius: var(--ios-radius-circle);
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; will-change: transform;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.25);
         }
 
-        .cc-bottom-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 4px; }
-
-        .bottom-tool-btn {
-            background: var(--card-bg);
-            backdrop-filter: var(--card-blur);
-            -webkit-backdrop-filter: var(--card-blur);
+        .ios-capsule-row {
+            height: 71px;
+            background: var(--card-glass);
             border: 1px solid var(--card-border);
-            height: 68px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 20;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            will-change: transform;
-            transform-origin: center center;
-            cursor: pointer;
+            border-radius: 24px;
+            display: flex; align-items: center; padding: 0 16px; gap: 12px;
+            cursor: pointer; will-change: transform;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+        }
+        .capsule-label { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+
+        /* صف الأدوات السفلي المطور */
+        .cc-row-bottom {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
         }
 
-        .icon-svg {
-            width: 22px;
-            height: 22px;
-            fill: none;
-            stroke: #ffffff;
-            stroke-width: 2.3;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            z-index: 2;
+        .icon-svg-core {
+            width: 22px; height: 22px; fill: none; stroke: #ffffff;
+            stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round;
+            position: relative; z-index: 3;
         }
-        .icon-filled { fill: #ffffff; }
 
-        .bottom-close-line {
-            width: 48px; height: 5px; background-color: rgba(255, 255, 255, 0.45);
-            border-radius: 10px; position: absolute; bottom: 12px; left: 50%;
+        .bottom-home-indicator {
+            width: 140px; height: 5px; background: rgba(255,255,255,0.4);
+            border-radius: 10px; position: absolute; bottom: 10px; left: 50%;
             transform: translateX(-50%); cursor: pointer; z-index: 1001;
         }
     </style>
 </head>
 <body>
 
-    <div class="phone-frame" id="phoneContainer">
+    <div class="phone-container" id="iosPhoneContainer">
         <div class="status-bar">
-            <span style="display:flex; align-items:center; gap:4px;">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M5 12.55a11 11 0 0 1 14.08 0"/></svg>
+            <span style="display:flex; align-items:center; gap:5px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M5 12.55a11 11 0 0 1 14.08 0"/></svg>
                 <span>%١٠٠</span>
             </span>
-            <div>١٢:٣٣</div>
+            <div>٠٩:٤١</div>
         </div>
         <div class="dynamic-island"></div>
 
-        <div class="drag-zone-top" id="dragZone"></div>
+        <div class="cc-trigger-zone" id="ccTrigger"></div>
 
-        <div class="home-screen">
-            <div class="app-icon"><div class="app-box" style="background: linear-gradient(135deg, #2f9fff, #0051d4);"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="app-label">الرسائل</div></div>
-            <div class="app-icon"><div class="app-box" style="background: linear-gradient(135deg, #3cf06e, #0fa82d);"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><div class="app-label">الهاتف</div></div>
-            <div class="app-icon"><div class="app-box" style="background: linear-gradient(135deg, #ffb300, #e65100);"><svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10zM2 12h20"/></svg></div><div class="app-label">سفاري</div></div>
-            <div class="app-icon"><div class="app-box" style="background: linear-gradient(135deg, #cc66ff, #6600cc);"><svg class="icon-svg" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div><div class="app-label">المطور</div></div>
+        <div class="home-screen-layer" id="homeScreen">
+            <div class="home-app"><div class="home-app-icon" style="background: linear-gradient(135deg, #007aff, #0040a8);"><svg class="icon-svg-core" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="home-app-label">الرسائل</div></div>
+            <div class="home-app"><div class="home-app-icon" style="background: linear-gradient(135deg, #34c759, #118032);"><svg class="icon-svg-core" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><div class="home-app-label">الهاتف</div></div>
+            <div class="home-app"><div class="home-app-icon" style="background: linear-gradient(135deg, #ff9500, #b36600);"><svg class="icon-svg-core" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="home-app-label">سفاري</div></div>
+            <div class="home-app"><div class="home-app-icon" style="background: linear-gradient(135deg, #5856d6, #3b39a3);"><svg class="icon-svg-core" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/></svg></div><div class="home-app-label">المطور</div></div>
         </div>
 
         <div class="control-center-panel" id="ccPanel">
             
-            <div class="cc-row-top">
-                <div class="cc-card music-card jelly-drag-target" id="musicFolder">
-                    <div class="music-top">
-                        <svg class="icon-svg" viewBox="0 0 24 24" style="width:18px; height:18px; stroke:#ff2d55;"><circle cx="12" cy="12" r="3"/><path d="M12 2a10 10 0 1 0 10 10"/></svg>
-                        <span style="font-size:10px; color:#ff2d55; font-weight:800; letter-spacing: 0.5px;">LIVE</span>
-                    </div>
-                    <div class="music-status">مشغل الموسيقى</div>
-                    <div class="music-controls">
-                        <svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:#fff;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                        <svg viewBox="0 0 24 24" style="width:22px; height:22px; fill:#fff;"><path d="M8 5v14l11-7z"/></svg>
-                        <svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:#fff;"><path d="M6 5v14l11-7z"/></svg>
-                    </div>
-                </div>
-
-                <div class="cc-card connectivity-grid jelly-drag-target">
-                    <div class="conn-btn" onclick="triggerElasticToggle(this, 'active-orange')"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 16v-2l-8.5-5V3.5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5V9L2 14v2l8.5-2.5V19L8 20.5V22l4-1 4 1v-1.5L13.5 19v-5.5L22 16z"/></svg></div>
-                    <div class="conn-btn active-blue" onclick="triggerElasticToggle(this, 'active-blue')"><svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3a9 9 0 0 1 9 9/M3 12a9 9 0 0 1 9-9"/></svg></div>
-                    <div class="conn-btn active-blue" onclick="triggerElasticToggle(this, 'active-blue')"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0"/></svg></div>
+            <div class="cc-grid-top">
+                <div class="ios-card connectivity-module physics-target">
+                    <div class="liquid-glass-specular"></div>
+                    <div class="cc-btn-circle" data-action="toggle" onclick="triggerTactile(this)"><svg class="icon-svg-core" viewBox="0 0 24 24"><path d="M22 16v-2l-8.5-5V3.5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5V9L2 14v2l8.5-2.5V19L8 20.5V22l4-1 4 1v-1.5L13.5 19v-5.5L22 16z"/></svg></div>
+                    <div class="cc-btn-circle active-blue" data-action="toggle" onclick="triggerTactile(this)"><svg class="icon-svg-core" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3a9 9 0 0 1 9 9/M3 12a9 9 0 0 1 9-9"/></svg></div>
+                    <div class="cc-btn-circle active-blue" data-action="toggle" onclick="triggerTactile(this)"><svg class="icon-svg-core" viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0"/></svg></div>
                     <div class="mini-conn-box">
-                        <div class="mini-dot green"><svg viewBox="0 0 24 24" style="width:10px; height:10px; fill:#fff;"><path d="M2 22h20V2z"/></svg></div>
-                        <div class="mini-dot blue"><svg viewBox="0 0 24 24" style="width:10px; height:10px; stroke:#fff; stroke-width:3; fill:none;"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></svg></div>
-                        <div class="mini-dot grey"></div>
-                        <div class="mini-dot grey"></div>
+                        <div class="mini-dot green"><svg viewBox="0 0 24 24" style="width:11px; height:11px; fill:#fff;"><path d="M2 22h20V2z"/></svg></div>
+                        <div class="mini-dot blue"><svg viewBox="0 0 24 24" style="width:11px; height:11px; stroke:#fff; stroke-width:3; fill:none;"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></svg></div>
+                        <div class="mini-dot"></div><div class="mini-dot"></div>
+                    </div>
+                </div>
+
+                <div class="ios-card media-module physics-target" id="mediaCard">
+                    <div class="liquid-glass-specular"></div>
+                    <div class="media-header">
+                        <div>
+                            <div class="media-title">Barça Anthem</div>
+                            <div class="media-artist">FC Barcelona</div>
+                        </div>
+                        <svg class="icon-svg-core" viewBox="0 0 24 24" style="stroke:#ff2d55;"><circle cx="12" cy="12" r="3"/><path d="M12 2a10 10 0 1 0 10 10"/></svg>
+                    </div>
+                    
+                    <div class="media-expanded-content">
+                        <div class="timeline-bar"><div class="timeline-progress"></div></div>
+                        <div style="display:flex; justify-content: space-between; font-size:11px; color:var(--text-secondary);">
+                            <span>١:١٢</span><span>٣:٣٠</span>
+                        </div>
+                    </div>
+
+                    <div class="media-controls">
+                        <div class="media-btn"><svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:#fff;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></div>
+                        <div class="media-btn" style="margin: 0 10px;"><svg viewBox="0 0 24 24" style="width:24px; height:24px; fill:#fff;"><path d="M8 5v14l11-7z"/></svg></div>
+                        <div class="media-btn"><svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:#fff;"><path d="M6 5v14l11-7z"/></svg></div>
                     </div>
                 </div>
             </div>
 
-            <div class="cc-middle-section">
-                <div class="sliders-subgrid">
-                    <div class="jelly-slider-capsule" data-type="volume">
-                        <div class="slider-fill" style="height: 65%;"></div>
-                        <div class="slider-icon-box">
-                            <svg class="icon-svg" viewBox="0 0 24 24" style="stroke: #00bcd4;"><path d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+            <div class="cc-grid-middle">
+                <div class="sliders-layout">
+                    <div class="ios-slider-capsule physics-slider-node" data-slider-type="volume">
+                        <div class="liquid-glass-specular"></div>
+                        <div class="slider-fill-layer" style="height: 60%;"></div>
+                        <div class="slider-icon-holder">
+                            <svg class="icon-svg-core" viewBox="0 0 24 24" style="stroke: #00bcd4;"><path d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
                         </div>
                     </div>
-                    <div class="jelly-slider-capsule" data-type="brightness">
-                        <div class="slider-fill" style="height: 45%;"></div>
-                        <div class="slider-icon-box">
-                            <svg class="icon-svg" viewBox="0 0 24 24" style="stroke: #ffb300;"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2"/></svg>
+                    <div class="ios-slider-capsule physics-slider-node" data-slider-type="brightness">
+                        <div class="liquid-glass-specular"></div>
+                        <div class="slider-fill-layer" style="height: 40%;"></div>
+                        <div class="slider-icon-holder">
+                            <svg class="icon-svg-core" viewBox="0 0 24 24" style="stroke: #ffb300;"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2"/></svg>
                         </div>
                     </div>
                 </div>
 
-                <div class="right-controls-subgrid">
-                    <div class="top-two-buttons">
-                        <div class="circle-action-btn jelly-drag-target" onclick="triggerElasticToggle(this, 'active-blue')">
-                            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                        </div>
-                        <div class="circle-action-btn jelly-drag-target" onclick="triggerElasticToggle(this, 'active-blue')">
-                            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-                        </div>
+                <div class="right-tools-layout">
+                    <div class="two-buttons-row">
+                        <div class="ios-action-circle physics-target" onclick="triggerTactile(this)"><div class="liquid-glass-specular"></div><svg class="icon-svg-core" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+                        <div class="ios-action-circle physics-target" onclick="triggerTactile(this)"><div class="liquid-glass-specular"></div><svg class="icon-svg-core" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg></div>
                     </div>
-                    <div class="focus-capsule jelly-drag-target" onclick="triggerElasticToggle(this, 'active-blue')">
-                        <svg class="icon-svg icon-filled" viewBox="0 0 24 24" style="width:18px; height:18px; stroke:#5856d6; fill:#5856d6;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                        <span style="font-size:13px; font-weight:600;">التركيز</span>
+                    <div class="ios-capsule-row physics-target" onclick="triggerTactile(this)">
+                        <div class="liquid-glass-specular"></div>
+                        <svg class="icon-svg-core" viewBox="0 0 24 24" style="stroke:#5856d6; fill:#5856d6;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                        <span class="capsule-label">التركيز</span>
                     </div>
                 </div>
             </div>
 
-            <div class="cc-bottom-row">
-                <div class="bottom-tool-btn jelly-drag-target" onclick="triggerElasticToggle(this, 'active-blue')">
-                    <svg class="icon-svg" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="14" r="2"/></svg>
-                </div>
-                <div class="bottom-tool-btn jelly-drag-target" onclick="triggerElasticToggle(this, 'active-blue')">
-                    <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                </div>
-                <div class="bottom-tool-btn jelly-drag-target" onclick="triggerElasticToggle(this, 'active-blue')">
-                    <svg class="icon-svg" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/></svg>
-                </div>
-                <div class="bottom-tool-btn jelly-drag-target" onclick="triggerElasticToggle(this, 'active-blue')">
-                    <svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 2H6v3l4 4v9a2 2 0 0 0 2 2 2 2 0 0 0 2-2v-9l4-4V2z"/></svg>
-                </div>
+            <div class="cc-row-bottom">
+                <div class="ios-action-circle physics-target" onclick="triggerTactile(this)"><div class="liquid-glass-specular"></div><svg class="icon-svg-core" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="14" r="2"/></svg></div>
+                <div class="ios-action-circle physics-target" onclick="triggerTactile(this)"><div class="liquid-glass-specular"></div><svg class="icon-svg-core" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+                <div class="ios-action-circle physics-target" onclick="triggerTactile(this)"><div class="liquid-glass-specular"></div><svg class="icon-svg-core" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/></svg></div>
+                <div class="ios-action-circle physics-target" onclick="triggerTactile(this)"><div class="liquid-glass-specular"></div><svg class="icon-svg-core" viewBox="0 0 24 24"><path d="M18 2H6v3l4 4v9a2 2 0 0 0 2 2 2 2 0 0 0 2-2v-9l4-4V2z"/></svg></div>
             </div>
 
-            <div class="bottom-close-line" id="closeHandle"></div>
+            <div class="bottom-home-indicator" id="homeIndicator"></div>
         </div>
     </div>
 
     <script>
-        const container = document.getElementById('phoneContainer');
+        const phone = document.getElementById('iosPhoneContainer');
         const ccPanel = document.getElementById('ccPanel');
-        const dragZone = document.getElementById('dragZone');
-        const closeHandle = document.getElementById('closeHandle');
-        const musicFolder = document.getElementById('musicFolder');
+        const ccTrigger = document.getElementById('ccTrigger');
+        const homeIndicator = document.getElementById('homeIndicator');
+        const homeScreen = document.getElementById('homeScreen');
+        const mediaCard = document.getElementById('mediaCard');
 
-        let isDraggingCC = false;
-        let startYCC = 0;
+        // كلاس المحرك الحركي الفيزيائي المخصص لـ iOS Spring Math
+        class SpringSolver {
+            constructor(mass, stiffness, damping) {
+                this.m = mass; this.k = stiffness; this.c = damping;
+                this.x = 0; this.v = 0; this.target = 0;
+            }
+            update(dt) {
+                let fSpring = -this.k * (this.x - this.target);
+                let fDamping = -this.c * this.v;
+                let a = (fSpring + fDamping) / this.m;
+                this.v += a * dt; this.x += this.v * dt;
+                return this.x;
+            }
+        }
 
-        // تفعيل تتبع حركة الماوس أو اللمس لصنع تأثير الزجاج السائل المتفاعل (Liquid Glass Real Refraction)
-        document.querySelectorAll('.cc-card, .jelly-slider-capsule, .circle-action-btn, .bottom-tool-btn').forEach(card => {
-            card.addEventListener('pointermove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                card.style.setProperty('--mouse-x', `${x}px`);
-                card.style.setProperty('--mouse-y', `${y}px`);
+        // إنشاء محركات فيزيائية منفصلة للوحة والسحب لضمان الاستقرار الكلي للـ 60 FPS
+        const panelSpring = new SpringSolver(1, 260, 26);
+        let currentPanelY = -852;
+        let isDraggingPanel = false;
+        let startDragY = 0;
+        let lastDragY = 0;
+        let dragVelocity = 0;
+
+        // تتبع حركة إصبع ولمعان زجاج الكروت (Liquid Glass Engine)
+        document.querySelectorAll('.ios-card, .ios-slider-capsule, .ios-action-circle, .ios-capsule-row').forEach(element => {
+            element.addEventListener('pointermove', (e) => {
+                const rect = element.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                element.style.setProperty('--shine-x', `${x}%`);
+                element.style.setProperty('--shine-y', `${y}%`);
             });
         });
 
-        // 1. هندسة سحب اللوحة الحية ومحاكاة التسارع اللحظي
-        dragZone.addEventListener('pointerdown', (e) => {
-            isDraggingCC = true;
-            startYCC = e.clientY;
-            ccPanel.style.transition = 'none';
-            dragZone.setPointerCapture(e.pointerId);
+        // 1. إدارة سحب وهبوط مركز التحكم بالكامل
+        ccTrigger.addEventListener('pointerdown', (e) => {
+            isDraggingPanel = true;
+            startDragY = e.clientY;
+            lastDragY = e.clientY;
+            ccTrigger.setPointerCapture(e.pointerId);
         });
 
-        dragZone.addEventListener('pointermove', (e) => {
-            if (!isDraggingCC) return;
-            let currentMoveY = e.clientY - startYCC;
-            if (currentMoveY >= 0 && currentMoveY <= 852) {
-                let progress = currentMoveY / 852;
-                // استخدام تحويل ثنائي الأبعاد فائق السرعة عبر كرت الشاشة
-                ccPanel.style.transform = `translateY(${-852 + currentMoveY}px)`;
-                ccPanel.style.background = `rgba(0, 0, 0, ${progress * 0.58})`;
-                ccPanel.style.backdropFilter = `blur(${progress * 45}px)`;
-                ccPanel.style.webkitBackdropFilter = `blur(${progress * 45}px)`;
+        ccTrigger.addEventListener('pointermove', (e) => {
+            if (!isDraggingPanel) return;
+            let delta = e.clientY - startDragY;
+            dragVelocity = e.clientY - lastDragY;
+            lastDragY = e.clientY;
+
+            if (delta >= 0 && delta <= 852) {
+                currentPanelY = -852 + delta;
+                renderCCFrame();
             }
         });
 
-        dragZone.addEventListener('pointerup', (e) => {
-            if (!isDraggingCC) return;
-            isDraggingCC = false;
-            let finalMoveY = e.clientY - startYCC;
-            if (finalMoveY > 100) {
-                container.classList.add('panel-open');
-                ccPanel.style.transition = 'transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), background 0.5s, backdrop-filter 0.5s';
-                ccPanel.style.transform = 'translateY(0)';
-                ccPanel.style.background = 'rgba(0, 0, 0, 0.58)';
-                ccPanel.style.backdropFilter = 'var(--ios-blur)';
-                ccPanel.style.webkitBackdropFilter = 'var(--ios-blur)';
+        ccTrigger.addEventListener('pointerup', () => {
+            isDraggingPanel = false;
+            if (currentPanelY > -600 || dragVelocity > 8) {
+                panelSpring.target = 0;
+                phone.classList.add('cc-open');
             } else {
-                closeCC();
+                panelSpring.target = -852;
+                phone.classList.remove('cc-open');
             }
+            triggerSpringLoop();
         });
 
-        closeHandle.addEventListener('click', () => { closeCC(); });
-        function closeCC() {
-            container.classList.remove('panel-open');
-            ccPanel.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
-            ccPanel.style.transform = 'translateY(-100%)';
-            if(musicFolder.classList.contains('expanded')) musicFolder.classList.remove('expanded');
+        homeIndicator.addEventListener('click', () => {
+            panelSpring.target = -852;
+            phone.classList.remove('cc-open');
+            triggerSpringLoop();
+        });
+
+        // توسيع كارت الميديا التفاعلي المكدس عند النقر
+        mediaCard.addEventListener('click', (e) => {
+            if(e.target.closest('.media-controls')) return;
+            mediaCard.classList.toggle('expanded');
+        });
+
+        function renderCCFrame() {
+            let progress = (currentPanelY + 852) / 852;
+            ccPanel.style.transform = `translate3d(0, ${currentPanelY}px, 0)`;
+            ccPanel.style.backgroundColor = `rgba(0, 0, 0, ${progress * 0.6})`;
+            ccPanel.style.backdropFilter = `blur(${progress * 50}px)`;
+            ccPanel.style.webkitBackdropFilter = `blur(${progress * 50}px)`;
+            homeScreen.style.transform = `scale(${1 - (progress * 0.07)})`;
         }
 
-        // 2. تمدد وتوسيع المجلدات المكدسة (كارت الموسيقى)
-        musicFolder.addEventListener('click', (e) => {
-            if (e.target.closest('.music-controls') || isDraggingCC) return;
-            musicFolder.classList.toggle('expanded');
-        });
+        let springAnimFrame;
+        function triggerSpringLoop() {
+            cancelAnimationFrame(springAnimFrame);
+            let lastTime = performance.now();
+            
+            function step(now) {
+                let dt = (now - lastTime) / 1000;
+                if (dt > 0.03) dt = 0.016; // حماية واستقرار الفريمات
+                lastTime = now;
 
-        // 3. التفاعل البصري المطاطي الفخم للأزرار لتقليد الـ Haptic Feedback
-        function triggerElasticToggle(btn, className) {
-            btn.classList.toggle(className);
-            btn.style.transform = 'scale(0.86)';
+                currentPanelY = panelSpring.update(dt);
+                renderCCFrame();
+
+                if (Math.abs(panelSpring.v) > 0.1 || Math.abs(currentPanelY - panelSpring.target) > 0.1) {
+                    springAnimFrame = requestAnimationFrame(step);
+                } else {
+                    currentPanelY = panelSpring.target;
+                    renderCCFrame();
+                }
+            }
+            springAnimFrame = requestAnimationFrame(step);
+        }
+
+        // 2. محرك ردود الفعل اللمسية التفاعلية للأزرار والتقلص المرن (Tactile Pulse Response)
+        function triggerTactile(btn) {
+            if(btn.dataset.action === "toggle") {
+                btn.classList.toggle('active-blue');
+            }
+            btn.style.transform = 'scale(0.86) translateZ(0)';
             setTimeout(() => {
-                btn.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.3)';
-                btn.style.transform = 'scale(1.06)';
-                setTimeout(() => { btn.style.transform = ''; btn.style.transition = ''; }, 160);
-            }, 80);
+                btn.style.transition = 'transform 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.28)';
+                btn.style.transform = 'scale(1.05) translateZ(0)';
+                setTimeout(() => { btn.style.transform = ''; btn.style.transition = ''; }, 150);
+            }, 60);
         }
 
-        // 4. محرك المطاط الثقيل وتصحيح التشويه العكسي للسلايدرات (Squash & Stretch Math Engine)
-        document.querySelectorAll('.jelly-slider-capsule').forEach(slider => {
-            let sY = 0, sX = 0, active = false;
+        // 3. المحرك المطاطي للكبسولات والسلايدرات (Squash, Stretch & Elastic Deformation Engine)
+        document.querySelectorAll('.physics-slider-node').forEach(slider => {
+            let active = false;
+            let baseYS = 0;
+            let currentHeight = parseFloat(slider.querySelector('.slider-fill-layer').style.height);
 
             slider.addEventListener('pointerdown', (e) => {
                 active = true;
-                sY = e.clientY; sX = e.clientX;
+                baseYS = e.clientY;
                 slider.setPointerCapture(e.pointerId);
                 slider.style.transition = 'none';
-                updateFill(e, slider);
             });
 
             slider.addEventListener('pointermove', (e) => {
                 if (!active) return;
-                updateFill(e, slider);
-                let dY = e.clientY - sY;
-                let dX = e.clientX - sX;
+                const rect = slider.getBoundingClientRect();
+                let fillPercent = 100 - (((e.clientY - rect.top) / rect.height) * 100);
+                fillPercent = Math.max(0, Math.min(100, fillPercent));
+                slider.querySelector('.slider-fill-layer').style.height = `${fillPercent}%`;
 
-                // معادلة دقيقة لحساب التمدد الطردي الحقيقي ومقاومة التشويه العكسي المتزن بالمليم
-                let stretchY = 1 + Math.min(Math.abs(dY) * 0.00045, 0.06);
-                let squeezeX = 1 - Math.min(Math.abs(dY) * 0.0003, 0.04);
-                
-                // تطبيق مصفوفة التحويل ثلاثي الأبعاد لضمان أعلى مستويات الأداء 60fps
-                slider.style.transform = `scale(${squeezeX}, ${stretchY})`;
+                let diffY = e.clientY - baseYS;
+                // مصفوفة رياضية متقدمة لتوليد تمدد طردي بالارتفاع وضغط طردي بالعرض لمحاكاة الفيزيائية الهلامية للمطاط
+                let sY = 1 + Math.min(Math.abs(diffY) * 0.0006, 0.08);
+                let sX = 1 - Math.min(Math.abs(diffY) * 0.0004, 0.05);
+
+                slider.style.transform = `matrix3d(${sX}, 0, 0, 0, 0, ${sY}, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)`;
             });
 
             slider.addEventListener('pointerup', () => {
                 active = false;
-                // ارتداد مخمد نهائي واحترافي يمنع تماماً أي هزة قاسية أو وقوف مفاجئ
-                slider.style.transition = 'transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)';
-                slider.style.transform = 'scale(1, 1)';
+                // العودة بسلاسة فائقة بإخماد رصين يمنع الارتجاج البدائي
+                slider.style.transition = 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+                slider.style.transform = 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)';
             });
         });
 
-        function updateFill(e, slider) {
-            const fill = slider.querySelector('.slider-fill');
-            const rect = slider.getBoundingClientRect();
-            let p = 100 - ((e.clientY - rect.top) / rect.height * 100);
-            fill.style.height = Math.max(0, Math.min(100, p)) + '%';
-        }
+        // 4. السحب الفيزيائي الحر لكروت الواجهة الرئيسية مع خاصية العزل والعمق الحركي
+        document.querySelectorAll('.physics-target').forEach(card => {
+            let draggingCard = false;
+            let cStartX = 0, cStartY = 0;
 
-        // 5. محرك السحب والارتداد الفيزيائي للكروت وباقي الأزرار بنقاء معزول كامل
-        document.querySelectorAll('.jelly-drag-target').forEach(el => {
-            let aY = 0, aX = 0, drag = false;
-
-            el.addEventListener('pointerdown', (e) => {
-                if(el.classList.contains('expanded')) return;
-                drag = true;
-                aY = e.clientY; aX = e.clientX;
-                el.setPointerCapture(e.pointerId);
-                el.style.transition = 'none';
-                el.style.zIndex = '50'; // رفع طبقة العنصر النشط ليظهر تأثير الزجاج المعزول فوق بقية المكونات
+            card.addEventListener('pointerdown', (e) => {
+                if(card.classList.contains('expanded')) return;
+                draggingCard = true;
+                cStartX = e.clientX; cStartY = e.clientY;
+                card.setPointerCapture(e.pointerId);
+                card.style.transition = 'none';
+                card.style.zIndex = '50';
             });
 
-            el.addEventListener('pointermove', (e) => {
-                if (!drag) return;
-                let dY = e.clientY - aY;
-                let dX = e.clientX - aX;
+            card.addEventListener('pointermove', (e) => {
+                if (!draggingCard) return;
+                let offX = (e.clientX - cStartX) * 0.15; // وزن ومقاومة السحب ليعطي ثقل حقيقي
+                let offY = (e.clientY - cStartY) * 0.15;
 
-                let sX = 1 + (dX * 0.0003);
-                let sY = 1 + (dY * 0.0003);
-                let mX = dX * 0.16; // حركة رصينة وثقيلة تلحق الإصبع بفخامة ثقيلة
-                let mY = dY * 0.16;
+                let stretchY = 1 + Math.min(Math.abs(offY) * 0.001, 0.04);
+                let stretchX = 1 + Math.min(Math.abs(offX) * 0.001, 0.04);
 
-                el.style.transform = `translate3d(${mX}px, ${mY}px, 0) scale(${sX}, ${sY})`;
+                card.style.transform = `translate3d(${offX}px, ${offY}px, 0) scale(${stretchX}, ${stretchY})`;
             });
 
-            el.addEventListener('pointerup', () => {
-                if (!drag) return;
-                drag = false;
-                el.style.transition = 'transform 0.68s cubic-bezier(0.16, 1, 0.3, 1)';
-                el.style.transform = 'translate3d(0px, 0px, 0) scale(1, 1)';
-                setTimeout(() => { if(!el.classList.contains('expanded')) el.style.zIndex = '20'; }, 680);
+            card.addEventListener('pointerup', () => {
+                if (!draggingCard) return;
+                draggingCard = false;
+                card.style.transition = 'transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)';
+                card.style.transform = 'translate3d(0,0,0) scale(1)';
+                setTimeout(() => { if(!card.classList.contains('expanded')) card.style.zIndex = '20'; }, 650);
             });
         });
     </script>
