@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jelly Physics Sandbox - Fixed</title>
+    <title>المستطيل المطاطي الاحترافي</title>
     <style>
         * {
             margin: 0;
@@ -14,17 +14,26 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
+            background-color: #0b071a;
         }
-        body {
-            background: linear-gradient(45deg, #120c1f, #1a103c, #2b1055, #511845);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+        /* خلفية سينمائية متحركة باحترافية بأكثر من لون متداخل */
+        .bg-gradient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background: linear-gradient(125deg, #0f0c20, #150933, #2a0845, #64113f, #113644);
+            background-size: 300% 300%;
+            animation: elegantGradient 18s ease infinite;
         }
-        @keyframes gradientBG {
+        @keyframes elegantGradient {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
+        /* تأثير الضباب تحت الكانفاس لتوليد مظهر زجاجي للمستطيل */
         canvas {
             display: block;
             position: absolute;
@@ -32,11 +41,14 @@
             left: 0;
             width: 100%;
             height: 100%;
+            z-index: 2;
+            pointer-events: auto;
         }
     </style>
 </head>
 <body>
 
+    <div class="bg-gradient"></div>
     <canvas id="jellyCanvas"></canvas>
 
     <script>
@@ -50,13 +62,14 @@
         window.addEventListener('resize', resize);
         resize();
 
-        // إعدادات فيزيائية موزونة ومستقرة تماماً
-        const GRAVITY = 0.0; 
-        const STIFFNESS = 0.03; // تقليل الصلابة لمنع الانفجار الفيزيائي
-        const DAMPING = 0.85;   // الحفاظ على ثقل الجيلي ولزوجته
-        const ROWS = 6;         
-        const COLS = 10;        
-        const SPACING = 25;     
+        // إعدادات فيزيائية صارمة لمنع الاختفاء والانفجار
+        const STIFFNESS = 0.12;    // قوة السبرنغ لإرجاع الشكل وضمان عدم تمدده للانهاية
+        const DAMPING = 0.82;      // لزوجة عالية تعطي ثقل جيلي حقيقي وتمتص الطاقة الزائدة
+        const MAX_VELOCITY = 15;   // حد أقصى للسرعة (حماية مطلقة من الاختفاء)
+        const ROWS = 5;            
+        const COLS = 8;            
+        const SPACING_X = 35;      
+        const SPACING_Y = 30;      
 
         let particles = [];
         let springs = [];
@@ -68,22 +81,28 @@
                 this.y = y;
                 this.vx = 0;
                 this.vy = 0;
-                this.mass = 1.0;
-                this.radius = 10;
+                this.mass = 1.5; // زيادة الكتلة ليعطي شعوراً بالثقل
             }
             update() {
                 if (this === draggedParticle) return;
-                
+
+                // تطبيق اللزوجة والتباطؤ
                 this.vx *= DAMPING;
                 this.vy *= DAMPING;
+
+                // كبح السرعة الزائدة كأمان
+                this.vx = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, this.vx));
+                this.vy = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, this.vy));
+
                 this.x += this.vx;
                 this.y += this.vy;
 
-                // كود حماية: يمنع النقاط من الخروج خارج شاشة الموقع
-                if (this.x < this.radius) { this.x = this.radius; this.vx *= -0.5; }
-                if (this.x > canvas.width - this.radius) { this.x = canvas.width - this.radius; this.vx *= -0.5; }
-                if (this.y < this.radius) { this.y = this.radius; this.vy *= -0.5; }
-                if (this.y > canvas.height - this.radius) { this.y = canvas.height - this.radius; this.vy *= -0.5; }
+                // منع النقاط من الخروج عن حدود الشاشة بأي شكل من الأشكال
+                const pad = 20;
+                if (this.x < pad) { this.x = pad; this.vx *= -0.3; }
+                if (this.x > canvas.width - pad) { this.x = canvas.width - pad; this.vx *= -0.3; }
+                if (this.y < pad) { this.y = pad; this.vy *= -0.3; }
+                if (this.y > canvas.height - pad) { this.y = canvas.height - pad; this.vy *= -0.3; }
             }
         }
 
@@ -98,11 +117,10 @@
                 let dy = this.p2.y - this.p1.y;
                 let distance = Math.sqrt(dx * dx + dy * dy);
                 if (distance === 0) return;
-                
+
                 let diff = this.length - distance;
-                // معادلة الحركة التوافقية لضمان مرونة الجيلي بدون طاقة زائدة
                 let force = (diff / distance) * STIFFNESS;
-                
+
                 let fx = dx * force;
                 let fy = dy * force;
 
@@ -111,8 +129,8 @@
                     this.p1.vy -= fy / this.p1.mass;
                 }
                 if (this.p2 !== draggedParticle) {
-                    this.p2.x += fx / this.p2.mass;
-                    this.p2.y += fy / this.p2.mass;
+                    this.p2.vx += fx / this.p2.mass;
+                    this.p2.vy += fy / this.p2.mass;
                 }
             }
         }
@@ -120,31 +138,43 @@
         function initJelly() {
             particles = [];
             springs = [];
-            let startX = (canvas.width - (COLS - 1) * SPACING) / 2;
-            let startY = (canvas.height - (ROWS - 1) * SPACING) / 2;
+            
+            let startX = (canvas.width - (COLS - 1) * SPACING_X) / 2;
+            let startY = (canvas.height - (ROWS - 1) * SPACING_Y) / 2;
 
+            // إنشاء النقاط
             for (let r = 0; r < ROWS; r++) {
                 for (let c = 0; c < COLS; c++) {
-                    particles.push(new Particle(startX + c * SPACING, startY + r * SPACING));
+                    particles.push(new Particle(startX + c * SPACING_X, startY + r * SPACING_Y));
                 }
             }
 
+            // ربط السبرنغات (هيكلة داخلية مكثفة للمحافظة على شكل المستطيل)
             for (let r = 0; r < ROWS; r++) {
                 for (let c = 0; c < COLS; c++) {
                     let i = r * COLS + c;
-                    if (c < COLS - 1) springs.push(new Spring(particles[i], particles[i + 1], SPACING));
-                    if (r < ROWS - 1) springs.push(new Spring(particles[i], particles[i + COLS], SPACING));
-                    if (c < COLS - 1 && r < ROWS - 1) springs.push(new Spring(particles[i], particles[i + COLS + 1], Math.sqrt(2) * SPACING));
-                    if (c > 0 && r < ROWS - 1) springs.push(new Spring(particles[i], particles[i + COLS - 1], Math.sqrt(2) * SPACING));
+
+                    // روابط أفقية
+                    if (c < COLS - 1) springs.push(new Spring(particles[i], particles[i + 1], SPACING_X));
+                    // روابط عمودية
+                    if (r < ROWS - 1) springs.push(new Spring(particles[i], particles[i + COLS], SPACING_Y));
+                    
+                    // روابط قطرية متقاطعة لمنع الانهيار الهيكلي وتأمين حركة الجيلي
+                    if (c < COLS - 1 && r < ROWS - 1) {
+                        let distDiag = Math.sqrt(SPACING_X * SPACING_X + SPACING_Y * SPACING_Y);
+                        springs.push(new Spring(particles[i], particles[i + COLS + 1], distDiag));
+                        springs.push(new Spring(particles[i + 1], particles[i + COLS], distDiag));
+                    }
                 }
             }
         }
 
         initJelly();
 
+        // تتبع اللمس والماوس بدقة
         function handleStart(mx, my) {
             let closest = null;
-            let minDist = 50; 
+            let minDist = 60; // نطاق التقاط مريح للإصبع
             particles.forEach(p => {
                 let dist = Math.hypot(p.x - mx, p.y - my);
                 if (dist < minDist) {
@@ -168,12 +198,14 @@
             draggedParticle = null;
         }
 
+        // أحداث الماوس
         window.addEventListener('mousedown', (e) => handleStart(e.clientX, e.clientY));
         window.addEventListener('mousemove', (e) => handleMove(e.clientX, e.clientY));
         window.addEventListener('mouseup', handleEnd);
 
+        // أحداث اللمس للهواتف
         window.addEventListener('touchstart', (e) => {
-            if(e.touches.length > 0) handleStart(e.touches[0].clientX, e.touches[0].clientY);
+            if (e.touches.length > 0) handleStart(e.touches[0].clientX, e.touches[0].clientY);
         }, { passive: true });
         window.addEventListener('touchmove', (e) => {
-            if(e.touches.lengthNormally I can help with things like this, but I don't seem to have access to that content. You can try again or ask me for something else.
+            if (e.touches.Normally I can help with things like this, but I don't seem to have access to that content. You can try again or ask me for something else.
