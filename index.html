@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jelly Physics Sandbox</title>
+    <title>Jelly Physics Sandbox - Fixed</title>
     <style>
         * {
             margin: 0;
@@ -14,16 +14,11 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            font-family: sans-serif;
         }
-        /* خلفية الألوان المتحركة */
         body {
             background: linear-gradient(45deg, #120c1f, #1a103c, #2b1055, #511845);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
         @keyframes gradientBG {
             0% { background-position: 0% 50%; }
@@ -48,7 +43,6 @@
         const canvas = document.getElementById('jellyCanvas');
         const ctx = canvas.getContext('2d');
 
-        // ضبط حجم الكانفاس
         function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -56,13 +50,13 @@
         window.addEventListener('resize', resize);
         resize();
 
-        // إعدادات الفيزياء (تكدر تعدل عليها حتى تغير الثقل والمرونة)
+        // إعدادات فيزيائية موزونة ومستقرة تماماً
         const GRAVITY = 0.0; 
-        const STIFFNESS = 0.04; // قوة السبرنغ (كل ما تقل كل ما يصير مطاطي أكثر)
-        const DAMPING = 0.88;   // لزوجة الجيلي وثقله (كل ما تقل يزيد الثقل والتباطؤ)
-        const ROWS = 6;         // عدد النقاط بالطول
-        const COLS = 10;        // عدد النقاط بالعرض
-        const SPACING = 30;     // المسافة بين النقاط
+        const STIFFNESS = 0.03; // تقليل الصلابة لمنع الانفجار الفيزيائي
+        const DAMPING = 0.85;   // الحفاظ على ثقل الجيلي ولزوجته
+        const ROWS = 6;         
+        const COLS = 10;        
+        const SPACING = 25;     
 
         let particles = [];
         let springs = [];
@@ -72,19 +66,24 @@
             constructor(x, y) {
                 this.x = x;
                 this.y = y;
-                this.ox = x;
-                this.oy = y;
                 this.vx = 0;
                 this.vy = 0;
-                this.mass = 1.2; // وزن النقطة
+                this.mass = 1.0;
+                this.radius = 10;
             }
             update() {
                 if (this === draggedParticle) return;
-                this.vy += GRAVITY;
+                
                 this.vx *= DAMPING;
                 this.vy *= DAMPING;
                 this.x += this.vx;
                 this.y += this.vy;
+
+                // كود حماية: يمنع النقاط من الخروج خارج شاشة الموقع
+                if (this.x < this.radius) { this.x = this.radius; this.vx *= -0.5; }
+                if (this.x > canvas.width - this.radius) { this.x = canvas.width - this.radius; this.vx *= -0.5; }
+                if (this.y < this.radius) { this.y = this.radius; this.vy *= -0.5; }
+                if (this.y > canvas.height - this.radius) { this.y = canvas.height - this.radius; this.vy *= -0.5; }
             }
         }
 
@@ -101,6 +100,7 @@
                 if (distance === 0) return;
                 
                 let diff = this.length - distance;
+                // معادلة الحركة التوافقية لضمان مرونة الجيلي بدون طاقة زائدة
                 let force = (diff / distance) * STIFFNESS;
                 
                 let fx = dx * force;
@@ -117,7 +117,6 @@
             }
         }
 
-        // إنشاء شبكة الجيلي في منتصف الشاشة
         function initJelly() {
             particles = [];
             springs = [];
@@ -130,17 +129,12 @@
                 }
             }
 
-            // ربط النقاط بالسبرنغات (أفقياً، عمودياً، وقطرياً للمحافظة على الشكل الرئيسي)
             for (let r = 0; r < ROWS; r++) {
                 for (let c = 0; c < COLS; c++) {
                     let i = r * COLS + c;
-                    // أفقي
                     if (c < COLS - 1) springs.push(new Spring(particles[i], particles[i + 1], SPACING));
-                    // عمودي
                     if (r < ROWS - 1) springs.push(new Spring(particles[i], particles[i + COLS], SPACING));
-                    // قطري يمين
                     if (c < COLS - 1 && r < ROWS - 1) springs.push(new Spring(particles[i], particles[i + COLS + 1], Math.sqrt(2) * SPACING));
-                    // قطري يسار
                     if (c > 0 && r < ROWS - 1) springs.push(new Spring(particles[i], particles[i + COLS - 1], Math.sqrt(2) * SPACING));
                 }
             }
@@ -148,10 +142,9 @@
 
         initJelly();
 
-        // السحب والتحكم بالماوس أو اللمس
         function handleStart(mx, my) {
             let closest = null;
-            let minDist = 40; // مسافة الالتقاط
+            let minDist = 50; 
             particles.forEach(p => {
                 let dist = Math.hypot(p.x - mx, p.y - my);
                 if (dist < minDist) {
@@ -166,6 +159,8 @@
             if (draggedParticle) {
                 draggedParticle.x = mx;
                 draggedParticle.y = my;
+                draggedParticle.vx = 0;
+                draggedParticle.vy = 0;
             }
         }
 
@@ -179,54 +174,6 @@
 
         window.addEventListener('touchstart', (e) => {
             if(e.touches.length > 0) handleStart(e.touches[0].clientX, e.touches[0].clientY);
-        });
+        }, { passive: true });
         window.addEventListener('touchmove', (e) => {
-            if(e.touches.length > 0) handleMove(e.touches[0].clientX, e.touches[0].clientY);
-        });
-        window.addEventListener('touchend', handleEnd);
-
-        // حلقة التحديث والرسم المستمر
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // هزات خفيفة طبيعية حتى يضل الجيلي يتحرك تلقائياً
-            if (!draggedParticle && Math.random() < 0.03) {
-                let randomP = particles[Math.floor(Math.random() * particles.length)];
-                randomP.vx += (Math.random() - 0.5) * 5;
-                randomP.vy += (Math.random() - 0.5) * 5;
-            }
-
-            // تحديث الفيزياء عدة مرات في الفريم الواحد لزيادة الدقة والتقل
-            for (let k = 0; k < 6; k++) {
-                springs.forEach(s => s.update());
-            }
-            particles.forEach(p => p.update());
-
-            // رسم المستطيل المشوه ككتلة وحدة ناعمة
-            ctx.beginPath();
-            // رسم المحيط الخارجي للشبكة
-            // الحافة العلوية
-            for (let c = 0; c < COLS; c++) ctx.lineTo(particles[c].x, particles[c].y);
-            // الحافة اليمنى
-            for (let r = 1; r < ROWS; r++) ctx.lineTo(particles[r * COLS + (COLS - 1)].x, particles[r * COLS + (COLS - 1)].y);
-            // الحافة السفلية
-            for (let c = COLS - 2; c >= 0; c--) ctx.lineTo(particles[(ROWS - 1) * COLS + c].x, particles[(ROWS - 1) * COLS + c].y);
-            // الحافة اليسرى
-            for (let r = ROWS - 2; r >= 0; r--) ctx.lineTo(particles[r * COLS].x, particles[r * COLS].y);
-
-            ctx.closePath();
-            
-            // لون الجيلي (نصف شفاف حتى يبين المطاط)
-            ctx.fillStyle = 'rgba(0, 229, 255, 0.7)';
-            ctx.fill();
-            ctx.strokeStyle = '#fff';
-            ctx.lineWidth = 3;
-            ctx.stroke();
-
-            requestAnimationFrame(animate);
-        }
-
-        animate();
-    </script>
-</body>
-</html>
+            if(e.touches.lengthNormally I can help with things like this, but I don't seem to have access to that content. You can try again or ask me for something else.
