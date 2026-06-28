@@ -5,352 +5,183 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Jelly Soft-Body Rectangle</title>
 <style>
-  /* 1. الخلفية السينمائية المتحركة - 4 ألوان غامقة */
-  :root {
-    --bg-size: 400% 400%;
-  }
   html, body {
     margin: 0;
     padding: 0;
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: linear-gradient(135deg,
-      #0b0c2a, /* أزرق ليلي عميق */
-      #2a0b3d, /* بنفسجي عميق */
-      #4a102a, /* وردي محروق */
-      #0a1f3a /* نيلي */
-    );
-    background-size: var(--bg-size);
+    background: linear-gradient(135deg, #0b0c2a, #2a0b3d, #4a102a, #0a1f3a);
+    background-size: 400% 400%;
     animation: gradientFlow 25s ease infinite;
-    touch-action: none; /* منع سحب الصفحة */
+    touch-action: none;
   }
-
   @keyframes gradientFlow {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
   }
-
-  canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-
-  /* طبقة معلومات */
- .hint {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: rgba(255,255,255,0.7);
-    font-family: system-ui, -apple-system, sans-serif;
-    font-size: 14px;
-    backdrop-filter: blur(10px);
-    background: rgba(0,0,0,0.2);
-    padding: 8px 16px;
-    border-radius: 20px;
-    pointer-events: none;
-    user-select: none;
+  canvas { display: block; width: 100%; height: 100%; }
+.hint {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    color: rgba(255,255,255,0.8); font-family: system-ui, sans-serif; font-size: 14px;
+    backdrop-filter: blur(10px); background: rgba(0,0,0,0.25); padding: 8px 16px;
+    border-radius: 20px; pointer-events: none; user-select: none; border: 1px solid rgba(255,255,255,0.1);
   }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
-<div class="hint">اسحب المستطيل بإصبعك أو الماوس</div>
+<div class="hint">اسحب المستطيل الجيلي بإصبعك</div>
 
 <script>
-/*
- 2+3+4. محاكي فيزياء Spring-Mass لشبكة 2D
-  مستطيل جيلي بزجاج ضبابي Glassmorphism
-*/
-
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d', { alpha: true });
 
 let W = window.innerWidth;
 let H = window.innerHeight;
-canvas.width = W * devicePixelRatio;
-canvas.height = H * devicePixelRatio;
-ctx.scale(devicePixelRatio, devicePixelRatio);
-
-window.addEventListener('resize', () => {
+function resizeCanvas(){
   W = window.innerWidth;
   H = window.innerHeight;
   canvas.width = W * devicePixelRatio;
   canvas.height = H * devicePixelRatio;
-  ctx.scale(devicePixelRatio, devicePixelRatio);
-  initJelly(); // إعادة تموضع عند التدوير
-});
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  initJelly();
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
 
-/* ========= إعدادات الفيزياء الصارمة ========= */
-const CONFIG = {
-  GRID_W: 12, // عدد النقاط عرضاً
-  GRID_H: 8, // عدد النقاط طولاً
-  REST_STIFFNESS: 0.12, // قوة السبرنغ للشكل الأصلي
-  SHEAR_STIFFNESS: 0.08, // قوة السبرنغات القطرية
-  DAMPING: 0.92, // عطالة وثقل لزج - كل ما قل صار أثقل
-  MASS: 1.0,
-  MAX_VELOCITY: 18, // Velocity Clamping لمنع الانفجار
-  MAX_STRETCH: 2.5, // الحد الأقصى للامتداد
-  GRAVITY: 0, // بدون جاذبية حتى ما يسقط
-  BOUNCE: 0.4, // ارتداد الجدران
-  DRAG_STIFFNESS: 0.35 // قوة سحب النقطة بالماوس
+/* ========= إعدادات الفيزياء ========= */
+const CFG = {
+  GRID_W: 10, GRID_H: 6,
+  STIFF: 0.14, SHEAR: 0.09, DAMP: 0.91,
+  MAX_V: 20, MAX_STRETCH: 2.2, BOUNCE: 0.35, DRAG_K: 0.4
 };
 
-class Particle {
-  constructor(x, y, pinned = false) {
-    this.x = x; this.y = y; // الموقع الحالي
-    this.ox = x; this.oy = y; // الموقع الأصلي للعودة
-    this.vx = 0; this.vy = 0; // السرعة
-    this.ax = 0; this.ay = 0; // التسارع
-    this.pinned = pinned; // ثابت؟
-    this.mass = CONFIG.MASS;
+class P {
+  constructor(x,y,ox,oy){
+    this.x=x; this.y=y; this.ox=ox; this.oy=oy;
+    this.vx=0; this.vy=0; this.ax=0; this.ay=0;
   }
-
-  applyForce(fx, fy) {
-    if(this.pinned) return;
-    this.ax += fx / this.mass;
-    this.ay += fy / this.mass;
+  f(fx,fy){ this.ax+=fx; this.ay+=fy; }
+  step(){
+    this.vx+=this.ax; this.vy+=this.ay;
+    const v=Math.hypot(this.vx,this.vy);
+    if(v>CFG.MAX_V){ const s=CFG.MAX_V/v; this.vx*=s; this.vy*=s; }
+    this.x+=this.vx; this.y+=this.vy;
+    this.vx*=CFG.DAMP; this.vy*=CFG.DAMP;
+    this.ax=0; this.ay=0;
+    if(this.x<0){this.x=0;this.vx*=-CFG.BOUNCE;}
+    if(this.x>W){this.x=W;this.vx*=-CFG.BOUNCE;}
+    if(this.y<0){this.y=0;this.vy*=-CFG.BOUNCE;}
+    if(this.y>H){this.y=H;this.vy*=-CFG.BOUNCE;}
   }
-
-  update() {
-    if(this.pinned) return;
-
-    // تكامل فيرليت البسيط
-    this.vx += this.ax;
-    this.vy += this.ay + CONFIG.GRAVITY;
-
-    // Velocity Clamping شرط الأمان 1
-    const v = Math.hypot(this.vx, this.vy);
-    if(v > CONFIG.MAX_VELOCITY){
-      const s = CONFIG.MAX_VELOCITY / v;
-      this.vx *= s; this.vy *= s;
-    }
-
-    this.x += this.vx;
-    this.y += this.vy;
-
-    // Damping = اللزوجة والثقل
-    this.vx *= CONFIG.DAMPING;
-    this.vy *= CONFIG.DAMPING;
-
-    // إعادة تعيين القوة
-    this.ax = 0; this.ay = 0;
-
-    // Boundary Collisions شرط الأمان 2
-    if(this.x < 0){ this.x = 0; this.vx *= -CONFIG.BOUNCE; }
-    if(this.x > W){ this.x = W; this.vx *= -CONFIG.BOUNCE; }
-    if(this.y < 0){ this.y = 0; this.vy *= -CONFIG.BOUNCE; }
-    if(this.y > H){ this.y = H; this.vy *= -CONFIG.BOUNCE; }
-  }
-
-  restore() {
-    // قوة تعيد النقطة لمكانها الأصلي = شكل المستطيل
-    if(this.pinned) return;
-    const dx = this.ox - this.x;
-    const dy = this.oy - this.y;
-    this.applyForce(dx * CONFIG.REST_STIFFNESS, dy * CONFIG.REST_STIFFNESS);
+  restore(){
+    this.f((this.ox-this.x)*CFG.STIFF, (this.oy-this.y)*CFG.STIFF);
   }
 }
 
-class Spring {
-  constructor(p1, p2, restLen, k) {
-    this.p1 = p1; this.p2 = p2;
-    this.rest = restLen;
-    this.k = k; // معامل الصلابة
-  }
-
-  update() {
-    let dx = this.p2.x - this.p1.x;
-    let dy = this.p2.y - this.p1.y;
-    let dist = Math.hypot(dx, dy);
-    if(dist === 0) return;
-
-    // Max Stretch Clamping
-    if(dist > this.rest * CONFIG.MAX_STRETCH){
-      dist = this.rest * CONFIG.MAX_STRETCH;
-      const ratio = dist / Math.hypot(this.p2.x - this.p1.x, this.p2.y - this.p1.y);
-      this.p2.x = this.p1.x + dx * ratio;
-      this.p2.y = this.p1.y + dy * ratio;
-    }
-
-    const force = (dist - this.rest) * this.k;
-    const fx = force * dx / dist;
-    const fy = force * dy / dist;
-
-    this.p1.applyForce(fx, fy);
-    this.p2.applyForce(-fx, -fy);
+class S {
+  constructor(a,b,len,k){this.a=a;this.b=b;this.len=len;this.k=k;}
+  step(){
+    let dx=this.b.x-this.a.x, dy=this.b.y-this.a.y;
+    let d=Math.hypot(dx,dy)||0.001;
+    if(d>this.len*CFG.MAX_STRETCH){d=this.len*CFG.MAX_STRETCH;}
+    const f=(d-this.len)*this.k;
+    const fx=f*dx/d, fy=f*dy/d;
+    this.a.f(fx,fy); this.b.f(-fx,-fy);
   }
 }
 
-/* ========= بناء المستطيل الجيلي ========= */
-let particles = [];
-let springs = [];
-let cols, rows, spacingX, spacingY;
-let dragParticle = null;
-let dragOffsetX = 0, dragOffsetY = 0;
+let pts=[], spr=[];
+let cols, rows, dx, dy;
 
-function initJelly() {
-  particles = [];
-  springs = [];
+function initJelly(){
+  pts=[]; spr=[];
+  const rw=Math.min(W,H)*0.55, rh=rw*0.6;
+  const sx=(W-rw)/2, sy=(H-rh)/2;
+  cols=CFG.GRID_W; rows=CFG.GRID_H;
+  dx=rw/(cols-1); dy=rh/(rows-1);
 
-  const rectW = Math.min(W, H) * 0.5;
-  const rectH = rectW * 0.6;
-  const startX = (W - rectW) / 2;
-  const startY = (H - rectH) / 2;
-
-  cols = CONFIG.GRID_W;
-  rows = CONFIG.GRID_H;
-  spacingX = rectW / (cols - 1);
-  spacingY = rectH / (rows - 1);
-
-  // إنشاء شبكة النقاط
-  for(let y = 0; y < rows; y++){
-    for(let x = 0; x < cols; x++){
-      const px = startX + x * spacingX;
-      const py = startY + y * spacingY;
-      const pinned = false; // كله حر حتى يتحرك كله
-      particles.push(new Particle(px, py, pinned));
+  for(let y=0;y<rows;y++){
+    for(let x=0;x<cols;x++){
+      pts.push(new P(sx+x*dx, sy+y*dy, sx+x*dx, sy+y*dy));
     }
   }
-
-  const idx = (x,y) => y * cols + x;
-
-  // سبرنغات أفقية ورأسية
-  for(let y = 0; y < rows; y++){
-    for(let x = 0; x < cols; x++){
-      if(x < cols - 1)
-        springs.push(new Spring(particles[idx(x,y)], particles[idx(x+1,y)], spacingX, CONFIG.REST_STIFFNESS));
-      if(y < rows - 1)
-        springs.push(new Spring(particles[idx(x,y)], particles[idx(x,y+1)], spacingY, CONFIG.REST_STIFFNESS));
-      // سبرنغات قطرية للثبات ومنع التشوه المدب
-      if(x < cols - 1 && y < rows - 1){
-        springs.push(new Spring(particles[idx(x,y)], particles[idx(x+1,y+1)], Math.hypot(spacingX, spacingY), CONFIG.SHEAR_STIFFNESS));
-        springs.push(new Spring(particles[idx(x+1,y)], particles[idx(x,y+1)], Math.hypot(spacingX, spacingY), CONFIG.SHEAR_STIFFNESS));
+  const id=(x,y)=>y*cols+x;
+  for(let y=0;y<rows;y++){
+    for(let x=0;x<cols;x++){
+      if(x<cols-1) spr.push(new S(pts[id(x,y)], pts[id(x+1,y)], dx, CFG.STIFF));
+      if(y<rows-1) spr.push(new S(pts[id(x,y)], pts[id(x,y+1)], dy, CFG.STIFF));
+      if(x<cols-1&&y<rows-1){
+        const dl=Math.hypot(dx,dy);
+        spr.push(new S(pts[id(x,y)], pts[id(x+1,y+1)], dl, CFG.SHEAR));
+        spr.push(new S(pts[id(x+1,y)], pts[id(x,y+1)], dl, CFG.SHEAR));
       }
     }
   }
 }
-initJelly();
 
-/* ========= التفاعل: ماوس + لمس ========= */
-function getPointerPos(e){
-  if(e.touches) {
-    const t = e.touches[0] || e.changedTouches[0];
-    return {x: t.clientX, y: t.clientY};
-  }
-  return {x: e.clientX, y: e.clientY};
+/* ========= السحب ماوس + لمس ========= */
+let drag=null, offx=0, offy=0;
+function pos(e){ const t=e.touches?e.touches[0]:e; return {x:t.clientX,y:t.clientY}; }
+function near(x,y){
+  let best=null, bd=70;
+  for(const p of pts){ const d=Math.hypot(p.x-x,p.y-y); if(d<bd){bd=d;best=p;} }
+  return best;
 }
-
-function findNearestParticle(x, y){
-  let best = null; let bestD = 9999;
-  for(const p of particles){
-    const d = Math.hypot(p.x - x, p.y - y);
-    if(d < bestD){ bestD = d; best = p; }
-  }
-  // فقط لو قريب 80px حتى ما يمسك من بعيد
-  return bestD < 80? best : null;
-}
-
-function onStart(e){
-  e.preventDefault();
-  const {x,y} = getPointerPos(e);
-  const p = findNearestParticle(x,y);
-  if(p){
-    dragParticle = p;
-    dragOffsetX = p.x - x;
-    dragOffsetY = p.y - y;
-    p.vx = 0; p.vy = 0; // وقف العطالة عند المسك
-  }
-}
-function onMove(e){
-  if(!dragParticle) return;
-  e.preventDefault();
-  const {x,y} = getPointerPos(e);
-  const tx = x + dragOffsetX;
-  const ty = y + dragOffsetY;
-  // سحب مرن وليس لصق مباشر
-  dragParticle.applyForce((tx - dragParticle.x) * CONFIG.DRAG_STIFFNESS,
-                          (ty - dragParticle.y) * CONFIG.DRAG_STIFFNESS);
-}
-function onEnd(e){
-  dragParticle = null;
-}
-
-canvas.addEventListener('mousedown', onStart, {passive: false});
-canvas.addEventListener('mousemove', onMove, {passive: true});
-canvas.addEventListener('mouseup', onEnd, {passive: true});
-canvas.addEventListener('mouseleave', onEnd, {passive: true});
-
-canvas.addEventListener('touchstart', onStart, {passive: false});
-canvas.addEventListener('touchmove', onMove, {passive: false});
-canvas.addEventListener('touchend', onEnd, {passive: true});
+canvas.addEventListener('mousedown',e=>{e.preventDefault();const p=pos(e);drag=near(p.x,p.y);if(drag){offx=drag.x-p.x;offy=drag.y-p.y;drag.vx=drag.vy=0;}},{passive:false});
+canvas.addEventListener('mousemove',e=>{if(!drag)return;e.preventDefault();const p=pos(e);drag.f((p.x+offx-drag.x)*CFG.DRAG_K,(p.y+offy-drag.y)*CFG.DRAG_K);},{passive:true});
+addEventListener('mouseup',()=>drag=null,{passive:true});
+canvas.addEventListener('touchstart',e=>{e.preventDefault();const p=pos(e);drag=near(p.x,p.y);if(drag){offx=drag.x-p.x;offy=drag.y-p.y;drag.vx=drag.vy=0;}},{passive:false});
+canvas.addEventListener('touchmove',e=>{if(!drag)return;e.preventDefault();const p=pos(e);drag.f((p.x+offx-drag.x)*CFG.DRAG_K,(p.y+offy-drag.y)*CFG.DRAG_K);},{passive:false});
+addEventListener('touchend',()=>drag=null,{passive:true});
 
 /* ========= الرسم ========= */
-function drawJelly() {
-  // بناء مسار محيطي ناعم من النقاط الخارجية فقط
-  const outline = [];
-  for(let x = 0; x < cols; x++) outline.push(particles[x]); // أعلى
-  for(let y = 1; y < rows; y++) outline.push(particles[(rows-1)*cols + x]); // يمين - تم تصحيحه
-  // إعادة بناء صحيحة للمحيط
-  outline.length = 0;
-  for(let x = 0; x < cols; x++) outline.push(particles[x]); // top row
-  for(let y = 1; y < rows; y++) outline.push(particles[y*cols + cols-1]); // right col
-  for(let x = cols-2; x >= 0; x--) outline.push(particles[(rows-1)*cols + x]); // bottom row
-  for(let y = rows-2; y > 0; y--) outline.push(particles[y*cols]); // left col
+function draw(){
+  ctx.clearRect(0,0,W,H);
+
+  // ناخذ نقاط المحيط فقط بالترتيب الصحيح
+  const ring=[];
+  for(let x=0;x<cols;x++) ring.push(pts[x]); // top
+  for(let y=1;y<rows;y++) ring.push(pts[y*cols+cols-1]); // right
+  for(let x=cols-2;x>=0;x--) ring.push(pts[(rows-1)*cols+x]); // bottom
+  for(let y=rows-2;y>0;y--) ring.push(pts[y*cols]); // left
 
   ctx.save();
 
-  // 2. تأثير Glassmorphism: ضبابي يشف اللي تحته
-  ctx.fillStyle = 'rgba(255,255,255,0.08)';
+  // 1. رسم الجيلي الضبابي
   ctx.beginPath();
-  ctx.moveTo(outline[0].x, outline[0].y);
-  for(let i = 1; i < outline.length; i++){
-    // Catmull-Rom to Bezier للزوايا الدائرية الناعمة
-    const p0 = outline[(i-1+outline.length)%outline.length];
-    const p1 = outline[i];
-    const p2 = outline[(i+1)%outline.length];
-    const p3 = outline[(i+2)%outline.length];
-    const cp1x = p1.x + (p2.x - p0.x) / 6;
-    const cp1y = p1.y + (p2.y - p0.y) / 6;
-    const cp2x = p2.x - (p3.x - p1.x) / 6;
-    const cp2y = p2.y - (p3.y - p1.y) / 6;
-    ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+  ctx.moveTo(ring[0].x, ring[0].y);
+  for(let i=0;i<ring.length;i++){
+    const p1=ring[i], p2=ring[(i+1)%ring.length];
+    const mx=(p1.x+p2.x)/2, my=(p1.y+p2.y)/2;
+    ctx.quadraticCurveTo(p1.x,p1.y,mx,my); // زوايا ناعمة دائرية
   }
   ctx.closePath();
-  ctx.fill();
 
-  // حدود ضوئية ناعمة
-  ctx.strokeStyle = 'rgba(255,255,255,0.25)';
-  ctx.lineWidth = 2;
+  // طبقة الزجاج
+  ctx.fillStyle='rgba(255,255,255,0.1)';
+  ctx.fill();
+  ctx.filter='blur(14px)';
+  ctx.fill();
+  ctx.filter='none';
+
+  // إطار لمعة
+  ctx.strokeStyle='rgba(255,255,255,0.3)';
+  ctx.lineWidth=1.5;
   ctx.stroke();
-
-  // Backdrop Blur الفعلي
-  ctx.filter = 'blur(12px)';
-  ctx.fill();
-  ctx.filter = 'none';
-
   ctx.restore();
 }
 
-function physicsStep(){
-  // 1. قوى الإرجاع للشكل الأصلي
-  for(const p of particles) p.restore();
-  // 2. سبرنغات الشبكة
-  for(const s of springs) s.update();
-  // 3. تكامل الحركة
-  for(const p of particles) p.update();
+function tick(){
+  for(const p of pts) p.restore();
+  for(const s of spr) s.step();
+  for(const p of pts) p.step();
+  draw();
+  requestAnimationFrame(tick);
 }
-
-function loop(){
-  ctx.clearRect(0,0,W,H);
-  physicsStep();
-  drawJelly();
-  requestAnimationFrame(loop);
-}
-loop();
+tick();
 </script>
 </body>
 </html>
