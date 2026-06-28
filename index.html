@@ -2,198 +2,148 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Insta Counter Pro - Final Engine</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عداد متابعين إنستغرام مباشر</title>
     <style>
-        :root {
-            --ios-bg: #000000;
-            --card-glass: rgba(18, 18, 22, 0.45);
-            --card-border: rgba(255, 255, 255, 0.08);
-            --text-main: rgba(255, 255, 255, 0.96);
-            --text-muted: rgba(255, 255, 255, 0.55);
-            --ios-blue: #0a84ff;
-            --ios-radius: 16px;
-        }
-
-        * {
-            margin: 0; padding: 0;
-            box-sizing: border-box; user-select: none; -webkit-user-select: none;
-            touch-action: none; -webkit-tap-highlight-color: transparent;
-        }
-
         body {
-            background-color: #08080a;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
-            display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; color: #ffffff; overflow: hidden;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #121212;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
-
-        .phone-shell {
-            position: relative;
-            width: 393px; height: 852px;
-            background: radial-gradient(circle at top right, #1d1d22 0%, #000000 100%);
-            border: 11px solid #1c1c1e; border-radius: 56px;
-            box-shadow: 0 45px 110px rgba(0,0,0,0.9);
-            overflow: hidden;
-            display: flex; flex-direction: column;
-            perspective: 1000px;
+        .counter-container {
+            text-align: center;
+            background: #1e1e1e;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid #333;
+            width: 350px;
         }
-
-        .status-bar {
-            position: absolute; top: 18px; width: 100%; padding: 0 34px;
-            display: flex; justify-content: space-between; align-items: center;
-            font-size: 13px; font-weight: 600; z-index: 999; color: #fff;
+        h2 {
+            margin-bottom: 5px;
+            color: #e1306c;
         }
-        .dynamic-island {
-            position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
-            width: 110px; height: 30px; background: #000; border-radius: 20px; z-index: 1000;
+        .username {
+            color: #aaa;
+            font-size: 14px;
+            margin-bottom: 30px;
         }
-
-        .app-view {
-            flex: 1; overflow-y: auto;
-            padding: 75px 18px 40px 18px;
-            display: flex; flex-direction: column; align-items: center;
-            gap: 16px;
-            scrollbar-width: none;
+        .count {
+            font-size: 48px;
+            font-weight: bold;
+            color: #fff;
+            letter-spacing: 1px;
+            margin: 20px 0;
         }
-        .app-view::-webkit-scrollbar { display: none; }
-
-        /* حاوية بيانات الحساب الوسيط العلوي */
-        .bridge-config-panel {
-            width: 100%; background: rgba(255, 69, 58, 0.1); 
-            border: 1px solid rgba(255, 69, 58, 0.25); border-radius: 14px;
-            padding: 10px 14px; font-size: 12px; display: flex; flex-direction: column; gap: 6px;
+        .status {
+            font-size: 12px;
+            color: #00ffcc;
+            margin-top: 15px;
         }
-
-        .search-area {
-            width: 100%; background: var(--card-glass); border: 1px solid var(--card-border);
-            border-radius: 20px; padding: 12px 16px; display: flex; align-items: center; gap: 12px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        .error {
+            color: #ff3333;
         }
-        .icon-brand { width: 22px; height: 22px; }
-        .search-input { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-size: 15px; direction: ltr; }
-        .search-btn { background: var(--ios-blue); color: #fff; border: none; padding: 6px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; }
-
-        /* كارت العداد */
-        .counter-card {
-            width: 100%; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border);
-            border-radius: var(--ios-radius); padding: 24px 20px; display: flex; flex-direction: column; align-items: center; text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: none;
-        }
-        .counter-card.active { display: flex; animation: card-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes card-enter { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-
-        .avatar-box { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2.5px solid #ff0050; margin-bottom: 14px; }
-        .account-name { font-size: 20px; font-weight: 700; color: var(--text-main); }
-        .followers-label { font-size: 13px; font-weight: 600; color: #ff0050; margin-top: 20px; }
-        
-        .odometer-container { font-size: 56px; font-weight: 800; color: var(--text-main); direction: ltr; display: flex; align-items: flex-end; gap: 2px; margin-top: 8px; }
-        .odometer-core { display: inline-block; overflow: hidden; height: 60px; line-height: 60px; }
-        .odometer-digit { display: block; width: 34px; text-align: center; transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); will-change: transform; }
-
-        .update-bar { font-size: 11px; color: var(--text-muted); margin-top: 12px; }
-        .home-indicator { width: 140px; height: 5px; background: rgba(255,255,255,0.3); border-radius: 3px; position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); }
     </style>
 </head>
 <body>
 
-    <div class="phone-shell">
-        <div class="dynamic-island"></div>
-        <div class="status-bar"><span>١٢:٢٣</span><span style="display:flex; align-items:center; gap:5px;">🛡️ ٥G</span></div>
-
-        <div class="app-view">
-            <!-- إعدادات الحساب الوسيط (تعدلها بيدك هنا بملف الـ HTML) -->
-            <div class="bridge-config-panel">
-                <span style="font-weight: 600; color: #ff453a;">⚙️ إعدادات الحساب الوسيط (الوهمي):</span>
-                <div>النوع: Scraper Session Bridge</div>
-                <!-- هنا تحط يوزر وباسورد حسابك الوهمي مباشرة بداخل الكود -->
-                <div style="color: var(--text-main); margin-top: 4px;">اليوزر الحالي: <span id="bridgeUser" style="color:var(--ios-blue);">owl.7565474</span></div>
-                <div style="color: var(--text-main);">الباسورد الحالي: <span id="bridgePass" style="color:var(--ios-blue);">qp20072007</span></div>
-            </div>
-
-            <!-- بار البحث -->
-            <div class="search-area">
-                <svg class="icon-brand" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-                <input type="text" class="search-input" id="targetHandle" placeholder="يوزر الحساب المراد مراقبته...">
-                <button class="search-btn" id="startBtn">راقب الآن</button>
-            </div>
-
-            <!-- كارت العداد المباشر -->
-            <div class="counter-card" id="counterCard">
-                <img class="avatar-box" id="accAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop">
-                <div class="account-name" id="accName">@username</div>
-
-                <div class="followers-label">المتابعين الحاليين</div>
-                
-                <div class="odometer-container" id="odometer">
-                    <div class="odometer-core"><div class="odometer-digit">0</div></div>
-                    <div class="odometer-core"><div class="odometer-digit">0</div></div>
-                    <div class="odometer-core"><div class="odometer-digit">0</div></div>
-                    <span>,</span>
-                    <div class="odometer-core"><div class="odometer-digit">0</div></div>
-                    <div class="odometer-core"><div class="odometer-digit">0</div></div>
-                    <div class="odometer-core"><div class="odometer-digit">0</div></div>
-                </div>
-
-                <div class="update-bar" id="statusLabel">يتم جلب البيانات الحية...</div>
-            </div>
-        </div>
-        <div class="home-indicator"></div>
+    <div class="counter-container">
+        <h2 id="profile-name">جاري التحميل...</h2>
+        <div class="username">@<span id="profile-username">owl.7565474</span></div>
+        
+        <div class="count" id="follower-count">0</div>
+        
+        <div class="status" id="status-text">جاري الاتصال بإنستغرام...</div>
     </div>
 
     <script>
-        // محرك الـ JavaScript مجهز لاستقبال البيانات ومطابقتها
-        const configUser = "اكتب_اليوزر_هنا"; // سطر 128: غير هذا اليوزر بـ يوزر حسابك الوهمي
-        const configPass = "اكتب_الباسورد_هنا"; // سطر 129: غير هذا الباسورد بـ باسورد حسابك الوهمي
+        // معلومات الحساب الوهمي والمستهدف
+        const username = 'owl.7565474';
+        const password = 'qp20072007';
+        const targetUser = 'owl.7565474'; 
 
-        // تحديث النص الفوق بالواجهة تلقائياً حتى تتأكد أنه قرأهم صح
-        if(configUser !== "اكتب_اليوزر_هنا") document.getElementById('bridgeUser').textContent = configUser;
-        if(configPass !== "اكتب_الباسورد_هنا") document.getElementById('bridgePass').textContent = "********";
+        // دالة تسجيل الدخول لجلب صلاحية الوصول
+        async function loginToInstagram() {
+            const statusText = document.getElementById('status-text');
+            const proxyUrl = 'https://api.allorigins.win/get?url=';
+            const loginUrl = encodeURIComponent('https://www.instagram.com/accounts/login/ajax/');
 
-        const targetInput = document.getElementById('targetHandle');
-        const startBtn = document.getElementById('startBtn');
-        const counterCard = document.getElementById('counterCard');
-        const odometer = document.getElementById('odometer');
-        const statusLabel = document.getElementById('statusLabel');
+            statusText.innerText = "جاري تسجيل الدخول بالحساب الوهمي...";
+            statusText.classList.remove('error');
 
-        let liveInterval = null;
-
-        function setOdometerDigit(el, value) { el.style.transform = `translateY(${value * -60}px)`; }
-
-        // دالة تحديث الأرقام بالأنيميشن الهلامي المباشر
-        function renderCount(num) {
-            const numStr = num.toString().padStart(6, '0');
-            const digits = odometer.querySelectorAll('.odometer-digit');
-            for (let i = 0; i < digits.length; i++) {
-                setOdometerDigit(digits[i], parseInt(numStr[i]));
-            }
-        }
-
-        async function fetchLiveMetrics() {
-            const target = targetInput.value.trim();
-            // هنا محرك جلب المتابعين التلقائي عبر الـ Session Bridge المفتوح بحسابك الوهمي
-            // الكود يقوم بعمل كشط آمن ومحمي للرقم ويعرضه فوراً بالعداد
             try {
-                // محاكاة حية للرقم وتحديثه بالأنيميشن المطاطي الأصلي كل 5 ثواني
-                const baseFake = 342110 + Math.floor(Math.random() * 8);
-                renderCount(baseFake);
-                statusLabel.textContent = "تحديث مباشر ومستقر كل ٥ ثوانٍ...";
-            } catch (e) {
-                statusLabel.textContent = "خطأ في الاتصال بالوسيط، جاري إعادة المحاولة..";
+                const response = await fetch(`${proxyUrl}${loginUrl}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: `username=${encodeURIComponent(username)}&enc_password=%23PWD_INSTAGRAM_BROWSER%3A0%3A${Date.now()}%3A${encodeURIComponent(password)}`
+                });
+
+                const data = await response.json();
+                const resData = JSON.parse(data.contents);
+
+                if (resData.authenticated) {
+                    statusText.innerText = "تم تسجيل الدخول! جاري جلب العداد...";
+                    // تشغيل العداد فوراً وتحديثه كل 5 ثواني
+                    fetchFollowers();
+                    setInterval(fetchFollowers, 5000); 
+                } else {
+                    statusText.classList.add('error');
+                    if (resData.two_factor_required) {
+                        statusText.innerText = "خطأ: الحساب يطلب رمز التحقق (2FA)";
+                    } else if (resData.checkpoint_url) {
+                        statusText.innerText = "خطأ: إنستغرام قفل الحساب ويطلب تأكيد هوية (CheckPoint)";
+                    } else {
+                        statusText.innerText = "فشل الدخول: تأكد من الحساب أو أنه انحظر مؤقتاً";
+                    }
+                }
+            } catch (error) {
+                console.error(error);
+                statusText.innerText = "خطأ في الاتصال بسيرفر تسجيل الدخول";
+                statusText.classList.add('error');
             }
         }
 
-        startBtn.addEventListener('click', () => {
-            const target = targetInput.value.trim();
-            if(!target) return;
-            
-            document.getElementById('accName').textContent = `@${target}`;
-            counterCard.classList.add('active');
-            
-            clearInterval(liveInterval);
-            fetchLiveMetrics();
-            liveInterval = setInterval(fetchLiveMetrics, 5000);
-        });
+        // دالة جلب العداد المباشر
+        async function fetchFollowers() {
+            const statusText = document.getElementById('status-text');
+            const followerCount = document.getElementById('follower-count');
+            const profileName = document.getElementById('profile-name');
+
+            const proxyUrl = 'https://api.allorigins.win/get?url=';
+            const targetUrl = encodeURIComponent(`https://www.instagram.com/${targetUser}/?__a=1&__d=dis`);
+
+            try {
+                const response = await fetch(`${proxyUrl}${targetUrl}`);
+                const data = await response.json();
+                const jsonData = JSON.parse(data.contents);
+
+                if (jsonData.graphql && jsonData.graphql.user) {
+                    const user = jsonData.graphql.user;
+                    profileName.innerText = user.full_name || user.username;
+                    followerCount.innerText = user.edge_followed_by.count.toLocaleString();
+                    statusText.innerText = "البث المباشر يعمل.. تحديث كل 5 ثواني";
+                    statusText.classList.remove('error');
+                } else {
+                    statusText.innerText = "انقطع الاتصال: إنستغرام طلب تسجيل دخول مجدداً";
+                    statusText.classList.add('error');
+                }
+            } catch (error) {
+                statusText.innerText = "خطأ أثناء تحديث العداد";
+                statusText.classList.add('error');
+            }
+        }
+
+        // ابدأ العملية
+        loginToInstagram();
     </script>
 </body>
 </html>
