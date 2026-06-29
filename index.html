@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مستطيل الزجاج السائل الاحترافي</title>
+    <title>لعبة الزجاج السائل - تجميع النقاط</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #080415; }
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #080415; font-family: sans-serif; }
         
-        /* الخلفية السينمائية المتداخلة */
         .bg-gradient {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
             background: linear-gradient(135deg, #090518, #140931, #2e083f, #4a0e3f, #0f2b3c);
@@ -19,17 +18,29 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
+        
+        /* واجهة النتيجة */
+        .score-board {
+            position: absolute; top: 25px; left: 50%; transform: translateX(-50%);
+            z-index: 3; color: #fff; font-size: 24px; font-weight: bold;
+            background: rgba(255, 255, 255, 0.07); padding: 10px 25px;
+            border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px); pointer-events: none;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); letter-spacing: 1px;
+        }
         canvas { display: block; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
     </style>
 </head>
 <body>
 
     <div class="bg-gradient"></div>
+    <div class="score-board">النقاط: <span id="scoreNum">0</span></div>
     <canvas id="jellyCanvas"></canvas>
 
     <script>
         const canvas = document.getElementById('jellyCanvas');
         const ctx = canvas.getContext('2d');
+        const scoreNum = document.getElementById('scoreNum');
 
         let dpr = window.devicePixelRatio || 1;
         function resize() {
@@ -42,41 +53,39 @@
         }
         window.addEventListener('resize', resize);
 
-        // قيم فيزيائية مدروسة بدقة لمنع القلتشات والسرعة الزائدة
-        const STIFFNESS = 0.09;      // صلابة ناعمة ومطاطية متزنة
-        const DAMPING = 0.80;        // زيادة التخميد لامتصاص الرجفة والسرعة الزايدة
-        const HOME_STIFFNESS = 0.035; // قوة جذب ناعمة للمركز تعطيك إحساس السائل الثقيل
-        const MIN_DISTANCE = 50;     // مسافة الأمان لمنع التداخل
-        const MAX_VELOCITY = 12;     // كبح السرعة القصوى للنقاط لمنع الطيران والقلتشات
+        // الفيزياء الاحترافية المستقرة
+        const STIFFNESS = 0.09;      
+        const DAMPING = 0.80;        
+        const HOME_STIFFNESS = 0.035; 
+        const MIN_DISTANCE = 50;     
+        const MAX_VELOCITY = 12;     
         
         let particles = [], springs = [], dragged = null;
         let touchPos = { x: 0, y: 0, glowAlpha: 0, targetGlowAlpha: 0 };
+        
+        // متغيرات اللعبة
+        let score = 0;
+        let items = [];
+        let lastItemTime = 0;
 
         class Particle {
             constructor(x, y, homeX, homeY) {
                 this.x = x; this.y = y;
                 this.homeX = homeX; this.homeY = homeY;
                 this.vx = 0; this.vy = 0;
-                this.mass = 3.5; // وزن ثقيل ومستقر
+                this.mass = 3.5;
             }
             update() {
                 if (this === dragged) return;
-
-                // الجذب نحو المركز الأصلي
                 let hx = this.homeX - this.x;
                 let hy = this.homeY - this.y;
                 this.vx += hx * HOME_STIFFNESS;
                 this.vy += hy * HOME_STIFFNESS;
-
                 this.vx *= DAMPING; this.vy *= DAMPING;
-
-                // كبح السرعة (Velocity Clamping) لمنع الحركات المفاجئة والقلتشات
                 this.vx = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, this.vx));
                 this.vy = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, this.vy));
-
                 this.x += this.vx; this.y += this.vy;
 
-                // حدود الشاشة الذكية
                 const b = 40;
                 if (this.x < b) { this.x = b; this.vx *= -0.1; }
                 if (this.x > window.innerWidth - b) { this.x = window.innerWidth - b; this.vx *= -0.1; }
@@ -97,12 +106,36 @@
             }
         }
 
+        // كلاس الكرات الساقطة (النقاط)
+        class FallingItem {
+            constructor() {
+                this.x = Math.random() * (window.innerWidth - 60) + 30;
+                this.y = -20;
+                this.radius = 8;
+                this.speed = Math.random() * 2 + 2; // سرعة الهبوط
+                this.pulse = 0;
+            }
+            update() {
+                this.y += this.speed;
+                this.pulse += 0.1;
+            }
+            draw() {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius + Math.sin(this.pulse) * 2, 0, Math.PI * 2);
+                ctx.shadowColor = "#00ffcc";
+                ctx.shadowBlur = 15;
+                ctx.fillStyle = "#00ffcc";
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
         function init() {
             particles = []; springs = [];
             let w = 260, h = 160; 
             let cx = window.innerWidth / 2, cy = window.innerHeight / 2;
 
-            // بناء 8 نقاط محيطية متناسقة هندسياً
             let pts = [
                 {x: cx - w/2, y: cy - h/2}, {x: cx, y: cy - h/2}, {x: cx + w/2, y: cy - h/2},
                 {x: cx + w/2, y: cy},
@@ -111,7 +144,6 @@
             ];
             pts.forEach(p => particles.push(new Particle(p.x, p.y, p.x, p.y)));
 
-            // ربط شبكي متقاطع كامل لثبات الهيكل ومنع الانبعاج والقلتشات
             for (let i = 0; i < particles.length; i++) {
                 for (let j = i + 1; j < particles.length; j++) {
                     let dx = particles[i].x - particles[j].x;
@@ -138,6 +170,18 @@
             }
         }
 
+        // دالة لفحص إذا كانت الكرة الساقطة بداخل حدود المستطيل الجيلي
+        function isPointInJelly(x, y) {
+            let inside = false;
+            for (let i = 0, j = particles.length - 1; i < particles.length; j = i++) {
+                let xi = particles[i].x, yi = particles[i].y;
+                let xj = particles[j].x, yj = particles[j].y;
+                let intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                if (intersect) inside = !inside;
+            }
+            return inside;
+        }
+
         resize();
 
         function getMousePos(e) {
@@ -153,42 +197,61 @@
         window.addEventListener('touchend', () => end());
 
         function start(mx, my) {
-            let close = null, minDist = 90;
+            let close = null, minDist = 100;
             particles.forEach(p => { let d = Math.hypot(p.x - mx, p.y - my); if (d < minDist) { minDist = d; close = p; } });
             dragged = close;
-
-            if (dragged) {
-                touchPos.x = mx; touchPos.y = my;
-                touchPos.targetGlowAlpha = 0.65; // تفعيل التوهج بنعومة
-            }
+            if (dragged) { touchPos.x = mx; touchPos.y = my; touchPos.targetGlowAlpha = 0.65; }
         }
-
         function move(mx, my) { 
             if (dragged) { 
-                dragged.x = mx; dragged.y = my; 
-                dragged.vx = 0; dragged.vy = 0; 
+                dragged.x = mx; dragged.y = my; dragged.vx = 0; dragged.vy = 0; 
                 touchPos.x = mx; touchPos.y = my;
             } 
         }
-
         function end() { dragged = null; touchPos.targetGlowAlpha = 0; }
 
         function loop() {
             ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
             
-            // توزيع مريح وعميق لحسابات الفيزياء لمنع أي تقطيع (Sub-stepping)
+            // توليد كرات جديدة كل ثانية تلقائياً
+            let now = Date.now();
+            if (now - lastItemTime > 1000) {
+                items.push(new FallingItem());
+                lastItemTime = now;
+            }
+
             for (let k = 0; k < 5; k++) {
                 springs.forEach(s => s.update());
                 resolveCollisions();
             }
             particles.forEach(p => p.update());
 
-            // حساب السنتر التفاعلي للمستطيل
             let avgX = 0, avgY = 0;
             particles.forEach(p => { avgX += p.x; avgY += p.y; });
             avgX /= particles.length; avgY /= particles.length;
 
-            // رسم المستطيل بمنحنيات بيزيه انسيابية ومحترفة
+            // تحديث ورسم الكرات الساقطة وفحص الاصطدام
+            for (let i = items.length - 1; i >= 0; i--) {
+                items[i].update();
+                items[i].draw();
+
+                // إذا الكرة دخلت بداخل المستطيل السائل
+                if (isPointInJelly(items[i].x, items[i].y)) {
+                    score++;
+                    scoreNum.innerText = score;
+                    // إعطاء دفعة فيزيائية خفيفة للمستطيل عند الارتطام بالكرة لإحساس حركي رهيب
+                    particles.forEach(p => { p.vy += 1.5; }); 
+                    items.splice(i, 1);
+                    continue;
+                }
+
+                // حذف الكرة إذا خرجت أسفل الشاشة
+                if (items[i].y > window.innerHeight + 20) {
+                    items.splice(i, 1);
+                }
+            }
+
+            // رسم مسار منحنيات المستطيل
             ctx.beginPath();
             let startX = (particles[particles.length - 1].x + particles[0].x) / 2;
             let startY = (particles[particles.length - 1].y + particles[0].y) / 2;
@@ -203,7 +266,7 @@
             }
             ctx.closePath();
 
-            // خامة الزجاج السائل الواضحة والفخمة
+            // خامة الزجاج
             let dxCenter = avgX - (window.innerWidth / 2);
             let dyCenter = avgY - (window.innerHeight / 2);
             let gradX1 = avgX - dxCenter * 0.3;
@@ -220,13 +283,11 @@
             ctx.fill();
             ctx.shadowBlur = 0;
 
-            // تنعيم ظهور واختفاء التوهج (Linear Interpolation) لمنع القفزات البصرية
+            // توهج اللمس
             touchPos.glowAlpha += (touchPos.targetGlowAlpha - touchPos.glowAlpha) * 0.1;
-
-            // رسم التوهج تحت أصبع المستخدم باحترافية
             if (touchPos.glowAlpha > 0.01) {
                 ctx.save();
-                ctx.clip(); // حصر التوهج داخل جسم المستطيل
+                ctx.clip();
                 let touchGlow = ctx.createRadialGradient(touchPos.x, touchPos.y, 5, touchPos.x, touchPos.y, 70);
                 touchGlow.addColorStop(0, `rgba(255, 255, 255, ${touchPos.glowAlpha})`);
                 touchGlow.addColorStop(1, "rgba(255, 255, 255, 0)");
@@ -235,13 +296,12 @@
                 ctx.restore();
             }
 
-            // التحديد الخارجي الواضح والبارز وبأعلى دقة ونعومة
+            // التحديد الخارجي والداخلي
             ctx.lineJoin = "round";
             ctx.lineWidth = 4.5;
             ctx.strokeStyle = "rgba(255, 255, 255, 0.78)";
             ctx.stroke();
 
-            // لمعة الحافة الداخلية الرفيعة
             ctx.lineWidth = 1.5;
             ctx.strokeStyle = "rgba(255, 255, 255, 0.38)";
             ctx.stroke();
