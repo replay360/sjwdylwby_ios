@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المستطيل الجيلي الاحترافي</title>
+    <title>مستطيل الجيلي الانسيابي</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #080415; }
-        /* خلفية سينمائية متحركة بـ 5 ألوان متداخلة ببطء */
+        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #060312; }
         .bg-gradient {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
-            background: linear-gradient(135deg, #090518, #140931, #2e083f, #4a0e3f, #0f2b3c);
+            background: linear-gradient(135deg, #070414, #12082b, #2b063b, #420a39, #0a2436);
             background-size: 400% 400%; animation: ultraGradient 16s ease infinite;
         }
         @keyframes ultraGradient {
@@ -29,29 +28,31 @@
     <script>
         const canvas = document.getElementById('jellyCanvas');
         const ctx = canvas.getContext('2d');
+        let dpr = window.devicePixelRatio || 1;
 
-        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        function resize() {
+            canvas.width = window.innerWidth * dpr;
+            canvas.height = window.innerHeight * dpr;
+            ctx.scale(dpr, dpr); // حل مشكلة البكسلة وتنعيم الخطوط
+        }
         window.addEventListener('resize', resize); resize();
 
-        // إعدادات الفيزياء الصارمة لضمان الثقل ومنع الاختفاء
-        const STIFFNESS = 0.15; const DAMPING = 0.82; const MAX_VEL = 15;
-        const ROWS = 5; const COLS = 8; const SPACING = 30;
+        // فيزياء متزنة ومقاومة للانعقاد والتداخل
+        const STIFFNESS = 0.12; const DAMPING = 0.85;
         let particles = [], springs = [], dragged = null;
 
         class Particle {
-            constructor(x, y) { this.x = x; this.y = y; this.vx = 0; this.vy = 0; this.mass = 1.6; }
+            constructor(x, y) { this.x = x; this.y = y; this.vx = 0; this.vy = 0; this.mass = 1.5; }
             update() {
                 if (this === dragged) return;
                 this.vx *= DAMPING; this.vy *= DAMPING;
-                this.vx = Math.max(-MAX_VEL, Math.min(MAX_VEL, this.vx));
-                this.vy = Math.max(-MAX_VEL, Math.min(MAX_VEL, this.vy));
                 this.x += this.vx; this.y += this.vy;
-                // جدران وهمية تمنع الطيران خارج الشاشة
-                const b = 30;
-                if (this.x < b) { this.x = b; this.vx *= -0.3; }
-                if (this.x > canvas.width - b) { this.x = canvas.width - b; this.vx *= -0.3; }
-                if (this.y < b) { this.y = b; this.vy *= -0.3; }
-                if (this.y > canvas.height - b) { this.y = canvas.height - b; this.vy *= -0.3; }
+                // حدود الشاشة
+                const b = 30; const w = window.innerWidth; const h = window.innerHeight;
+                if (this.x < b) { this.x = b; this.vx *= -0.2; }
+                if (this.x > w - b) { this.x = w - b; this.vx *= -0.2; }
+                if (this.y < b) { this.y = b; this.vy *= -0.2; }
+                if (this.y > h - b) { this.y = h - b; this.vy *= -0.2; }
             }
         }
 
@@ -69,71 +70,85 @@
 
         function init() {
             particles = []; springs = [];
-            let sx = (canvas.width - (COLS - 1) * SPACING) / 2;
-            let sy = (canvas.height - (ROWS - 1) * SPACING) / 2;
-            for (let r = 0; r < ROWS; r++) {
-                for (let c = 0; c < COLS; c++) { particles.push(new Particle(sx + c * SPACING, sy + r * SPACING)); }
-            }
-            for (let r = 0; r < ROWS; r++) {
-                for (let c = 0; c < COLS; c++) {
-                    let i = r * COLS + c;
-                    if (c < COLS - 1) springs.push(new Spring(particles[i], particles[i + 1], SPACING));
-                    if (r < ROWS - 1) springs.push(new Spring(particles[i], particles[i + COLS], SPACING));
-                    if (c < COLS - 1 && r < ROWS - 1) {
-                        let d = Math.sqrt(2) * SPACING;
-                        springs.push(new Spring(particles[i], particles[i + COLS + 1], d));
-                        springs.push(new Spring(particles[i + 1], particles[i + COLS], d));
-                    }
-                }
+            const w = window.innerWidth; const h = window.innerHeight;
+            const cx = w / 2, cy = h / 2;
+            const rw = 220, rh = 140; // أبعاد المستطيل
+
+            // نقااط الزوايا والأسطح الخارجية فقط لمنع تداخل العقد
+            let countX = 6, countY = 4;
+            // الحافة العلوية
+            for (let i = 0; i < countX; i++) particles.push(new Particle(cx - rw/2 + (rw / (countX - 1)) * i, cy - rh/2));
+            // الحافة اليمنى
+            for (let i = 1; i < countY; i++) particles.push(new Particle(cx + rw/2, cy - rh/2 + (rh / (countY - 1)) * i));
+            // الحافة السفلية
+            for (let i = countX - 2; i >= 0; i--) particles.push(new Particle(cx - rw/2 + (rw / (countX - 1)) * i, cy + rh/2));
+            // الحافة اليسرى
+            for (let i = countY - 2; i > 0; i--) particles.push(new Particle(cx - rw/2, cy - rh/2 + (rh / (countY - 1)) * i));
+
+            // مركز ثقل داخلي يربط كل النقاط لمنع الانقلاب والتداخل
+            let center = new Particle(cx, cy);
+            particles.push(center);
+
+            // ربط المحيط الخارجي بسبرنغات دائرية قطرية
+            for (let i = 0; i < particles.length - 1; i++) {
+                let next = (i === particles.length - 2) ? 0 : i + 1;
+                let dist = Math.hypot(particles[next].x - particles[i].x, particles[next].y - particles[i].y);
+                springs.push(new Spring(particles[i], particles[next], dist));
+                
+                // ربط كل نقطة بالمركز للمحافظة على كيان المستطيل الضبابي
+                let cDist = Math.hypot(center.x - particles[i].x, center.y - particles[i].y);
+                springs.push(new Spring(particles[i], center, cDist));
             }
         }
         init();
 
-        // دمج أحداث الماوس واللمس لتقليل حجم الكود وتجنب الانقطاع
-        function توجيه(e) {
+        function getMousePos(e) {
             let t = e.touches ? e.touches[0] : e;
             return { x: t.clientX, y: t.clientY };
         }
-        window.addEventListener('mousedown', (e) => start(توجيه(e).x, توجيه(e).y));
-        window.addEventListener('mousemove', (e) => move(توجيه(e).x, توجيه(e).y));
+        window.addEventListener('mousedown', (e) => start(getMousePos(e).x, getMousePos(e).y));
+        window.addEventListener('mousemove', (e) => move(getMousePos(e).x, getMousePos(e).y));
         window.addEventListener('mouseup', () => dragged = null);
-        window.addEventListener('touchstart', (e) => start(توجيه(e).x, توجيه(e).y), { passive: true });
-        window.addEventListener('touchmove', (e) => move(توجيه(e).x, توجيه(e).y), { passive: true });
+        window.addEventListener('touchstart', (e) => start(getMousePos(e).x, getMousePos(e).y), { passive: true });
+        window.addEventListener('touchmove', (e) => move(getMousePos(e).x, getMousePos(e).y), { passive: true });
         window.addEventListener('touchend', () => dragged = null);
 
         function start(mx, my) {
-            let close = null, minDist = 60;
+            let close = null, minDist = 50;
             particles.forEach(p => { let d = Math.hypot(p.x - mx, p.y - my); if (d < minDist) { minDist = d; close = p; } });
             dragged = close;
         }
         function move(mx, my) { if (dragged) { dragged.x = mx; dragged.y = my; dragged.vx = 0; dragged.vy = 0; } }
 
         function loop() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let k = 0; k < 4; k++) springs.forEach(s => s.update());
+            ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            for (let k = 0; k < 5; k++) springs.forEach(s => s.update());
             particles.forEach(p => p.update());
 
-            // رسم المستطيل بحواف قطرية دائرية ناعمة وتأثير ضبابي
+            // رسم المستطيل بمنحنيات فيزيائية ناعمة جداً لمنع التكسر
             ctx.beginPath();
-            // مسار الحواف الخارجية للشبكة
-            for (let c = 0; c < COLS; c++) ctx.lineTo(particles[c].x, particles[c].y);
-            for (let r = 1; r < ROWS; r++) ctx.lineTo(particles[r * COLS + (COLS - 1)].x, particles[r * COLS + (COLS - 1)].y);
-            for (let c = COLS - 2; c >= 0; c--) ctx.lineTo(particles[(ROWS - 1) * COLS + c].x, particles[(ROWS - 1) * COLS + c].y);
-            for (let r = ROWS - 2; r >= 0; r--) ctx.lineTo(particles[r * COLS].x, particles[r * COLS].y);
+            let pCount = particles.length - 1;
+            ctx.moveTo(particles[0].x, particles[0].y);
+            
+            for (let i = 0; i < pCount; i++) {
+                let next = (i + 1) % pCount;
+                let xc = (particles[i].x + particles[next].x) / 2;
+                let yc = (particles[i].y + particles[next].y) / 2;
+                ctx.quadraticCurveTo(particles[i].x, particles[i].y, xc, yc);
+            }
             ctx.closePath();
 
-            ctx.lineJoin = "round"; // جعل الحواف قطرية ودائرية وليست حادة
-            ctx.lineWidth = 15;
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+            ctx.lineJoin = "round";
+            ctx.lineWidth = 12;
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.2)"; // تأثير الحافة القطرية الناعمة
             ctx.stroke();
 
-            // لون المستطيل الضبابي (يعمل عمل الزجاج frosted glass)
-            ctx.fillStyle = "rgba(255, 255, 255, 0.08)";
+            // تعبئة المستطيل بمظهر ضبابي زجاجي (Frosted Glass Effect)
+            ctx.fillStyle = "rgba(255, 255, 255, 0.07)";
             ctx.fill();
-            
-            // تحديد داخلي ناعم
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
+
+            ctx.lineWidth = 2.5;
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.65)";
             ctx.stroke();
 
             requestAnimationFrame(loop);
