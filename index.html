@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مستطيل الزجاج السائل المضيء</title>
+    <title>مستطيل الزجاج السائل الاحترافي</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body, html { width: 100%; height: 100%; overflow: hidden; background-color: #080415; }
         
-        /* الخلفية السينمائية المتحركة الثابتة */
+        /* الخلفية السينمائية المتداخلة */
         .bg-gradient {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
             background: linear-gradient(135deg, #090518, #140931, #2e083f, #4a0e3f, #0f2b3c);
@@ -42,39 +42,46 @@
         }
         window.addEventListener('resize', resize);
 
-        // الفيزياء القوية السابقة (ثقل، استقرار، العودة للمركز)
-        const STIFFNESS = 0.12;      
-        const DAMPING = 0.78;        
-        const HOME_STIFFNESS = 0.04; 
-        const MIN_DISTANCE = 45;     
+        // قيم فيزيائية مدروسة بدقة لمنع القلتشات والسرعة الزائدة
+        const STIFFNESS = 0.09;      // صلابة ناعمة ومطاطية متزنة
+        const DAMPING = 0.80;        // زيادة التخميد لامتصاص الرجفة والسرعة الزايدة
+        const HOME_STIFFNESS = 0.035; // قوة جذب ناعمة للمركز تعطيك إحساس السائل الثقيل
+        const MIN_DISTANCE = 50;     // مسافة الأمان لمنع التداخل
+        const MAX_VELOCITY = 12;     // كبح السرعة القصوى للنقاط لمنع الطيران والقلتشات
+        
         let particles = [], springs = [], dragged = null;
-
-        // إحداثيات صبع المستخدم للتوهج التفاعلي
-        let touchPos = { x: 0, y: 0, glowAlpha: 0 };
+        let touchPos = { x: 0, y: 0, glowAlpha: 0, targetGlowAlpha: 0 };
 
         class Particle {
             constructor(x, y, homeX, homeY) {
                 this.x = x; this.y = y;
                 this.homeX = homeX; this.homeY = homeY;
                 this.vx = 0; this.vy = 0;
-                this.mass = 3.0; 
+                this.mass = 3.5; // وزن ثقيل ومستقر
             }
             update() {
                 if (this === dragged) return;
 
+                // الجذب نحو المركز الأصلي
                 let hx = this.homeX - this.x;
                 let hy = this.homeY - this.y;
                 this.vx += hx * HOME_STIFFNESS;
                 this.vy += hy * HOME_STIFFNESS;
 
                 this.vx *= DAMPING; this.vy *= DAMPING;
+
+                // كبح السرعة (Velocity Clamping) لمنع الحركات المفاجئة والقلتشات
+                this.vx = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, this.vx));
+                this.vy = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, this.vy));
+
                 this.x += this.vx; this.y += this.vy;
 
-                const b = 30;
-                if (this.x < b) { this.x = b; this.vx *= -0.2; }
-                if (this.x > window.innerWidth - b) { this.x = window.innerWidth - b; this.vx *= -0.2; }
-                if (this.y < b) { this.y = b; this.vy *= -0.2; }
-                if (this.y > window.innerHeight - b) { this.y = window.innerHeight - b; this.vy *= -0.2; }
+                // حدود الشاشة الذكية
+                const b = 40;
+                if (this.x < b) { this.x = b; this.vx *= -0.1; }
+                if (this.x > window.innerWidth - b) { this.x = window.innerWidth - b; this.vx *= -0.1; }
+                if (this.y < b) { this.y = b; this.vy *= -0.1; }
+                if (this.y > window.innerHeight - b) { this.y = window.innerHeight - b; this.vy *= -0.1; }
             }
         }
 
@@ -92,9 +99,10 @@
 
         function init() {
             particles = []; springs = [];
-            let w = 250, h = 150; 
+            let w = 260, h = 160; 
             let cx = window.innerWidth / 2, cy = window.innerHeight / 2;
 
+            // بناء 8 نقاط محيطية متناسقة هندسياً
             let pts = [
                 {x: cx - w/2, y: cy - h/2}, {x: cx, y: cy - h/2}, {x: cx + w/2, y: cy - h/2},
                 {x: cx + w/2, y: cy},
@@ -103,6 +111,7 @@
             ];
             pts.forEach(p => particles.push(new Particle(p.x, p.y, p.x, p.y)));
 
+            // ربط شبكي متقاطع كامل لثبات الهيكل ومنع الانبعاج والقلتشات
             for (let i = 0; i < particles.length; i++) {
                 for (let j = i + 1; j < particles.length; j++) {
                     let dx = particles[i].x - particles[j].x;
@@ -144,14 +153,13 @@
         window.addEventListener('touchend', () => end());
 
         function start(mx, my) {
-            let close = null, minDist = 80;
+            let close = null, minDist = 90;
             particles.forEach(p => { let d = Math.hypot(p.x - mx, p.y - my); if (d < minDist) { minDist = d; close = p; } });
             dragged = close;
 
             if (dragged) {
-                touchPos.x = mx;
-                touchPos.y = my;
-                touchPos.glowAlpha = 0.6; // تفعيل توهج اللمس فوراً عند الضغط
+                touchPos.x = mx; touchPos.y = my;
+                touchPos.targetGlowAlpha = 0.65; // تفعيل التوهج بنعومة
             }
         }
 
@@ -159,30 +167,28 @@
             if (dragged) { 
                 dragged.x = mx; dragged.y = my; 
                 dragged.vx = 0; dragged.vy = 0; 
-                touchPos.x = mx;
-                touchPos.y = my;
+                touchPos.x = mx; touchPos.y = my;
             } 
         }
 
-        function end() {
-            dragged = null;
-        }
+        function end() { dragged = null; touchPos.targetGlowAlpha = 0; }
 
         function loop() {
             ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
             
-            for (let k = 0; k < 6; k++) {
+            // توزيع مريح وعميق لحسابات الفيزياء لمنع أي تقطيع (Sub-stepping)
+            for (let k = 0; k < 5; k++) {
                 springs.forEach(s => s.update());
                 resolveCollisions();
             }
             particles.forEach(p => p.update());
 
-            // حساب السنتر والاتجاه للمعان التفاعلي
+            // حساب السنتر التفاعلي للمستطيل
             let avgX = 0, avgY = 0;
             particles.forEach(p => { avgX += p.x; avgY += p.y; });
             avgX /= particles.length; avgY /= particles.length;
 
-            // رسم المستطيل الجيلي بمنحنيات ناعمة نظيفة
+            // رسم المستطيل بمنحنيات بيزيه انسيابية ومحترفة
             ctx.beginPath();
             let startX = (particles[particles.length - 1].x + particles[0].x) / 2;
             let startY = (particles[particles.length - 1].y + particles[0].y) / 2;
@@ -197,15 +203,15 @@
             }
             ctx.closePath();
 
-            // خامة زجاج سائل واضحة وأكثر بروزاً من قبل
+            // خامة الزجاج السائل الواضحة والفخمة
             let dxCenter = avgX - (window.innerWidth / 2);
             let dyCenter = avgY - (window.innerHeight / 2);
-            let gradX1 = avgX - dxCenter * 0.4;
-            let gradY1 = (avgY - 70) - dyCenter * 0.4;
+            let gradX1 = avgX - dxCenter * 0.3;
+            let gradY1 = (avgY - 70) - dyCenter * 0.3;
             
-            let glassGrad = ctx.createLinearGradient(gradX1, gradY1, avgX, avgY + 80);
-            glassGrad.addColorStop(0, "rgba(255, 255, 255, 0.28)"); // زيادة الوضوح واللمعة
-            glassGrad.addColorStop(0.5, "rgba(255, 255, 255, 0.12)"); // زيادة وضوح الوسط
+            let glassGrad = ctx.createLinearGradient(gradX1, gradY1, avgX, avgY + 90);
+            glassGrad.addColorStop(0, "rgba(255, 255, 255, 0.30)"); 
+            glassGrad.addColorStop(0.5, "rgba(255, 255, 255, 0.14)"); 
             glassGrad.addColorStop(1, "rgba(255, 255, 255, 0.04)");
             
             ctx.shadowColor = "rgba(255, 255, 255, 0.12)";
@@ -214,32 +220,30 @@
             ctx.fill();
             ctx.shadowBlur = 0;
 
-            // تلاشي التوهج بنعومة عند ترك الشاشة
-            if (!dragged && touchPos.glowAlpha > 0) {
-                touchPos.glowAlpha -= 0.04;
-            }
+            // تنعيم ظهور واختفاء التوهج (Linear Interpolation) لمنع القفزات البصرية
+            touchPos.glowAlpha += (touchPos.targetGlowAlpha - touchPos.glowAlpha) * 0.1;
 
-            // رسم تأثير التوهج بمكان لمس الأصبع داخل المستطيل فقط
-            if (touchPos.glowAlpha > 0) {
+            // رسم التوهج تحت أصبع المستخدم باحترافية
+            if (touchPos.glowAlpha > 0.01) {
                 ctx.save();
-                ctx.clip(); // حصر التوهج بداخل المستطيل لمنع خروجه
-                let touchGlow = ctx.createRadialGradient(touchPos.x, touchPos.y, 5, touchPos.x, touchPos.y, 65);
+                ctx.clip(); // حصر التوهج داخل جسم المستطيل
+                let touchGlow = ctx.createRadialGradient(touchPos.x, touchPos.y, 5, touchPos.x, touchPos.y, 70);
                 touchGlow.addColorStop(0, `rgba(255, 255, 255, ${touchPos.glowAlpha})`);
                 touchGlow.addColorStop(1, "rgba(255, 255, 255, 0)");
                 ctx.fillStyle = touchGlow;
-                ctx.fillRect(window.innerWidth/2 - 500, window.innerHeight/2 - 500, 1000, 1000);
+                ctx.fillRect(avgX - 400, avgY - 400, 800, 800);
                 ctx.restore();
             }
 
-            // التحديد الخارجي: صار أوضح وأقوى (0.75 Opacity) لمنع مظهر البهتان
+            // التحديد الخارجي الواضح والبارز وبأعلى دقة ونعومة
             ctx.lineJoin = "round";
             ctx.lineWidth = 4.5;
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.75)";
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.78)";
             ctx.stroke();
 
-            // لمعان الحافة الداخلية
+            // لمعة الحافة الداخلية الرفيعة
             ctx.lineWidth = 1.5;
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.38)";
             ctx.stroke();
 
             requestAnimationFrame(loop);
