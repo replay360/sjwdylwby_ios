@@ -3,44 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-    <title>لعبة الأفعى الاحترافية المحدثة</title>
+    <title>لعبة الأفعى 3D الاحترافية</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-user-select: none; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #0b071e; font-family: sans-serif; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #06040d; font-family: 'Segoe UI', sans-serif; }
         
-        canvas { display: block; width: 100vw; height: 100vh; background-color: #0b071e; }
+        canvas { display: block; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
 
-        /* شاشة اختيار المستوى */
+        /* شاشة اختيار المستوى والواجهات */
         .ui-screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(11, 7, 30, 0.95); transition: all 0.3s ease;
+            background: rgba(6, 4, 13, 0.92); backdrop-filter: blur(20px); transition: opacity 0.3s ease;
         }
         .ui-screen.hidden { opacity: 0; pointer-events: none; }
         
-        .game-title { color: #00ffcc; font-size: 32px; font-weight: bold; margin-bottom: 10px; text-shadow: 0 0 15px rgba(0, 255, 204, 0.6); text-align: center; }
-        .game-desc { color: #a099bc; font-size: 15px; margin-bottom: 30px; text-align: center; padding: 0 20px; max-width: 400px; line-height: 1.6; }
+        .game-title { color: #fff; font-size: 36px; font-weight: 800; margin-bottom: 10px; text-shadow: 0 0 25px rgba(0, 255, 204, 0.5); text-align: center; }
+        .game-desc { color: #8c85a6; font-size: 15px; margin-bottom: 35px; text-align: center; padding: 0 20px; max-width: 380px; line-height: 1.6; }
         
         .btn-container { display: flex; flex-direction: column; gap: 15px; width: 80%; max-width: 280px; }
         .menu-btn {
-            padding: 16px; font-size: 18px; font-weight: bold; border: none; border-radius: 12px;
-            cursor: pointer; color: #fff; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            padding: 16px; font-size: 18px; font-weight: bold; border: none; border-radius: 14px;
+            cursor: pointer; color: #fff; text-align: center; box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+            transition: transform 0.1s ease;
         }
-        .btn-normal { background: #0083b0; }
-        .btn-hard { background: #ff5858; }
+        .menu-btn:active { transform: scale(0.96); }
+        .btn-normal { background: linear-gradient(135deg, #00b4db, #0083b0); }
+        .btn-hard { background: linear-gradient(135deg, #f857a6, #ff5858); }
 
-        /* لوحة النقاط */
+        /* لوحة النقاط العلوية */
         .hud {
             position: absolute; top: 20px; left: 0; width: 100%; padding: 0 20px;
             display: flex; justify-content: space-between; z-index: 5; pointer-events: none;
-            color: #fff; font-weight: bold; font-size: 14px; display: none;
+            color: #fff; font-weight: bold; font-size: 15px; display: none;
         }
-        .score-box { background: rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 8px; backdrop-filter: blur(5px); }
+        .score-box { background: rgba(255, 255, 255, 0.05); padding: 10px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
         
         .status-msg {
             position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%);
-            color: #fff; font-size: 32px; font-weight: bold; z-index: 4; text-align: center;
-            text-shadow: 0 0 20px rgba(255,255,255,0.6); pointer-events: none; opacity: 0; transition: opacity 0.2s ease;
+            color: #fff; font-size: 34px; font-weight: 900; z-index: 4; text-align: center;
+            text-shadow: 0 0 25px rgba(255,255,255,0.6); pointer-events: none; opacity: 0; transition: opacity 0.2s ease;
+            width: 90%;
         }
     </style>
 </head>
@@ -48,18 +51,18 @@
 
     <!-- شاشة البداية واختيار المستوى -->
     <div class="ui-screen" id="startScreen">
-        <div class="game-title">تحدي الأفاعي النيون</div>
-        <div class="game-desc">تحكم بمسار أفعيتك بالضغط على يمين أو يسار الشاشة لتوجيهها. خلي المنافس يصطدم بيك حتى تفوز!</div>
+        <div class="game-title">أفعى الـ 3D المحترفة</div>
+        <div class="game-desc">الأفعى تمشي تلقائياً، حرك صبعك في أي مكان على الشاشة وستجد الأفعى تتبع مسار صبعك بسلاسة تامة.</div>
         <div class="btn-container">
             <button class="menu-btn btn-normal" onclick="startGame('normal')">مستوى عادي</button>
             <button class="menu-btn btn-hard" onclick="startGame('hard')">مستوى صعب 🔥</button>
         </div>
     </div>
 
-    <!-- واجهة اللعب العليا -->
+    <!-- واجهة اللعب -->
     <div class="hud" id="gameHud">
-        <div class="score-box" style="border-left: 4px solid #00ffaa;">أفعيتك: <span id="playerScore">0</span></div>
-        <div class="score-box" style="border-left: 4px solid #ff3333;">المنافس: <span id="aiScore">0</span></div>
+        <div class="score-box" style="box-shadow: 0 0 15px rgba(0,255,170,0.15)">أفعيتك: <span id="playerScore">0</span></div>
+        <div class="score-box" style="box-shadow: 0 0 15px rgba(255,51,51,0.15)">المنافس: <span id="aiScore">0</span></div>
     </div>
 
     <div class="status-msg" id="statusMsg"></div>
@@ -73,11 +76,18 @@
         let width = window.innerWidth;
         let height = window.innerHeight;
         
+        // إحداثيات اللمس أو صبع المستخدم
+        let pointer = { x: width / 2, y: height * 0.7, isDown: false };
+
         function initCanvas() {
             width = window.innerWidth;
             height = window.innerHeight;
             canvas.width = width;
             canvas.height = height;
+            if(!gameActive) {
+                pointer.x = width / 2;
+                pointer.y = height * 0.7;
+            }
         }
         window.addEventListener('resize', initCanvas);
         initCanvas();
@@ -85,24 +95,23 @@
         let gameActive = false;
         let difficulty = 'normal';
         let speedMultiplier = 1;
-        let food = { x: 0, y: 0, radius: 8 };
+        let food = { x: 0, y: 0, radius: 11 };
         
         let playerSnake = null;
         let aiSnake = null;
 
         class Snake {
-            constructor(x, y, color, isAI) {
-                this.isAI = isAI;
-                this.color = color;
-                this.radius = 10;
+            constructor(x, y, type) {
+                this.type = type; // 'player' أو 'ai'
+                this.baseRadius = 15; // حجم الرأس الضخم الـ 3D
                 this.segments = [];
-                this.angle = isAI ? Math.PI : 0; 
-                this.speed = 3.5;
-                this.turnSpeed = 0.06;
+                this.angle = type === 'ai' ? Math.PI : 0; 
+                this.speed = 3.8;
+                this.turnSpeed = 0.08;
                 this.alive = true;
 
-                // توليد الجسم البدئي
-                let length = 12;
+                // توليد عُقد الجسم
+                let length = 16;
                 for (let i = 0; i < length; i++) {
                     this.segments.push({
                         x: x - (i * this.speed * Math.cos(this.angle)),
@@ -114,78 +123,125 @@
             update() {
                 if (!this.alive) return;
 
-                // ذكاء اصطناعي بسيط لملاحقة الأكل وتوجيه الأفعى الحمراء
-                if (this.isAI) {
-                    let targetAngle = Math.atan2(food.y - this.segments[0].y, food.x - this.segments[0].x);
+                let head = this.segments[0];
+
+                if (this.type === 'player') {
+                    // التحكم الذكي: حساب الزاوية باتجاه موقع الصبع الحقيقي
+                    let dx = pointer.x - head.x;
+                    let dy = pointer.y - head.y;
+                    let dist = Math.hypot(dx, dy);
+                    
+                    // إذا كان الصبع قريب جداً من الرأس لا نغير الاتجاه بشكل مفاجئ لمنع الاهتزاز
+                    if (dist > 10) {
+                        let targetAngle = Math.atan2(dy, dx);
+                        let diff = targetAngle - this.angle;
+                        while (diff < -Math.PI) diff += Math.PI * 2;
+                        while (diff > Math.PI) diff -= Math.PI * 2;
+                        this.angle += Math.max(-this.turnSpeed * 1.5, Math.min(this.turnSpeed * 1.5, diff));
+                    }
+                } else {
+                    // ذكاء اصطناعي ذكي لملاحقة الأكل ومحاصرة اللاعب
+                    let targetAngle = Math.atan2(food.y - head.y, food.x - head.x);
                     let diff = targetAngle - this.angle;
                     while (diff < -Math.PI) diff += Math.PI * 2;
                     while (diff > Math.PI) diff -= Math.PI * 2;
                     
-                    let currentTurn = this.turnSpeed * (difficulty === 'hard' ? 1.3 : 0.8);
-                    this.angle += Math.max(-currentTurn, Math.min(currentTurn, diff));
+                    let aiTurn = this.turnSpeed * (difficulty === 'hard' ? 1.4 : 0.85);
+                    this.angle += Math.max(-aiTurn, Math.min(aiTurn, diff));
                 }
 
-                // حركة الرأس التلقائية المستمرة للأمام
-                let head = this.segments[0];
+                // تقدم الرأس تلقائياً للأمام بناءً على الزاوية الحالية
                 let nextX = head.x + Math.cos(this.angle) * this.speed * speedMultiplier;
                 let nextY = head.y + Math.sin(this.angle) * this.speed * speedMultiplier;
 
-                // التفاف حول حدود الشاشة بمرونة
-                if (nextX < 0) nextX = width;
-                if (nextX > width) nextX = 0;
-                if (nextY < 0) nextY = height;
-                if (nextY > height) nextY = 0;
+                // حدود الشاشة الالتفافية المرنة
+                if (nextX < -20) nextX = width + 20;
+                if (nextX > width + 20) nextX = -20;
+                if (nextY < -20) nextY = height + 20;
+                if (nextY > height + 20) nextY = -20;
 
-                // تحديث موقع الجسم
+                // تحديث مصفوفة الجسم (كل حلقة تأخذ مكان السابقة)
                 this.segments.unshift({ x: nextX, y: nextY });
                 this.segments.pop();
             }
 
             grow() {
                 let tail = this.segments[this.segments.length - 1];
-                for(let i = 0; i < 3; i++) {
+                // تطول بمقدار 4 حلقات عند كل أكلة لتعطي هيبة وضخامة ثلاثية أبعاد
+                for(let i = 0; i < 4; i++) {
                     this.segments.push({ x: tail.x, y: tail.y });
                 }
             }
 
             draw() {
-                ctx.save();
-                ctx.lineWidth = this.radius * 2;
-                ctx.lineCap = 'round';
-                ctx.lineJoin = 'round';
-                ctx.strokeStyle = this.color;
-                ctx.shadowColor = this.color;
-                ctx.shadowBlur = 10;
+                // رسم الحلقات من الذيل للرأس لتركيب أبعاد الـ Depth الصائبة
+                for (let i = this.segments.length - 1; i >= 0; i--) {
+                    let seg = this.segments[i];
+                    
+                    // تأثير التناقص ثلاثي الأبعاد: الذيل يكون أنحف وأعمق بالخلفية
+                    let progress = (this.segments.length - i) / this.segments.length;
+                    let radius = this.baseRadius * (0.4 + progress * 0.6);
+                    
+                    // إضافة حركة تموج خفيفة تحاكي الطفو ثلاثي الأبعاد بالعمق
+                    let waveZ = Math.sin((Date.now() * 0.006) + (i * 0.2)) * 3;
+                    let drawX = seg.x;
+                    let drawY = seg.y + waveZ;
 
-                // رسم جسم الأفعى كخيط نيون متصل وسلس جداً
-                ctx.beginPath();
-                ctx.moveTo(this.segments[0].x, this.segments[0].y);
-                for (let i = 1; i < this.segments.length; i++) {
-                    ctx.lineTo(this.segments[i].x, this.segments[i].y);
+                    ctx.save();
+                    
+                    // تدرج لوني شعاعي مجسم (3D Sphere Gradient)
+                    let gradient = ctx.createRadialGradient(
+                        drawX - radius * 0.3, drawY - radius * 0.3, radius * 0.05,
+                        drawX, drawY, radius
+                    );
+                    
+                    if (this.type === 'player') {
+                        gradient.addColorStop(0, '#a3ffdf'); // لمعة الضوء العليا
+                        gradient.addColorStop(0.3, '#00ffaa'); // اللون الأساسي النيون
+                        gradient.addColorStop(1, '#004d33'); // الظل المعتم بالأسفل
+                        ctx.shadowColor = "rgba(0, 255, 170, 0.35)";
+                    } else {
+                        gradient.addColorStop(0, '#ffb3b3');
+                        gradient.addColorStop(0.3, '#ff3333');
+                        gradient.addColorStop(1, '#4a0000');
+                        ctx.shadowColor = "rgba(255, 51, 51, 0.35)";
+                    }
+
+                    ctx.shadowBlur = i === 0 ? 25 : 8; // تركيز التوهج الاحترافي على الرأس فقط
+                    
+                    ctx.beginPath();
+                    ctx.arc(drawX, drawY, radius, 0, Math.PI * 2);
+                    ctx.fillStyle = gradient;
+                    ctx.fill();
+                    ctx.restore();
                 }
-                ctx.stroke();
-                
-                // رسم نقطة مميزة لرأس الأفعى حتى تبين العين والاتجاه
-                ctx.fillStyle = '#ffffff';
-                ctx.beginPath();
-                ctx.arc(this.segments[0].x, this.segments[0].y, this.radius * 0.6, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
             }
         }
 
         function spawnFood() {
-            food.x = Math.random() * (width - 60) + 30;
-            food.y = Math.random() * (height - 60) + 30;
+            food.x = Math.random() * (width - 100) + 50;
+            food.y = Math.random() * (height - 100) + 50;
         }
 
         function drawFood() {
+            // تأثير طفو ناعم ثلاثي الأبعاد للأكل بالهواء
+            let foodWave = Math.sin(Date.now() * 0.007) * 4;
+            let drawY = food.y + foodWave;
+
             ctx.save();
-            ctx.fillStyle = '#ffcc00';
+            let gradient = ctx.createRadialGradient(
+                food.x - 3, drawY - 3, 1,
+                food.x, drawY, food.radius
+            );
+            gradient.addColorStop(0, '#fff3cc');
+            gradient.addColorStop(0.3, '#ffcc00');
+            gradient.addColorStop(1, '#805500');
+            
             ctx.shadowColor = '#ffcc00';
-            ctx.shadowBlur = 15;
+            ctx.shadowBlur = 25;
             ctx.beginPath();
-            ctx.arc(food.x, food.y, food.radius, 0, Math.PI * 2);
+            ctx.arc(food.x, drawY, food.radius, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
             ctx.fill();
             ctx.restore();
         }
@@ -196,41 +252,47 @@
             let pHead = playerSnake.segments[0];
             let aHead = aiSnake.segments[0];
 
-            // 1. أكل النقاط
-            if (Math.hypot(pHead.x - food.x, pHead.y - food.y) < playerSnake.radius + food.radius) {
+            // 1. التهام نقاط الطعام
+            if (Math.hypot(pHead.x - food.x, pHead.y - food.y) < playerSnake.baseRadius + food.radius) {
                 playerSnake.grow();
                 spawnFood();
-                document.getElementById('playerScore').innerText = playerSnake.segments.length - 12;
+                document.getElementById('playerScore').innerText = playerSnake.segments.length - 16;
             }
-            if (Math.hypot(aHead.x - food.x, aHead.y - food.y) < aiSnake.radius + food.radius) {
+            if (Math.hypot(aHead.x - food.x, aHead.y - food.y) < aiSnake.baseRadius + food.radius) {
                 aiSnake.grow();
                 spawnFood();
-                document.getElementById('aiScore').innerText = aiSnake.segments.length - 12;
+                document.getElementById('aiScore').innerText = aiSnake.segments.length - 16;
             }
 
-            // 2. فحص موت اللاعب (إذا دعم بجسم الخصم)
+            // 2. فحص موت أفعى اللاعب (إذا اصطدم برأسها في جسم الخصم)
             for (let i = 0; i < aiSnake.segments.length; i++) {
                 let seg = aiSnake.segments[i];
-                if (Math.hypot(pHead.x - seg.x, pHead.y - seg.y) < playerSnake.radius + 2) {
+                if (Math.hypot(pHead.x - seg.x, pHead.y - seg.y) < playerSnake.baseRadius * 0.85) {
                     playerSnake.alive = false;
                 }
             }
 
-            // 3. فحص موت الخصم (إذا دعم بجسم اللاعب)
+            // 3. فحص موت أفعى الـ AI المنافسة (إذا اصطدم رأسها بجسم اللاعب)
             for (let i = 0; i < playerSnake.segments.length; i++) {
                 let seg = playerSnake.segments[i];
-                if (Math.hypot(aHead.x - seg.x, aHead.y - seg.y) < aiSnake.radius + 2) {
+                if (Math.hypot(aHead.x - seg.x, aHead.y - seg.y) < aiSnake.baseRadius * 0.85) {
                     aiSnake.alive = false;
                 }
             }
 
-            // معالجة الشروط والنهاية المزدوجة
+            // 4. تدمير متبادل في حال تصادم الرؤوس جبهةً بجبهة
+            if (Math.hypot(pHead.x - aHead.x, pHead.y - aHead.y) < playerSnake.baseRadius * 1.3) {
+                playerSnake.alive = false;
+                aiSnake.alive = false;
+            }
+
+            // إعلان النتيجة النهائية بناءً على قواعد الموت والفوز الاحترافية
             if (!playerSnake.alive && !aiSnake.alive) {
-                endGame("فوز ساحق! دمرتهما معاً 💥");
+                endGame("فوز ساحق! دمرتهما معاً بضربة واحدة 💥");
             } else if (!playerSnake.alive) {
-                endGame("خسرت! اصطدمت بالمنافس 💀");
+                endGame("خسرت! المنافس حاصرك ودمرك 💀");
             } else if (!aiSnake.alive) {
-                endGame("كفوو! فزت ودمرت المنافس 🎉");
+                endGame("كفوو عشت! فزت وحطمت المنافس 🎉");
             }
         }
 
@@ -244,38 +306,46 @@
                 msg.style.opacity = "0";
                 document.getElementById('gameHud').style.display = 'none';
                 document.getElementById('startScreen').classList.remove('hidden');
-            }, 2500);
+            }, 3000);
         }
 
-        // تحكم اللمس الفعال والسلس جداً (يمين ويسار الشاشة)
+        // --- نظام التحكم الاحترافي الجديد: اللحاق بالصبع/الماوس أينما تحرك ---
+        function handlePointerMove(clientX, clientY) {
+            pointer.x = clientX;
+            pointer.y = clientY;
+        }
+
+        // أحداث اللمس للموبايل
         window.addEventListener('touchstart', (e) => {
-            if (!gameActive || !playerSnake) return;
-            let touchX = e.touches[0].clientX;
-            if (touchX < width / 2) {
-                playerSnake.angle -= 0.4; // لف يسار
-            } else {
-                playerSnake.angle += 0.4; // لف يمين
-            }
+            if (!gameActive) return;
+            pointer.isDown = true;
+            handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
         }, { passive: true });
 
-        // تحكم الكيبورد الاحتياطي للحاسبة
-        window.addEventListener('keydown', (e) => {
-            if (!gameActive || !playerSnake) return;
-            if (e.key === 'ArrowLeft' || e.key === 'a') playerSnake.angle -= 0.3;
-            if (e.key === 'ArrowRight' || e.key === 'd') playerSnake.angle += 0.3;
+        window.addEventListener('touchmove', (e) => {
+            if (!gameActive) return;
+            handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: true });
+
+        window.addEventListener('touchend', () => { pointer.isDown = false; });
+
+        // أحداث الماوس للحاسبة (كدعم إضافي)
+        window.addEventListener('mousemove', (e) => {
+            if (!gameActive) return;
+            handlePointerMove(e.clientX, e.clientY);
         });
 
         function startGame(lvl) {
-            initCanvas(); // تحديث الأبعاد عند كبس الزر مباشرة لضمان الظهور
+            initCanvas();
             difficulty = lvl;
-            speedMultiplier = difficulty === 'hard' ? 1.4 : 1.0;
+            speedMultiplier = difficulty === 'hard' ? 1.5 : 1.0;
             
             document.getElementById('startScreen').classList.add('hidden');
             document.getElementById('gameHud').style.display = 'flex';
             
-            // توليد آمن ومضمون 100% في منتصف ساحة اللعب الحالية
-            playerSnake = new Snake(width * 0.25, height * 0.5, '#00ffaa', false);
-            aiSnake = new Snake(width * 0.75, height * 0.5, '#ff3333', true);
+            // توليد الأفاعي بأماكن متباعدة ومضمونة بنسبة 100%
+            playerSnake = new Snake(width * 0.2, height * 0.5, 'player');
+            aiSnake = new Snake(width * 0.8, height * 0.5, 'ai');
             
             document.getElementById('playerScore').innerText = "0";
             document.getElementById('aiScore').innerText = "0";
@@ -285,8 +355,8 @@
         }
 
         function loop() {
-            // تنظيف الساحة بمسح كامل وصبغها باللون الغامق المميز
-            ctx.fillStyle = '#0b071e';
+            // صبغ الساحة بلون داكن فخم جداً لإبراز الكرات المضيئة الـ 3D
+            ctx.fillStyle = '#06040d';
             ctx.fillRect(0, 0, width, height);
 
             if (gameActive) {
@@ -295,14 +365,13 @@
                 checkCollisions();
             }
 
-            // رسم العناصر الأساسية
+            // رسم العناصر بترتيب الأبعاد الصحيح
             drawFood();
             if (playerSnake) playerSnake.draw();
             if (aiSnake) aiSnake.draw();
 
             requestAnimationFrame(loop);
         }
-        // تشغيل حلقة الرسم الأساسية فوراً
         loop();
     </script>
 </body>
