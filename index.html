@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مستطيل الجيلي الانسيابي</title>
+    <title>مستطيل الزجاج السائل الثقيل</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #060312; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #080415; }
+        
+        /* خلفية سينمائية متحركة ناعمة */
         .bg-gradient {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
-            background: linear-gradient(135deg, #070414, #12082b, #2b063b, #420a39, #0a2436);
-            background-size: 400% 400%; animation: ultraGradient 16s ease infinite;
+            background: linear-gradient(135deg, #090518, #140931, #2e083f, #4a0e3f, #0f2b3c);
+            background-size: 400% 400%; animation: ultraGradient 20s ease infinite;
         }
         @keyframes ultraGradient {
             0% { background-position: 0% 50%; }
@@ -28,31 +30,41 @@
     <script>
         const canvas = document.getElementById('jellyCanvas');
         const ctx = canvas.getContext('2d');
-        let dpr = window.devicePixelRatio || 1;
 
+        let dpr = window.devicePixelRatio || 1;
         function resize() {
             canvas.width = window.innerWidth * dpr;
             canvas.height = window.innerHeight * dpr;
-            ctx.scale(dpr, dpr); // حل مشكلة البكسلة وتنعيم الخطوط
+            canvas.style.width = window.innerWidth + 'px';
+            canvas.style.height = window.innerHeight + 'px';
+            ctx.scale(dpr, dpr);
         }
-        window.addEventListener('resize', resize); resize();
+        window.addEventListener('resize', resize);
+        resize();
 
-        // فيزياء متزنة ومقاومة للانعقاد والتداخل
-        const STIFFNESS = 0.12; const DAMPING = 0.85;
+        // فيزياء ثقيلة ولزجة جداً للشعور بالراحة النفسية
+        const STIFFNESS = 0.08;     // تقليل الصلابة ليعطي مدى تمطط أطول وأسلس
+        const DAMPING = 0.75;       // زيادة اللزوجة (امتصاص طاقة أعلى) ليعطي إحساس السائل الثقيل
+        const MIN_DISTANCE = 40;    // الحد الأدنى للمسافة بين أي نقطتين لمنع التداخل والتشوه
         let particles = [], springs = [], dragged = null;
 
         class Particle {
-            constructor(x, y) { this.x = x; this.y = y; this.vx = 0; this.vy = 0; this.mass = 1.5; }
+            constructor(x, y) {
+                this.x = x; this.y = y;
+                this.vx = 0; this.vy = 0;
+                this.mass = 3.5; // زيادة الكتلة بشكل كبير لإعطاء ثقل الزجاج السائل
+            }
             update() {
                 if (this === dragged) return;
                 this.vx *= DAMPING; this.vy *= DAMPING;
                 this.x += this.vx; this.y += this.vy;
-                // حدود الشاشة
-                const b = 30; const w = window.innerWidth; const h = window.innerHeight;
+
+                // حماية الحدود من الخروج خارج الشاشة
+                const b = 40;
                 if (this.x < b) { this.x = b; this.vx *= -0.2; }
-                if (this.x > w - b) { this.x = w - b; this.vx *= -0.2; }
+                if (this.x > window.innerWidth - b) { this.x = window.innerWidth - b; this.vx *= -0.2; }
                 if (this.y < b) { this.y = b; this.vy *= -0.2; }
-                if (this.y > h - b) { this.y = h - b; this.vy *= -0.2; }
+                if (this.y > window.innerHeight - b) { this.y = window.innerHeight - b; this.vy *= -0.2; }
             }
         }
 
@@ -61,8 +73,10 @@
             update() {
                 let dx = this.p2.x - this.p1.x, dy = this.p2.y - this.p1.y;
                 let dist = Math.sqrt(dx * dx + dy * dy); if (dist === 0) return;
+                
                 let force = ((this.len - dist) / dist) * STIFFNESS;
                 let fx = dx * force, fy = dy * force;
+                
                 if (this.p1 !== dragged) { this.p1.vx -= fx / this.p1.mass; this.p1.vy -= fy / this.p1.mass; }
                 if (this.p2 !== dragged) { this.p2.vx += fx / this.p2.mass; this.p2.vy += fy / this.p2.mass; }
             }
@@ -70,37 +84,57 @@
 
         function init() {
             particles = []; springs = [];
-            const w = window.innerWidth; const h = window.innerHeight;
-            const cx = w / 2, cy = h / 2;
-            const rw = 220, rh = 140; // أبعاد المستطيل
+            let w = 260, h = 150; 
+            let cx = window.innerWidth / 2, cy = window.innerHeight / 2;
 
-            // نقااط الزوايا والأسطح الخارجية فقط لمنع تداخل العقد
-            let countX = 6, countY = 4;
-            // الحافة العلوية
-            for (let i = 0; i < countX; i++) particles.push(new Particle(cx - rw/2 + (rw / (countX - 1)) * i, cy - rh/2));
-            // الحافة اليمنى
-            for (let i = 1; i < countY; i++) particles.push(new Particle(cx + rw/2, cy - rh/2 + (rh / (countY - 1)) * i));
-            // الحافة السفلية
-            for (let i = countX - 2; i >= 0; i--) particles.push(new Particle(cx - rw/2 + (rw / (countX - 1)) * i, cy + rh/2));
-            // الحافة اليسرى
-            for (let i = countY - 2; i > 0; i--) particles.push(new Particle(cx - rw/2, cy - rh/2 + (rh / (countY - 1)) * i));
+            // 8 نقاط محيطية أساسية
+            let pts = [
+                {x: cx - w/2, y: cy - h/2}, {x: cx, y: cy - h/2}, {x: cx + w/2, y: cy - h/2},
+                {x: cx + w/2, y: cy},
+                {x: cx + w/2, y: cy + h/2}, {x: cx, y: cy + h/2}, {x: cx - w/2, y: cy + h/2},
+                {x: cx - w/2, y: cy}
+            ];
+            pts.forEach(p => particles.push(new Particle(p.x, p.y)));
 
-            // مركز ثقل داخلي يربط كل النقاط لمنع الانقلاب والتداخل
-            let center = new Particle(cx, cy);
-            particles.push(center);
-
-            // ربط المحيط الخارجي بسبرنغات دائرية قطرية
-            for (let i = 0; i < particles.length - 1; i++) {
-                let next = (i === particles.length - 2) ? 0 : i + 1;
-                let dist = Math.hypot(particles[next].x - particles[i].x, particles[next].y - particles[i].y);
-                springs.push(new Spring(particles[i], particles[next], dist));
-                
-                // ربط كل نقطة بالمركز للمحافظة على كيان المستطيل الضبابي
-                let cDist = Math.hypot(center.x - particles[i].x, center.y - particles[i].y);
-                springs.push(new Spring(particles[i], center, cDist));
+            // ربط هيكلي كامل لجميع النقاط ببعضها
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    let dx = particles[i].x - particles[j].x;
+                    let dy = particles[i].y - particles[j].y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    springs.push(new Spring(particles[i], particles[j], dist));
+                }
             }
         }
         init();
+
+        // نظام حظر التداخل الجذري (Anti-Tangle)
+        function resolveCollisions() {
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    let dx = particles[j].x - particles[i].x;
+                    let dy = particles[j].y - particles[i].y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    // إذا اقتربت النقاط من بعضها لدرجة التداخل، يتم دفعها للخارج بقوة
+                    if (dist < MIN_DISTANCE) {
+                        let overlap = MIN_DISTANCE - dist;
+                        let nx = dx / dist;
+                        let ny = dy / dist;
+                        
+                        // دفع النقاط بعيداً عن بعضها للحفاظ على الترتيب الدائري للمستطيل
+                        if (particles[i] !== dragged) {
+                            particles[i].x -= nx * overlap * 0.5;
+                            particles[i].y -= ny * overlap * 0.5;
+                        }
+                        if (particles[j] !== dragged) {
+                            particles[j].x += nx * overlap * 0.5;
+                            particles[j].y += ny * overlap * 0.5;
+                        }
+                    }
+                }
+            }
+        }
 
         function getMousePos(e) {
             let t = e.touches ? e.touches[0] : e;
@@ -114,7 +148,7 @@
         window.addEventListener('touchend', () => dragged = null);
 
         function start(mx, my) {
-            let close = null, minDist = 50;
+            let close = null, minDist = 80;
             particles.forEach(p => { let d = Math.hypot(p.x - mx, p.y - my); if (d < minDist) { minDist = d; close = p; } });
             dragged = close;
         }
@@ -122,33 +156,49 @@
 
         function loop() {
             ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-            for (let k = 0; k < 5; k++) springs.forEach(s => s.update());
+            
+            // تحديث الفيزياء وحل التصادمات الداخلية لمنع التداخل
+            for (let k = 0; k < 6; k++) {
+                springs.forEach(s => s.update());
+                resolveCollisions();
+            }
             particles.forEach(p => p.update());
 
-            // رسم المستطيل بمنحنيات فيزيائية ناعمة جداً لمنع التكسر
+            // رسم المستطيل بمنحنيات بيزيه ناعمة وانسيابية
             ctx.beginPath();
-            let pCount = particles.length - 1;
-            ctx.moveTo(particles[0].x, particles[0].y);
-            
-            for (let i = 0; i < pCount; i++) {
-                let next = (i + 1) % pCount;
-                let xc = (particles[i].x + particles[next].x) / 2;
-                let yc = (particles[i].y + particles[next].y) / 2;
+            ctx.moveTo((particles[0].x + particles[1].x) / 2, (particles[0].y + particles[1].y) / 2);
+            for (let i = 0; i < particles.length; i++) {
+                let next = particles[(i + 1) % particles.length];
+                let xc = (particles[i].x + next.x) / 2;
+                let yc = (particles[i].y + next.y) / 2;
                 ctx.quadraticCurveTo(particles[i].x, particles[i].y, xc, yc);
             }
             ctx.closePath();
 
-            ctx.lineJoin = "round";
-            ctx.lineWidth = 12;
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.2)"; // تأثير الحافة القطرية الناعمة
-            ctx.stroke();
+            // خامة تأثير الزجاج السائل (تدرج لوني يعكس الضوء)
+            let glassGrad = ctx.createLinearGradient(window.innerWidth/2, 0, window.innerWidth/2, window.innerHeight);
+            glassGrad.addColorStop(0, "rgba(255, 255, 255, 0.15)"); // لمعة من الأعلى
+            glassGrad.addColorStop(1, "rgba(255, 255, 255, 0.03)"); // شفافية بالأسفل
+            
+            // إضافة توهج ناعم خلف الزجاج السائل
+            ctx.shadowColor = "rgba(255, 255, 255, 0.1)";
+            ctx.shadowBlur = 20;
 
-            // تعبئة المستطيل بمظهر ضبابي زجاجي (Frosted Glass Effect)
-            ctx.fillStyle = "rgba(255, 255, 255, 0.07)";
+            ctx.fillStyle = glassGrad;
             ctx.fill();
 
-            ctx.lineWidth = 2.5;
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.65)";
+            // إعادة ضبط التظليل حتى لا يؤثر على الخطوط الخارجية
+            ctx.shadowBlur = 0;
+
+            // حافة الزجاج السائل الخارجية السلسة والخالية من البيكسلات
+            ctx.lineJoin = "round";
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.55)";
+            ctx.stroke();
+
+            // لمسة داخلية رفيعة وأنيقة
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
             ctx.stroke();
 
             requestAnimationFrame(loop);
