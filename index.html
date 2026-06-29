@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مستطيل الزجاج السائل المغناطيسي</title>
+    <title>مستطيل الزجاج السائل المتطور</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body, html { width: 100%; height: 100%; overflow: hidden; background-color: #080415; }
@@ -37,28 +37,31 @@
             canvas.style.width = window.innerWidth + 'px';
             canvas.style.height = window.innerHeight + 'px';
             ctx.scale(dpr, dpr);
-            init(); // إعادة الحساب عند تدوير الشاشة ليبقى بالمنتصف تماماً
+            init();
         }
         window.addEventListener('resize', resize);
 
-        // إعدادات الفيزياء المتزنة للثقل والعودة للمركز
-        const STIFFNESS = 0.12;      // صلابة الروابط الداخلية
-        const DAMPING = 0.78;        // لزوجة الحركة لمنع الشطحات
-        const HOME_STIFFNESS = 0.04; // قوة المغناطيس اللي ترجع المستطيل لمركز الشاشة (تأثير المطاط)
-        const MIN_DISTANCE = 45;     // حماية ضد التداخل والتشوه
+        // الإعدادات الفيزيائية السابقة لضمان الثقل وعدم التداخل
+        const STIFFNESS = 0.12;      
+        const DAMPING = 0.78;        
+        const HOME_STIFFNESS = 0.04; 
+        const MIN_DISTANCE = 45;     
         let particles = [], springs = [], dragged = null;
+
+        // متغيرات الإضافات الجديدة (التموج والقطرات)
+        let ripple = { x: 0, y: 0, radius: 0, maxRadius: 90, alpha: 0, active: false };
+        let blobs = [];
 
         class Particle {
             constructor(x, y, homeX, homeY) {
                 this.x = x; this.y = y;
-                this.homeX = homeX; this.homeY = homeY; // الإحداثيات الأصلية بالمركز
+                this.homeX = homeX; this.homeY = homeY;
                 this.vx = 0; this.vy = 0;
                 this.mass = 3.0; 
             }
             update() {
                 if (this === dragged) return;
 
-                // قوة الجذب المغناطيسية نحو المركز (المقر الأصلي)
                 let hx = this.homeX - this.x;
                 let hy = this.homeY - this.y;
                 this.vx += hx * HOME_STIFFNESS;
@@ -67,7 +70,6 @@
                 this.vx *= DAMPING; this.vy *= DAMPING;
                 this.x += this.vx; this.y += this.vy;
 
-                // جدران الحماية الخارجية
                 const b = 30;
                 if (this.x < b) { this.x = b; this.vx *= -0.2; }
                 if (this.x > window.innerWidth - b) { this.x = window.innerWidth - b; this.vx *= -0.2; }
@@ -88,12 +90,55 @@
             }
         }
 
+        // كلاس القطرات الزجاجية الطافية بالخلفية (إضافة 3)
+        class FloatingBlob {
+            constructor() {
+                this.x = Math.random() * window.innerWidth;
+                this.y = Math.random() * window.innerHeight;
+                this.radius = Math.random() * 20 + 15;
+                this.angle = Math.random() * Math.PI * 2;
+                this.speed = Math.random() * 0.4 + 0.2;
+            }
+            update(cx, cy) {
+                // حركة عشوائية انسيابية بالخلفية
+                this.angle += Math.sin(Date.now() * 0.001) * 0.02;
+                this.x += Math.cos(this.angle) * this.speed;
+                this.y += Math.sin(this.angle) * this.speed;
+
+                // التفاعل مع حركة المستطيل (إذا اقترب منها المستطيل تبتعد أو تنجذب بمرونة)
+                let dist = Math.hypot(this.x - cx, this.y - cy);
+                if (dist < 160) {
+                    let force = (160 - dist) * 0.05;
+                    this.x += ((this.x - cx) / dist) * force;
+                    this.y += ((this.y - cy) / dist) * force;
+                }
+
+                // الحفاظ على بقائها داخل الشاشة
+                if (this.x < -50) this.x = window.innerWidth + 50;
+                if (this.x > window.innerWidth + 50) this.x = -50;
+                if (this.y < -50) this.y = window.innerHeight + 50;
+                if (this.y > window.innerHeight + 50) this.y = -50;
+            }
+            draw() {
+                // رسم القطرات بأسلوب الزجاج السائل الناعم
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                let grad = ctx.createLinearGradient(this.x, this.y - this.radius, this.x, this.y + this.radius);
+                grad.addColorStop(0, "rgba(255, 255, 255, 0.12)");
+                grad.addColorStop(1, "rgba(255, 255, 255, 0.02)");
+                ctx.fillStyle = grad;
+                ctx.fill();
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+                ctx.stroke();
+            }
+        }
+
         function init() {
             particles = []; springs = [];
             let w = 250, h = 150; 
             let cx = window.innerWidth / 2, cy = window.innerHeight / 2;
 
-            // توليد الـ 8 نقاط مع حفظ مواقعهن السنترية كـ Home
             let pts = [
                 {x: cx - w/2, y: cy - h/2}, {x: cx, y: cy - h/2}, {x: cx + w/2, y: cy - h/2},
                 {x: cx + w/2, y: cy},
@@ -102,7 +147,6 @@
             ];
             pts.forEach(p => particles.push(new Particle(p.x, p.y, p.x, p.y)));
 
-            // ربط هيكلي محكم ومتقاطع 100% لثبات هندسي ومنع انعواج الزوايا
             for (let i = 0; i < particles.length; i++) {
                 for (let j = i + 1; j < particles.length; j++) {
                     let dx = particles[i].x - particles[j].x;
@@ -110,6 +154,11 @@
                     let dist = Math.sqrt(dx * dx + dy * dy);
                     springs.push(new Spring(particles[i], particles[j], dist));
                 }
+            }
+
+            // توليد قطرات الخلفية مرة واحدة
+            if(blobs.length === 0) {
+                for(let b=0; b<4; b++) blobs.push(new FloatingBlob());
             }
         }
 
@@ -129,13 +178,13 @@
             }
         }
 
-        // تفعيل الأبعاد لأول مرة
         resize();
 
         function getMousePos(e) {
             let t = e.touches ? e.touches[0] : e;
             return { x: t.clientX, y: t.clientY };
         }
+        
         window.addEventListener('mousedown', (e) => start(getMousePos(e).x, getMousePos(e).y));
         window.addEventListener('mousemove', (e) => move(getMousePos(e).x, getMousePos(e).y));
         window.addEventListener('mouseup', () => dragged = null);
@@ -147,19 +196,39 @@
             let close = null, minDist = 80;
             particles.forEach(p => { let d = Math.hypot(p.x - mx, p.y - my); if (d < minDist) { minDist = d; close = p; } });
             dragged = close;
+
+            // تفعيل تموج الضغط بمكان اللمس الحقيقي (إضافة 4)
+            if(dragged) {
+                ripple.x = mx;
+                ripple.y = my;
+                ripple.radius = 0;
+                ripple.alpha = 0.5;
+                ripple.active = true;
+            }
         }
         function move(mx, my) { if (dragged) { dragged.x = mx; dragged.y = my; dragged.vx = 0; dragged.vy = 0; } }
 
         function loop() {
             ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
             
+            // حساب سنتر المستطيل الحالي بشكل مستمر للتفاعل
+            let avgX = 0, avgY = 0;
+            particles.forEach(p => { avgX += p.x; avgY += p.y; });
+            avgX /= particles.length; avgY /= particles.length;
+
+            // 1. رسم وتحديث القطرات بالخلفية
+            blobs.forEach(b => {
+                b.update(avgX, avgY);
+                b.draw();
+            });
+
             for (let k = 0; k < 6; k++) {
                 springs.forEach(s => s.update());
                 resolveCollisions();
             }
             particles.forEach(p => p.update());
 
-            // معالجة الرسم الذكي للمنحنيات لضمان عدم تشوه الزوايا
+            // رسم مسار المنحنيات للمستطيل
             ctx.beginPath();
             let startX = (particles[particles.length - 1].x + particles[0].x) / 2;
             let startY = (particles[particles.length - 1].y + particles[0].y) / 2;
@@ -174,10 +243,17 @@
             }
             ctx.closePath();
 
-            // خامة خرافية للزجاج السائل الشفاف وتوهجه الناعم
-            let glassGrad = ctx.createLinearGradient(window.innerWidth/2, 0, window.innerWidth/2, window.innerHeight);
-            glassGrad.addColorStop(0, "rgba(255, 255, 255, 0.16)");
-            glassGrad.addColorStop(1, "rgba(255, 255, 255, 0.03)");
+            // 2. لمعان تفاعلي مع اتجاه الحركة (إضافة 2)
+            // نأخذ فرق المسافة بين سنتر المستطيل الحالي وسنتر الشاشة الأصلي لتوجيه الإضاءة عكس السحب
+            let dxCenter = avgX - (window.innerWidth / 2);
+            let dyCenter = avgY - (window.innerHeight / 2);
+            let gradX1 = avgX - dxCenter * 0.4;
+            let gradY1 = (avgY - 70) - dyCenter * 0.4;
+            
+            let glassGrad = ctx.createLinearGradient(gradX1, gradY1, avgX, avgY + 80);
+            glassGrad.addColorStop(0, "rgba(255, 255, 255, 0.22)"); // تتركز اللمعة حسب اتجاه السحب
+            glassGrad.addColorStop(0.5, "rgba(255, 255, 255, 0.06)");
+            glassGrad.addColorStop(1, "rgba(255, 255, 255, 0.02)");
             
             ctx.shadowColor = "rgba(255, 255, 255, 0.08)";
             ctx.shadowBlur = 25;
@@ -185,13 +261,30 @@
             ctx.fill();
             ctx.shadowBlur = 0;
 
-            // تحديد خارجي انسيابي جداً ونقي
+            // 3. تحديث ورسم تأثير التموج بداخل المستطيل فقط (إضافة 4)
+            if (ripple.active) {
+                ctx.save();
+                ctx.clip(); // حصر رسم التموج داخل حدود المستطيل فقط
+                ctx.beginPath();
+                ctx.arc(ripple.x, ripple.y, ripple.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(255, 255, 255, ${ripple.alpha})`;
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                ctx.restore();
+
+                ripple.radius += 2.5; // سرعة توسع التموج
+                ripple.alpha -= 0.015; // تلاشي تدريجي للتموج
+                if (ripple.alpha <= 0 || ripple.radius >= ripple.maxRadius) {
+                    ripple.active = false;
+                }
+            }
+
+            // التحديد الخارجي والداخلي الأصلي (ثابت وبدون بكسلة)
             ctx.lineJoin = "round";
             ctx.lineWidth = 4;
             ctx.strokeStyle = "rgba(255, 255, 255, 0.55)";
             ctx.stroke();
 
-            // لمسة لمعان داخلية خفيفة
             ctx.lineWidth = 1.2;
             ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
             ctx.stroke();
