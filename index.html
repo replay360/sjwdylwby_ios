@@ -36,7 +36,7 @@
         .hud {
             position: absolute; top: 20px; width: 100%; padding: 0 20px;
             display: flex; justify-content: space-between; z-index: 5; pointer-events: none;
-            color: #fff; font-weight: bold; font-size: 16px;
+            color: #fff; font-weight: bold; font-size: 16px; display: none;
         }
         .score-box { background: rgba(255,255,255,0.06); padding: 8px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(5px); }
         .status-msg {
@@ -59,9 +59,9 @@
     </div>
 
     <!-- واجهة اللعب العليا -->
-    <div class="hud">
-        <div class="score-box" style="box-shadow: 0 0 10px rgba(0,255,200,0.2)">أفعيتك (خضراء): <span id="playerScore">5</span></div>
-        <div class="score-box" style="box-shadow: 0 0 10px rgba(255,50,50,0.2)">المنافس (حمراء): <span id="aiScore">5</span></div>
+    <div class="hud" id="gameHud">
+        <div class="score-box" style="box-shadow: 0 0 10px rgba(0,255,200,0.2)">أفعيتك (خضراء): <span id="playerScore">15</span></div>
+        <div class="score-box" style="box-shadow: 0 0 10px rgba(255,50,50,0.2)">المنافس (حمراء): <span id="aiScore">15</span></div>
     </div>
 
     <div class="status-msg" id="statusMsg"></div>
@@ -73,7 +73,8 @@
         const ctx = canvas.getContext('2d');
         
         let dpr = window.devicePixelRatio || 1;
-        let width, height;
+        let width = window.innerWidth;
+        let height = window.innerHeight;
         
         function resize() {
             width = window.innerWidth;
@@ -85,7 +86,7 @@
             ctx.scale(dpr, dpr);
         }
         window.addEventListener('resize', resize);
-        resize();
+        resize(); // تشغيل فوري لتثبيت الأبعاد
 
         // متغيرات اللعبة العامة
         let gameActive = false;
@@ -93,8 +94,8 @@
         let speedMultiplier = 1;
         let food = { x: 0, y: 0, z: 0, radius: 10 };
         
-        // الأفاعي
-        let playerSnake, aiSnake;
+        let playerSnake = null;
+        let aiSnake = null;
 
         class Snake {
             constructor(x, y, color, isAI) {
@@ -103,17 +104,17 @@
                 this.baseRadius = 14;
                 this.segments = [];
                 this.angle = isAI ? Math.PI : 0; 
-                this.speed = 3.2;
-                this.turnSpeed = 0.06;
+                this.speed = 3.5;
+                this.turnSpeed = 0.07;
                 this.alive = true;
 
-                // توليد الجسم البدئي للأفعى
+                // توليد الجسم بشكل مستقر ومضمون في الساحة
                 let length = 15;
                 for (let i = 0; i < length; i++) {
                     this.segments.push({
                         x: x - (i * this.speed * Math.cos(this.angle)),
                         y: y - (i * this.speed * Math.sin(this.angle)),
-                        z: Math.sin(i * 0.3) * 3 // تموج ثلاثي الأبعاد عمودي تلقائي
+                        z: 0
                     });
                 }
             }
@@ -121,73 +122,67 @@
             update() {
                 if (!this.alive) return;
 
-                // حركة الذكاء الاصطناعي (AI)
+                // ذكاء اصطناعي محترف لملاحقة الهدف واقتناص الفرص
                 if (this.isAI) {
                     let targetAngle = Math.atan2(food.y - this.segments[0].y, food.x - this.segments[0].x);
-                    // ملاحقة ذكية للأكل أو تجنب اللاعب بناءً على الصعوبة
                     let diff = targetAngle - this.angle;
                     while (diff < -Math.PI) diff += Math.PI * 2;
                     while (diff > Math.PI) diff -= Math.PI * 2;
                     
-                    let currentTurn = this.turnSpeed * (difficulty === 'hard' ? 1.4 : 0.8);
+                    let currentTurn = this.turnSpeed * (difficulty === 'hard' ? 1.5 : 0.9);
                     this.angle += Math.max(-currentTurn, Math.min(currentTurn, diff));
                 }
 
-                // حركة الرأس تلقائياً للأمام
+                // حركة الرأس التلقائية للأمام
                 let head = this.segments[0];
                 let nextX = head.x + Math.cos(this.angle) * this.speed * speedMultiplier;
                 let nextY = head.y + Math.sin(this.angle) * this.speed * speedMultiplier;
 
-                // تحديث موقع الحلقات (كل حلقة تتبع السابقة بسلاسة متناهية)
-                let newHead = { x: nextX, y: nextY, z: Math.sin(Date.now() * 0.01) * 4 };
+                // حدود الشاشة الالتفافية اللولبية
+                if (nextX < 0) nextX = width;
+                if (nextX > width) nextX = 0;
+                if (nextY < 0) nextY = height;
+                if (nextY > height) nextY = 0;
+
+                // تحديث تموج الـ Z الفخم ومواقع الحلقات كلها
+                let newHead = { x: nextX, y: nextY, z: Math.sin(Date.now() * 0.008) * 4 };
                 this.segments.unshift(newHead);
                 this.segments.pop();
-
-                // حدود الشاشة الالتفافية الذكية للأفاعي
-                if (newHead.x < 0) newHead.x = width;
-                if (newHead.x > width) newHead.x = 0;
-                if (newHead.y < 0) newHead.y = height;
-                if (newHead.y > height) newHead.y = 0;
             }
 
             grow() {
                 let tail = this.segments[this.segments.length - 1];
-                // إضافة 4 حلقات جديدة عند الأكل لزيادة الطول والضخامة الفورية
-                for(let i=0; i<4; i++) {
+                for(let i = 0; i < 4; i++) {
                     this.segments.push({ x: tail.x, y: tail.y, z: tail.z });
                 }
             }
 
             draw() {
-                // رسم الحلقات من الذيل للرأس لمحاكاة العمق والمنظور الثلاثي الأبعاد (3D Shadowing)
+                // رسم الحلقات من الذيل للرأس لمحاكاة العمق والمنظور ثلاثي الأبعاد
                 for (let i = this.segments.length - 1; i >= 0; i--) {
                     let seg = this.segments[i];
-                    
-                    // حساب نصف القطر المتناقص تدريجياً نحو الذيل يعطي مظهر ثلاثي الأبعاد فخم
                     let factor = (this.segments.length - i) / this.segments.length;
-                    let radius = this.baseRadius * (0.4 + factor * 0.6);
+                    let radius = this.baseRadius * (0.45 + factor * 0.55);
                     
-                    // إضافة تأثير الارتفاع العمودي Z لإسقاط الأبعاد 3D Perspective
                     let drawX = seg.x;
                     let drawY = seg.y + seg.z; 
 
                     ctx.save();
-                    // تدرج لوني دائري يعطي شكل الكرة المجسمة الشبيهة بالزجاج السائل البرّاق
                     let grad = ctx.createRadialGradient(drawX - radius*0.3, drawY - radius*0.3, radius*0.1, drawX, drawY, radius);
                     
                     if (this.color === 'green') {
                         grad.addColorStop(0, '#8effd4');
                         grad.addColorStop(0.4, '#00ffaa');
                         grad.addColorStop(1, '#004a32');
-                        ctx.shadowColor = "rgba(0, 255, 170, 0.3)";
+                        ctx.shadowColor = "rgba(0, 255, 170, 0.4)";
                     } else {
                         grad.addColorStop(0, '#ff9e9e');
                         grad.addColorStop(0.4, '#ff3333');
                         grad.addColorStop(1, '#5e0000');
-                        ctx.shadowColor = "rgba(255, 51, 51, 0.3)";
+                        ctx.shadowColor = "rgba(255, 51, 51, 0.4)";
                     }
 
-                    ctx.shadowBlur = i === 0 ? 20 : 5; // تركيز الإضاءة على رأس الأفعى
+                    ctx.shadowBlur = i === 0 ? 25 : 6;
                     ctx.beginPath();
                     ctx.arc(drawX, drawY, radius, 0, Math.PI * 2);
                     ctx.fillStyle = grad;
@@ -197,15 +192,13 @@
             }
         }
 
-        // توزيع عشوائي للأكل ثلاثي الأبعاد بوسط الشاشة وبشكل آمن
         function spawnFood() {
-            food.x = Math.random() * (width - 100) + 50;
-            food.y = Math.random() * (height - 100) + 50;
-            food.z = 0;
+            food.x = Math.random() * (width - 120) + 60;
+            food.y = Math.random() * (height - 120) + 60;
         }
 
         function drawFood() {
-            food.z = Math.sin(Date.now() * 0.005) * 5; // تأثير طفو الأكل بالهواء 3D
+            food.z = Math.sin(Date.now() * 0.005) * 6;
             let drawY = food.y + food.z;
 
             ctx.save();
@@ -215,7 +208,7 @@
             grad.addColorStop(1, '#996600');
             
             ctx.shadowColor = '#ffcc00';
-            ctx.shadowBlur = 20;
+            ctx.shadowBlur = 25;
             ctx.beginPath();
             ctx.arc(food.x, drawY, food.radius, 0, Math.PI * 2);
             ctx.fillStyle = grad;
@@ -223,14 +216,13 @@
             ctx.restore();
         }
 
-        // فحص التصادمات وقواعد الموت والفوز باللعبة
         function checkCollisions() {
-            if (!playerSnake.alive || !aiSnake.alive) return;
+            if (!playerSnake || !aiSnake || !playerSnake.alive || !aiSnake.alive) return;
 
             let pHead = playerSnake.segments[0];
             let aHead = aiSnake.segments[0];
 
-            // 1. فحص لقط الأكل (اللاعب والمنافس)
+            // لقط العملات والأكل
             if (Math.hypot(pHead.x - food.x, pHead.y - food.y) < playerSnake.baseRadius + food.radius) {
                 playerSnake.grow();
                 spawnFood();
@@ -242,24 +234,27 @@
                 document.getElementById('aiScore').innerText = aiSnake.segments.length;
             }
 
-            // 2. فحص الموت: هل رأس اللاعب دعم بجسم الأفعى الثانية؟
-            for (let i = 0; i < aiSnake.segments.length; i++) {
+            // فحص الاصطدامات بين الأفاعي (قواعد الموت والفوز)
+            for (let i = 1; i < aiSnake.segments.length; i++) {
                 let seg = aiSnake.segments[i];
-                if (Math.hypot(pHead.x - seg.x, pHead.y - seg.y) < playerSnake.baseRadius * 0.8) {
+                if (Math.hypot(pHead.x - seg.x, pHead.y - seg.y) < playerSnake.baseRadius * 0.85) {
                     playerSnake.alive = false;
                 }
             }
 
-            // 3. فحص الموت: هل رأس أفعى الـ AI دعم بجسم أفعى اللاعب؟
-            for (let i = 0; i < playerSnake.segments.length; i++) {
+            for (let i = 1; i < playerSnake.segments.length; i++) {
                 let seg = playerSnake.segments[i];
-                if (Math.hypot(aHead.x - seg.x, aHead.y - seg.y) < aiSnake.baseRadius * 0.8) {
+                if (Math.hypot(aHead.x - seg.x, aHead.y - seg.y) < aiSnake.baseRadius * 0.85) {
                     aiSnake.alive = false;
                 }
             }
 
-            // معالجة حالات الفوز والموت المزدوج
-            let msg = document.getElementById('statusMsg');
+            // فحص اصطدام الرؤوس ببعضها مباشرة وموت الاثنين معاً (فكرتك الذهبية للفوز)
+            if (Math.hypot(pHead.x - aHead.x, pHead.y - aHead.y) < playerSnake.baseRadius * 1.2) {
+                playerSnake.alive = false;
+                aiSnake.alive = false;
+            }
+
             if (!playerSnake.alive && !aiSnake.alive) {
                 endGame("فوز ساحق! دمرتهما معاً 💥");
             } else if (!playerSnake.alive) {
@@ -277,34 +272,39 @@
             
             setTimeout(() => {
                 msg.style.opacity = "0";
+                document.getElementById('gameHud').style.display = 'none';
                 document.getElementById('startScreen').classList.remove('hidden');
             }, 3000);
         }
 
-        // توجيه الأفعى عن طريق لمس يمين ويسار الشاشة أو الأسهم بالحاسبة
-        window.addEventListener('keydown', (e) => {
-            if (!gameActive) return;
-            if (e.key === 'ArrowLeft') playerSnake.angle -= playerSnake.turnSpeed * 2;
-            if (e.key === 'ArrowRight') playerSnake.angle += playerSnake.turnSpeed * 2;
-        });
-
+        // التحكم عن طريق لمس يمين أو يسار الشاشة لتغيير الزاوية بسلاسة
         window.addEventListener('touchstart', (e) => {
-            if (!gameActive) return;
+            if (!gameActive || !playerSnake) return;
             let touchX = e.touches[0].clientX;
             if (touchX < width / 2) {
-                playerSnake.angle -= playerSnake.turnSpeed * 2.5; // التوجيه يساراً
+                playerSnake.angle -= 0.45; // لف يسار
             } else {
-                playerSnake.angle += playerSnake.turnSpeed * 2.5; // التوجيه يميناً
+                playerSnake.angle += 0.45; // لف يمين
             }
         }, { passive: true });
 
-        // بدء اللعبة وتجهيز الصعوبة واعادة العدادات
+        // التحكم بالكيبورد للحاسبة أيضاً كدعم إضافي الاحترافي
+        window.addEventListener('keydown', (e) => {
+            if (!gameActive || !playerSnake) return;
+            if (e.key === 'ArrowLeft' || e.key === 'a') playerSnake.angle -= 0.35;
+            if (e.key === 'ArrowRight' || e.key === 'd') playerSnake.angle += 0.35;
+        });
+
         function startGame(lvl) {
+            resize(); // إعادة حساب وتثبيت الأبعاد قبل البث لمنع أي ساحة فارغة
+            
             difficulty = lvl;
-            speedMultiplier = difficulty === 'hard' ? 1.4 : 1.0;
+            speedMultiplier = difficulty === 'hard' ? 1.45 : 1.0;
             
             document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('gameHud').style.display = 'flex';
             
+            // توليد الأفاعي بمنتصف الشاشة الآمن والمضمون
             playerSnake = new Snake(width * 0.25, height * 0.5, 'green', false);
             aiSnake = new Snake(width * 0.75, height * 0.5, 'red', true);
             
@@ -315,9 +315,8 @@
             gameActive = true;
         }
 
-        // حلقة التحديث والرسم الرئيسية للعبة
         function loop() {
-            // رسم خلفية كحلي داكنة لإبراز التوهج الثلاثي الأبعاد للأفاعي والأكل
+            // رسم الساحة الفخمة بلون كحلي ملكي عميق
             ctx.fillStyle = '#06030e';
             ctx.fillRect(0, 0, width, height);
 
@@ -327,10 +326,10 @@
                 checkCollisions();
             }
 
-            // رسم الأكل والأفاعي بالترتيب
+            // رسم الأكل والأفاعي بأبعاد 3D ونعومة كاملة
             drawFood();
-            playerSnake.draw();
-            aiSnake.draw();
+            if (playerSnake) playerSnake.draw();
+            if (aiSnake) aiSnake.draw();
 
             requestAnimationFrame(loop);
         }
