@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مستطيل الزجاج السائل المتطور</title>
+    <title>مستطيل الزجاج السائل المضيء</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body, html { width: 100%; height: 100%; overflow: hidden; background-color: #080415; }
         
+        /* الخلفية السينمائية المتحركة الثابتة */
         .bg-gradient {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
             background: linear-gradient(135deg, #090518, #140931, #2e083f, #4a0e3f, #0f2b3c);
@@ -41,16 +42,15 @@
         }
         window.addEventListener('resize', resize);
 
-        // الإعدادات الفيزيائية السابقة لضمان الثقل وعدم التداخل
+        // الفيزياء القوية السابقة (ثقل، استقرار، العودة للمركز)
         const STIFFNESS = 0.12;      
         const DAMPING = 0.78;        
         const HOME_STIFFNESS = 0.04; 
         const MIN_DISTANCE = 45;     
         let particles = [], springs = [], dragged = null;
 
-        // متغيرات الإضافات الجديدة (التموج والقطرات)
-        let ripple = { x: 0, y: 0, radius: 0, maxRadius: 90, alpha: 0, active: false };
-        let blobs = [];
+        // إحداثيات صبع المستخدم للتوهج التفاعلي
+        let touchPos = { x: 0, y: 0, glowAlpha: 0 };
 
         class Particle {
             constructor(x, y, homeX, homeY) {
@@ -90,50 +90,6 @@
             }
         }
 
-        // كلاس القطرات الزجاجية الطافية بالخلفية (إضافة 3)
-        class FloatingBlob {
-            constructor() {
-                this.x = Math.random() * window.innerWidth;
-                this.y = Math.random() * window.innerHeight;
-                this.radius = Math.random() * 20 + 15;
-                this.angle = Math.random() * Math.PI * 2;
-                this.speed = Math.random() * 0.4 + 0.2;
-            }
-            update(cx, cy) {
-                // حركة عشوائية انسيابية بالخلفية
-                this.angle += Math.sin(Date.now() * 0.001) * 0.02;
-                this.x += Math.cos(this.angle) * this.speed;
-                this.y += Math.sin(this.angle) * this.speed;
-
-                // التفاعل مع حركة المستطيل (إذا اقترب منها المستطيل تبتعد أو تنجذب بمرونة)
-                let dist = Math.hypot(this.x - cx, this.y - cy);
-                if (dist < 160) {
-                    let force = (160 - dist) * 0.05;
-                    this.x += ((this.x - cx) / dist) * force;
-                    this.y += ((this.y - cy) / dist) * force;
-                }
-
-                // الحفاظ على بقائها داخل الشاشة
-                if (this.x < -50) this.x = window.innerWidth + 50;
-                if (this.x > window.innerWidth + 50) this.x = -50;
-                if (this.y < -50) this.y = window.innerHeight + 50;
-                if (this.y > window.innerHeight + 50) this.y = -50;
-            }
-            draw() {
-                // رسم القطرات بأسلوب الزجاج السائل الناعم
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                let grad = ctx.createLinearGradient(this.x, this.y - this.radius, this.x, this.y + this.radius);
-                grad.addColorStop(0, "rgba(255, 255, 255, 0.12)");
-                grad.addColorStop(1, "rgba(255, 255, 255, 0.02)");
-                ctx.fillStyle = grad;
-                ctx.fill();
-                ctx.lineWidth = 1.5;
-                ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
-                ctx.stroke();
-            }
-        }
-
         function init() {
             particles = []; springs = [];
             let w = 250, h = 150; 
@@ -154,11 +110,6 @@
                     let dist = Math.sqrt(dx * dx + dy * dy);
                     springs.push(new Spring(particles[i], particles[j], dist));
                 }
-            }
-
-            // توليد قطرات الخلفية مرة واحدة
-            if(blobs.length === 0) {
-                for(let b=0; b<4; b++) blobs.push(new FloatingBlob());
             }
         }
 
@@ -187,48 +138,51 @@
         
         window.addEventListener('mousedown', (e) => start(getMousePos(e).x, getMousePos(e).y));
         window.addEventListener('mousemove', (e) => move(getMousePos(e).x, getMousePos(e).y));
-        window.addEventListener('mouseup', () => dragged = null);
+        window.addEventListener('mouseup', () => end());
         window.addEventListener('touchstart', (e) => start(getMousePos(e).x, getMousePos(e).y), { passive: true });
         window.addEventListener('touchmove', (e) => move(getMousePos(e).x, getMousePos(e).y), { passive: true });
-        window.addEventListener('touchend', () => dragged = null);
+        window.addEventListener('touchend', () => end());
 
         function start(mx, my) {
             let close = null, minDist = 80;
             particles.forEach(p => { let d = Math.hypot(p.x - mx, p.y - my); if (d < minDist) { minDist = d; close = p; } });
             dragged = close;
 
-            // تفعيل تموج الضغط بمكان اللمس الحقيقي (إضافة 4)
-            if(dragged) {
-                ripple.x = mx;
-                ripple.y = my;
-                ripple.radius = 0;
-                ripple.alpha = 0.5;
-                ripple.active = true;
+            if (dragged) {
+                touchPos.x = mx;
+                touchPos.y = my;
+                touchPos.glowAlpha = 0.6; // تفعيل توهج اللمس فوراً عند الضغط
             }
         }
-        function move(mx, my) { if (dragged) { dragged.x = mx; dragged.y = my; dragged.vx = 0; dragged.vy = 0; } }
+
+        function move(mx, my) { 
+            if (dragged) { 
+                dragged.x = mx; dragged.y = my; 
+                dragged.vx = 0; dragged.vy = 0; 
+                touchPos.x = mx;
+                touchPos.y = my;
+            } 
+        }
+
+        function end() {
+            dragged = null;
+        }
 
         function loop() {
             ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
             
-            // حساب سنتر المستطيل الحالي بشكل مستمر للتفاعل
-            let avgX = 0, avgY = 0;
-            particles.forEach(p => { avgX += p.x; avgY += p.y; });
-            avgX /= particles.length; avgY /= particles.length;
-
-            // 1. رسم وتحديث القطرات بالخلفية
-            blobs.forEach(b => {
-                b.update(avgX, avgY);
-                b.draw();
-            });
-
             for (let k = 0; k < 6; k++) {
                 springs.forEach(s => s.update());
                 resolveCollisions();
             }
             particles.forEach(p => p.update());
 
-            // رسم مسار المنحنيات للمستطيل
+            // حساب السنتر والاتجاه للمعان التفاعلي
+            let avgX = 0, avgY = 0;
+            particles.forEach(p => { avgX += p.x; avgY += p.y; });
+            avgX /= particles.length; avgY /= particles.length;
+
+            // رسم المستطيل الجيلي بمنحنيات ناعمة نظيفة
             ctx.beginPath();
             let startX = (particles[particles.length - 1].x + particles[0].x) / 2;
             let startY = (particles[particles.length - 1].y + particles[0].y) / 2;
@@ -243,50 +197,49 @@
             }
             ctx.closePath();
 
-            // 2. لمعان تفاعلي مع اتجاه الحركة (إضافة 2)
-            // نأخذ فرق المسافة بين سنتر المستطيل الحالي وسنتر الشاشة الأصلي لتوجيه الإضاءة عكس السحب
+            // خامة زجاج سائل واضحة وأكثر بروزاً من قبل
             let dxCenter = avgX - (window.innerWidth / 2);
             let dyCenter = avgY - (window.innerHeight / 2);
             let gradX1 = avgX - dxCenter * 0.4;
             let gradY1 = (avgY - 70) - dyCenter * 0.4;
             
             let glassGrad = ctx.createLinearGradient(gradX1, gradY1, avgX, avgY + 80);
-            glassGrad.addColorStop(0, "rgba(255, 255, 255, 0.22)"); // تتركز اللمعة حسب اتجاه السحب
-            glassGrad.addColorStop(0.5, "rgba(255, 255, 255, 0.06)");
-            glassGrad.addColorStop(1, "rgba(255, 255, 255, 0.02)");
+            glassGrad.addColorStop(0, "rgba(255, 255, 255, 0.28)"); // زيادة الوضوح واللمعة
+            glassGrad.addColorStop(0.5, "rgba(255, 255, 255, 0.12)"); // زيادة وضوح الوسط
+            glassGrad.addColorStop(1, "rgba(255, 255, 255, 0.04)");
             
-            ctx.shadowColor = "rgba(255, 255, 255, 0.08)";
-            ctx.shadowBlur = 25;
+            ctx.shadowColor = "rgba(255, 255, 255, 0.12)";
+            ctx.shadowBlur = 30;
             ctx.fillStyle = glassGrad;
             ctx.fill();
             ctx.shadowBlur = 0;
 
-            // 3. تحديث ورسم تأثير التموج بداخل المستطيل فقط (إضافة 4)
-            if (ripple.active) {
-                ctx.save();
-                ctx.clip(); // حصر رسم التموج داخل حدود المستطيل فقط
-                ctx.beginPath();
-                ctx.arc(ripple.x, ripple.y, ripple.radius, 0, Math.PI * 2);
-                ctx.strokeStyle = `rgba(255, 255, 255, ${ripple.alpha})`;
-                ctx.lineWidth = 3;
-                ctx.stroke();
-                ctx.restore();
-
-                ripple.radius += 2.5; // سرعة توسع التموج
-                ripple.alpha -= 0.015; // تلاشي تدريجي للتموج
-                if (ripple.alpha <= 0 || ripple.radius >= ripple.maxRadius) {
-                    ripple.active = false;
-                }
+            // تلاشي التوهج بنعومة عند ترك الشاشة
+            if (!dragged && touchPos.glowAlpha > 0) {
+                touchPos.glowAlpha -= 0.04;
             }
 
-            // التحديد الخارجي والداخلي الأصلي (ثابت وبدون بكسلة)
+            // رسم تأثير التوهج بمكان لمس الأصبع داخل المستطيل فقط
+            if (touchPos.glowAlpha > 0) {
+                ctx.save();
+                ctx.clip(); // حصر التوهج بداخل المستطيل لمنع خروجه
+                let touchGlow = ctx.createRadialGradient(touchPos.x, touchPos.y, 5, touchPos.x, touchPos.y, 65);
+                touchGlow.addColorStop(0, `rgba(255, 255, 255, ${touchPos.glowAlpha})`);
+                touchGlow.addColorStop(1, "rgba(255, 255, 255, 0)");
+                ctx.fillStyle = touchGlow;
+                ctx.fillRect(window.innerWidth/2 - 500, window.innerHeight/2 - 500, 1000, 1000);
+                ctx.restore();
+            }
+
+            // التحديد الخارجي: صار أوضح وأقوى (0.75 Opacity) لمنع مظهر البهتان
             ctx.lineJoin = "round";
-            ctx.lineWidth = 4;
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.55)";
+            ctx.lineWidth = 4.5;
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.75)";
             ctx.stroke();
 
-            ctx.lineWidth = 1.2;
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+            // لمعان الحافة الداخلية
+            ctx.lineWidth = 1.5;
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
             ctx.stroke();
 
             requestAnimationFrame(loop);
