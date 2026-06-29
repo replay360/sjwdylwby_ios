@@ -3,323 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-    <title>لعبة الأفعى 3D الاحترافية - تشغيل فوري</title>
+    <title>Snake 3D</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-user-select: none; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #06040d; font-family: 'Segoe UI', sans-serif; }
-        
-        canvas { display: block; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
-
-        /* لوحة النقاط العلوية الثابتة */
-        .hud {
-            position: absolute; top: 20px; left: 0; width: 100%; padding: 0 20px;
-            display: flex; justify-content: space-between; z-index: 5; pointer-events: none;
-            color: #fff; font-weight: bold; font-size: 15px;
-        }
-        .score-box { background: rgba(255, 255, 255, 0.05); padding: 10px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
-        
-        .status-msg {
-            position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%);
-            color: #fff; font-size: 34px; font-weight: 900; z-index: 4; text-align: center;
-            text-shadow: 0 0 25px rgba(255,255,255,0.6); pointer-events: none; opacity: 0; transition: opacity 0.2s ease;
-            width: 90%;
-        }
+        * { margin:0; padding:0; box-sizing:border-box; user-select:none; -webkit-user-select:none; }
+        body, html { width:100%; height:100%; overflow:hidden; background:#06040d; font-family:sans-serif; }
+        canvas { display:block; position:absolute; top:0; left:0; width:100%; height:100%; z-index:1; }
+        .hud { position:absolute; top:20px; left:0; width:100%; padding:0 20px; display:flex; justify-content:space-between; align-items:center; z-index:5; }
+        .score-box { background:rgba(255,255,255,0.05); padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); color:#fff; font-weight:bold; font-size:14px; pointer-events:none; }
+        .pause-btn { background:linear-gradient(135deg, #00b4db, #0083b0); color:#fff; border:none; padding:8px 16px; font-weight:bold; border-radius:10px; cursor:pointer; }
+        .menu-overlay { position:absolute; top:0; left:0; width:100%; height:100%; z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(6,4,13,0.85); backdrop-filter:blur(10px); opacity:0; pointer-events:none; transition:opacity 0.2s; }
+        .menu-overlay.active { opacity:1; pointer-events:auto; }
+        .menu-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); padding:20px; border-radius:20px; width:85%; max-width:280px; text-align:center; }
+        .menu-title { color:#fff; font-size:20px; font-weight:bold; margin-bottom:15px; }
+        .btn-container { display:flex; flex-direction:column; gap:10px; }
+        .diff-btn { padding:12px; font-size:15px; font-weight:bold; border:none; border-radius:10px; cursor:pointer; color:#fff; }
+        .diff-easy { background:#2ecc71; } .diff-normal { background:#3498db; } .diff-hard { background:#e67e22; } .diff-expert { background:#e74c3c; }
+        .btn-resume { background:#fff; color:#06040d; margin-top:5px; }
+        .status-msg { position:absolute; top:45%; left:50%; transform:translate(-50%,-50%); color:#fff; font-size:28px; font-weight:bold; z-index:4; text-align:center; opacity:0; transition:opacity 0.2s; width:90%; }
     </style>
 </head>
 <body>
 
-    <!-- واجهة اللعب العليا -->
-    <div class="hud" id="gameHud">
-        <div class="score-box" style="box-shadow: 0 0 15px rgba(0,255,170,0.15)">أفعيتك: <span id="playerScore">0</span></div>
-        <div class="score-box" style="box-shadow: 0 0 15px rgba(255,51,51,0.15)">المنافس: <span id="aiScore">0</span></div>
+    <div class="hud">
+        <div class="score-box" style="box-shadow:0 0 10px rgba(0,255,170,0.1)">أفعيتك: <span id="playerScore">0</span></div>
+        <button class="pause-btn" onclick="togglePause()">إيقاف ⏸</button>
+        <div class="score-box" style="box-shadow:0 0 10px rgba(255,51,51,0.1)">المنافس: <span id="aiScore">0</span></div>
+    </div>
+
+    <div class="menu-overlay" id="menuOverlay">
+        <div class="menu-card">
+            <div class="menu-title">اختر الصعوبة</div>
+            <div class="btn-container">
+                <button class="diff-btn diff-easy" onclick="setDifficulty('easy')">سهل 🟢</button>
+                <button class="diff-btn diff-normal" onclick="setDifficulty('normal')">عادي 🔵</button>
+                <button class="diff-btn diff-hard" onclick="setDifficulty('hard')">صعب 🟠</button>
+                <button class="diff-btn diff-expert" onclick="setDifficulty('expert')">خارق 🔥</button>
+                <button class="diff-btn btn-resume" onclick="togglePause()">استئناف ▶</button>
+            </div>
+        </div>
     </div>
 
     <div class="status-msg" id="statusMsg"></div>
-
     <canvas id="gameCanvas"></canvas>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        
-        let width = window.innerWidth;
-        let height = window.innerHeight;
-        
-        // إحداثيات اللمس أو صبع المستخدم (تبدأ من منتصف الشاشة تلقائياً)
+        let width = window.innerWidth, height = window.innerHeight;
         let pointer = { x: width / 2, y: height * 0.7 };
+        let gameActive = true, isPaused = false, currentDifficulty = 'normal';
+        let food = { x: 0, y: 0, radius: 11 }, playerSnake = null, aiSnake = null;
 
-        function initCanvas() {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = width;
-            canvas.height = height;
-        }
-        window.addEventListener('resize', initCanvas);
-        initCanvas();
-
-        let gameActive = true;
-        let food = { x: 0, y: 0, radius: 11 };
-        
-        let playerSnake = null;
-        let aiSnake = null;
+        function initCanvas() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
+        window.addEventListener('resize', initCanvas); initCanvas();
 
         class Snake {
             constructor(x, y, type) {
-                this.type = type; 
-                this.baseRadius = 15; // حجم الرأس الـ 3D الضخم
-                this.segments = [];
-                this.angle = type === 'ai' ? Math.PI : 0; 
-                this.speed = 3.8;
-                this.turnSpeed = 0.08;
-                this.alive = true;
-
-                // توليد عُقد الجسم البدئية
-                let length = 16;
-                for (let i = 0; i < length; i++) {
-                    this.segments.push({
-                        x: x - (i * this.speed * Math.cos(this.angle)),
-                        y: y - (i * this.speed * Math.sin(this.angle))
-                    });
-                }
+                this.type = type; this.baseRadius = 15; this.segments = [];
+                this.angle = type === 'ai' ? Math.PI : 0; this.alive = true;
+                this.speed = 3.8; this.turnSpeed = 0.08; this.eatPulses = [];
+                for (let i = 0; i < 16; i++) { this.segments.push({ x: x - (i * this.speed * Math.cos(this.angle)), y: y - (i * this.speed * Math.sin(this.angle)) }); }
             }
-
             update() {
                 if (!this.alive) return;
-
                 let head = this.segments[0];
-
-                if (this.type === 'player') {
-                    // ملاحقة الصبع بسلاسة تامة وبدون اهتزاز
-                    let dx = pointer.x - head.x;
-                    let dy = pointer.y - head.y;
-                    let dist = Math.hypot(dx, dy);
-                    
-                    if (dist > 10) {
-                        let targetAngle = Math.atan2(dy, dx);
-                        let diff = targetAngle - this.angle;
-                        while (diff < -Math.PI) diff += Math.PI * 2;
-                        while (diff > Math.PI) diff -= Math.PI * 2;
-                        this.angle += Math.max(-this.turnSpeed * 1.5, Math.min(this.turnSpeed * 1.5, diff));
-                    }
-                } else {
-                    // ذكاء اصطناعي متوازن لملاحقة الأكل ومنافستك
-                    let targetAngle = Math.atan2(food.y - head.y, food.x - head.x);
-                    let diff = targetAngle - this.angle;
-                    while (diff < -Math.PI) diff += Math.PI * 2;
-                    while (diff > Math.PI) diff -= Math.PI * 2;
-                    
-                    let aiTurn = this.turnSpeed * 1.1;
-                    this.angle += Math.max(-aiTurn, Math.min(aiTurn, diff));
+                if (this.type === 'ai') {
+                    if (currentDifficulty === 'easy') { this.speed = 2.4; this.turnSpeed = 0.04; }
+                    else if (currentDifficulty === 'normal') { this.speed = 3.8; this.turnSpeed = 0.08; }
+                    else if (currentDifficulty === 'hard') { this.speed = 5.0; this.turnSpeed = 0.13; }
+                    else if (currentDifficulty === 'expert') { this.speed = 6.2; this.turnSpeed = 0.19; }
                 }
-
-                // حركة الرأس التلقائية المستمرة للأمام
+                let dx = (this.type === 'player' ? pointer.x : food.x) - head.x;
+                let dy = (this.type === 'player' ? pointer.y : food.y) - head.y;
+                if (Math.hypot(dx, dy) > 12 || this.type === 'ai') {
+                    let diff = Math.atan2(dy, dx) - this.angle;
+                    while (diff < -Math.PI) diff += Math.PI * 2; while (diff > Math.PI) diff -= Math.PI * 2;
+                    let maxTurn = this.type === 'player' ? 0.12 : this.turnSpeed;
+                    this.angle += Math.max(-maxTurn, Math.min(maxTurn, diff));
+                }
                 let nextX = head.x + Math.cos(this.angle) * this.speed;
                 let nextY = head.y + Math.sin(this.angle) * this.speed;
-
-                // حدود الشاشة الالتفافية المرنة
-                if (nextX < -20) nextX = width + 20;
-                if (nextX > width + 20) nextX = -20;
-                if (nextY < -20) nextY = height + 20;
-                if (nextY > height + 20) nextY = -20;
-
-                this.segments.unshift({ x: nextX, y: nextY });
-                this.segments.pop();
+                if (nextX < -20) nextX = width + 20; else if (nextX > width + 20) nextX = -20;
+                if (nextY < -20) nextY = height + 20; else if (nextY > height + 20) nextY = -20;
+                this.segments.unshift({ x: nextX, y: nextY }); this.segments.pop();
+                for (let j = this.eatPulses.length - 1; j >= 0; j--) { this.eatPulses[j]++; if (this.eatPulses[j] >= this.segments.length) this.eatPulses.splice(j, 1); }
             }
-
-            grow() {
-                let tail = this.segments[this.segments.length - 1];
-                for(let i = 0; i < 4; i++) {
-                    this.segments.push({ x: tail.x, y: tail.y });
-                }
-            }
-
+            grow() { let tail = this.segments[this.segments.length - 1]; for(let i=0; i<4; i++) this.segments.push({ x: tail.x, y: tail.y }); }
             draw() {
-                // رسم الحلقات من الذيل للرأس لتركيب أبعاد الـ 3D والعمق الصائب
                 for (let i = this.segments.length - 1; i >= 0; i--) {
                     let seg = this.segments[i];
-                    
-                    // تأثير التناقص ثلاثي الأبعاد
-                    let progress = (this.segments.length - i) / this.segments.length;
-                    let radius = this.baseRadius * (0.4 + progress * 0.6);
-                    
-                    // حركة تموج خفيفة تحاكي الطفو بالعمق
-                    let waveZ = Math.sin((Date.now() * 0.006) + (i * 0.2)) * 3;
-                    let drawX = seg.x;
-                    let drawY = seg.y + waveZ;
-
+                    let radius = this.baseRadius * (0.4 + ((this.segments.length - i) / this.segments.length) * 0.6);
+                    this.eatPulses.forEach(p => { if (Math.abs(i - p) < 3) radius *= 1.4; });
+                    let drawY = seg.y + Math.sin((Date.now() * 0.006) + (i * 0.2)) * 3;
                     ctx.save();
-                    
-                    // تدرج لوني شعاعي مجسم (3D Sphere Gradient)
-                    let gradient = ctx.createRadialGradient(
-                        drawX - radius * 0.3, drawY - radius * 0.3, radius * 0.05,
-                        drawX, drawY, radius
-                    );
-                    
-                    if (this.type === 'player') {
-                        gradient.addColorStop(0, '#a3ffdf'); // لمعة الضوء العليا
-                        gradient.addColorStop(0.3, '#00ffaa'); // اللون الأساسي النيون
-                        gradient.addColorStop(1, '#004d33'); // الظل المعتم بالأسفل
-                        ctx.shadowColor = "rgba(0, 255, 170, 0.35)";
-                    } else {
-                        gradient.addColorStop(0, '#ffb3b3');
-                        gradient.addColorStop(0.3, '#ff3333');
-                        gradient.addColorStop(1, '#4a0000');
-                        ctx.shadowColor = "rgba(255, 51, 51, 0.35)";
-                    }
-
-                    ctx.shadowBlur = i === 0 ? 25 : 8; 
-                    
-                    ctx.beginPath();
-                    ctx.arc(drawX, drawY, radius, 0, Math.PI * 2);
-                    ctx.fillStyle = gradient;
-                    ctx.fill();
-                    ctx.restore();
+                    let g = ctx.createRadialGradient(seg.x - radius*0.3, drawY - radius*0.3, radius*0.05, seg.x, drawY, radius);
+                    if (this.type === 'player') { g.addColorStop(0, '#a3ffdf'); g.addColorStop(0.3, '#00ffaa'); g.addColorStop(1, '#004d33'); ctx.shadowColor = "rgba(0,255,170,0.3)"; }
+                    else { g.addColorStop(0, '#ffb3b3'); g.addColorStop(0.3, '#ff3333'); g.addColorStop(1, '#4a0000'); ctx.shadowColor = "rgba(255,51,51,0.3)"; }
+                    ctx.shadowBlur = i === 0 ? 20 : 6; ctx.beginPath(); ctx.arc(seg.x, drawY, radius, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill(); ctx.restore();
                 }
             }
         }
 
-        function spawnFood() {
-            food.x = Math.random() * (width - 100) + 50;
-            food.y = Math.random() * (height - 100) + 50;
-        }
-
+        function spawnFood() { food.x = Math.random() * (width - 100) + 50; food.y = Math.random() * (height - 100) + 50; }
         function drawFood() {
-            let foodWave = Math.sin(Date.now() * 0.007) * 4;
-            let drawY = food.y + foodWave;
-
-            ctx.save();
-            let gradient = ctx.createRadialGradient(
-                food.x - 3, drawY - 3, 1,
-                food.x, drawY, food.radius
-            );
-            gradient.addColorStop(0, '#fff3cc');
-            gradient.addColorStop(0.3, '#ffcc00');
-            gradient.addColorStop(1, '#805500');
-            
-            ctx.shadowColor = '#ffcc00';
-            ctx.shadowBlur = 25;
-            ctx.beginPath();
-            ctx.arc(food.x, drawY, food.radius, 0, Math.PI * 2);
-            ctx.fillStyle = gradient;
-            ctx.fill();
-            ctx.restore();
+            let dy = food.y + Math.sin(Date.now() * 0.007) * 4; ctx.save();
+            let g = ctx.createRadialGradient(food.x-3, dy-3, 1, food.x, dy, food.radius);
+            g.addColorStop(0, '#fff3cc'); g.addColorStop(0.3, '#ffcc00'); g.addColorStop(1, '#805500');
+            ctx.shadowColor = '#ffcc00'; ctx.shadowBlur = 20; ctx.beginPath(); ctx.arc(food.x, dy, food.radius, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill(); ctx.restore();
         }
 
         function checkCollisions() {
             if (!playerSnake || !aiSnake || !playerSnake.alive || !aiSnake.alive) return;
-
-            let pHead = playerSnake.segments[0];
-            let aHead = aiSnake.segments[0];
-
-            // 1. التهام نقاط الطعام
-            if (Math.hypot(pHead.x - food.x, pHead.y - food.y) < playerSnake.baseRadius + food.radius) {
-                playerSnake.grow();
-                spawnFood();
-                document.getElementById('playerScore').innerText = playerSnake.segments.length - 16;
-            }
-            if (Math.hypot(aHead.x - food.x, aHead.y - food.y) < aiSnake.baseRadius + food.radius) {
-                aiSnake.grow();
-                spawnFood();
-                document.getElementById('aiScore').innerText = aiSnake.segments.length - 16;
-            }
-
-            // 2. فحص موت اللاعب (الاصطدام بجسم الخصم)
-            for (let i = 0; i < aiSnake.segments.length; i++) {
-                let seg = aiSnake.segments[i];
-                if (Math.hypot(pHead.x - seg.x, pHead.y - seg.y) < playerSnake.baseRadius * 0.85) {
-                    playerSnake.alive = false;
-                }
-            }
-
-            // 3. فحص موت الـ AI (الاصطدام بجسم اللاعب)
-            for (let i = 0; i < playerSnake.segments.length; i++) {
-                let seg = playerSnake.segments[i];
-                if (Math.hypot(aHead.x - seg.x, aHead.y - seg.y) < aiSnake.baseRadius * 0.85) {
-                    aiSnake.alive = false;
-                }
-            }
-
-            // 4. تصادم الرؤوس مباشرة جبهةً بجبهة
-            if (Math.hypot(pHead.x - aHead.x, pHead.y - aHead.y) < playerSnake.baseRadius * 1.3) {
-                playerSnake.alive = false;
-                aiSnake.alive = false;
-            }
-
-            if (!playerSnake.alive && !aiSnake.alive) {
-                endGame("فوز ساحق! دمرتهما معاً 💥");
-            } else if (!playerSnake.alive) {
-                endGame("خسرت! المنافس حاصرك ودمرك 💀");
-            } else if (!aiSnake.alive) {
-                endGame("كفوو عشت! فزت وحطمت المنافس 🎉");
-            }
+            let pHead = playerSnake.segments[0], aHead = aiSnake.segments[0];
+            if (Math.hypot(pHead.x - food.x, pHead.y - food.y) < playerSnake.baseRadius + food.radius) { playerSnake.grow(); playerSnake.eatPulses.push(0); spawnFood(); document.getElementById('playerScore').innerText = playerSnake.segments.length - 16; }
+            if (Math.hypot(aHead.x - food.x, aHead.y - food.y) < aiSnake.baseRadius + food.radius) { aiSnake.grow(); aiSnake.eatPulses.push(0); spawnFood(); document.getElementById('aiScore').innerText = aiSnake.segments.length - 16; }
+            for (let i = 0; i < aiSnake.segments.length; i++) { if (Math.hypot(pHead.x - aiSnake.segments[i].x, pHead.y - aiSnake.segments[i].y) < playerSnake.baseRadius * 0.85) playerSnake.alive = false; }
+            for (let i = 0; i < playerSnake.segments.length; i++) { if (Math.hypot(aHead.x - playerSnake.segments[i].x, aHead.y - playerSnake.segments[i].y) < aiSnake.baseRadius * 0.85) aiSnake.alive = false; }
+            if (Math.hypot(pHead.x - aHead.x, pHead.y - aHead.y) < playerSnake.baseRadius * 1.3) { playerSnake.alive = false; aiSnake.alive = false; }
+            if (!playerSnake.alive && !aiSnake.alive) endGame("تعادل مدمر! 💥"); else if (!playerSnake.alive) endGame("خسرت! دمرك المنافس 💀"); else if (!aiSnake.alive) endGame("كفوو! فزت وحطمته 🎉");
         }
 
-        function endGame(text) {
-            gameActive = false;
-            let msg = document.getElementById('statusMsg');
-            msg.innerText = text;
-            msg.style.opacity = "1";
-            
-            setTimeout(() => {
-                msg.style.opacity = "0";
-                resetGame();
-            }, 3000);
-        }
+        function endGame(txt) { gameActive = false; let m = document.getElementById('statusMsg'); m.innerText = txt; m.style.opacity = "1"; setTimeout(() => { m.style.opacity = "0"; resetGame(); }, 2500); }
+        function resetGame() { initCanvas(); playerSnake = new Snake(width * 0.2, height * 0.5, 'player'); aiSnake = new Snake(width * 0.8, height * 0.5, 'ai'); document.getElementById('playerScore').innerText = "0"; document.getElementById('aiScore').innerText = "0"; spawnFood(); gameActive = true; isPaused = false; document.getElementById('menuOverlay').classList.remove('active'); }
+        function togglePause() { if (!gameActive) return; isPaused = !isPaused; document.getElementById('menuOverlay').classList.toggle('active', isPaused); }
+        function setDifficulty(lvl) { currentDifficulty = lvl; togglePause(); }
+        function handleMove(cx, cy) { if (isPaused || !gameActive) return; pointer.x = cx; pointer.y = cy; }
 
-        // دالة تصفير وإعادة تشغيل اللعبة فورا بدون شاشات اختيار
-        function resetGame() {
-            initCanvas();
-            playerSnake = new Snake(width * 0.2, height * 0.5, 'player');
-            aiSnake = new Snake(width * 0.8, height * 0.5, 'ai');
-            
-            document.getElementById('playerScore').innerText = "0";
-            document.getElementById('aiScore').innerText = "0";
-            
-            spawnFood();
-            gameActive = true;
-        }
-
-        // --- نظام التحكم بالصبع (Follow Finger) ---
-        function handlePointerMove(clientX, clientY) {
-            pointer.x = clientX;
-            pointer.y = clientY;
-        }
-
-        window.addEventListener('touchstart', (e) => {
-            if (!gameActive) return;
-            handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
-        }, { passive: true });
-
-        window.addEventListener('touchmove', (e) => {
-            if (!gameActive) return;
-            handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
-        }, { passive: true });
-
-        window.addEventListener('mousemove', (e) => {
-            if (!gameActive) return;
-            handlePointerMove(e.clientX, e.clientY);
-        });
+        window.addEventListener('touchstart', (e) => { handleMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
+        window.addEventListener('touchmove', (e) => { handleMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
+        window.addEventListener('mousemove', (e) => { handleMove(e.clientX, e.clientY); });
 
         function loop() {
-            ctx.fillStyle = '#06040d';
-            ctx.fillRect(0, 0, width, height);
-
-            if (gameActive) {
-                playerSnake.update();
-                aiSnake.update();
-                checkCollisions();
-            }
-
-            drawFood();
-            if (playerSnake) playerSnake.draw();
-            if (aiSnake) aiSnake.draw();
-
+            ctx.fillStyle = '#06040d'; ctx.fillRect(0, 0, width, height);
+            if (gameActive && !isPaused) { playerSnake.update(); aiSnake.update(); checkCollisions(); }
+            drawFood(); if (playerSnake) playerSnake.draw(); if (aiSnake) aiSnake.draw();
             requestAnimationFrame(loop);
         }
-
-        // بدء اللعبة فورا عند تحميل الصفحة
-        resetGame();
-        loop();
+        resetGame(); loop();
     </script>
 </body>
 </html>
