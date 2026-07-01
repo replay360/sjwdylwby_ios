@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Impossible Light Bulb - Interactive</title>
+    <title>Impossible Light Bulb - Angry Bear Edition</title>
     <style>
         :root {
-            /* الألوان مأخوذة من صورتك */
             --bg-lit: #f5e4bc;
-            --bg-dark: #2c2519; /* الغرفة ظلمة بالبداية */
+            --bg-dark: #181510; /* الظلمة الحقيقية من صورتك */
             --door-color: #9c8a75;
             --door-dark: #847360;
             --bear-fur: #784421;
@@ -16,23 +15,16 @@
         }
 
         body {
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             background-color: #0f141c;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-            user-select: none;
-            -webkit-user-select: none;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden;
+            user-select: none; -webkit-user-select: none;
         }
 
-        /* حاوية المشهد */
         .scene {
             position: relative;
-            width: 600px;
-            height: 420px;
+            width: 600px; height: 420px;
             background-color: var(--bg-dark);
             border: 4px solid #fff;
             box-shadow: 0 15px 40px rgba(0,0,0,0.6);
@@ -40,181 +32,100 @@
             transition: background-color 0.15s ease;
         }
 
-        /* عندما تشتغل الإضاءة */
-        .scene.lit {
-            background-color: var(--bg-lit);
-        }
+        .scene.lit { background-color: var(--bg-lit); }
 
-        /* طبقة التظليم فوق العناصر ما عدا المصباح والباب */
-        .overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.45);
-            z-index: 2;
-            pointer-events: none;
-            transition: opacity 0.15s ease;
-        }
-        .scene.lit .overlay {
-            opacity: 0;
-        }
-
-        /* الباب وتأثير الفتحة */
+        /* الباب مجسم */
         .door-container {
-            position: absolute;
-            right: 0;
-            top: 50px;
-            width: 210px;
-            height: 370px;
-            z-index: 10;
-            perspective: 1000px; /* ليعطي عمق عند فتح الباب */
+            position: absolute; right: 0; top: 50px;
+            width: 210px; height: 370px;
+            z-index: 10; perspective: 1000px;
         }
 
         .door {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             background-color: var(--door-color);
             border-left: 4px solid var(--door-dark);
-            box-sizing: border-box;
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            align-items: center;
+            box-sizing: border-box; padding: 25px;
+            display: flex; flex-direction: column; justify-content: space-around; align-items: center;
             transform-origin: right center;
             transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            position: relative;
         }
 
-        /* الأنيميشن: الباب ينفتح شوي على كد إيد الدب */
-        .scene.door-open .door {
-            transform: rotateY(-25deg);
-            box-shadow: -10px 0 30px rgba(0,0,0,0.3);
-        }
+        /* الباب ينفتح شوي بالإيد، وينفتح حيل من الدب يعصب */
+        .scene.door-open .door { transform: rotateY(-30deg); }
+        .scene.door-rage .door { transform: rotateY(-75deg); }
 
-        .door-panel {
-            width: 130px;
-            height: 130px;
-            border: 4px solid var(--door-dark);
-            border-radius: 4px;
-        }
+        .door-panel { width: 130px; height: 130px; border: 4px solid var(--door-dark); border-radius: 4px; }
+        .door-knob { position: absolute; left: 15px; top: 52%; width: 22px; height: 22px; background-color: #f0cc6c; border-radius: 4px; }
 
-        .door-knob {
-            position: absolute;
-            left: 15px;
-            top: 52%;
-            width: 22px;
-            height: 22px;
-            background-color: #f0cc6c;
-            border-radius: 4px;
-            box-shadow: inset -2px -2px rgba(0,0,0,0.15);
-        }
+        /* المصباح */
+        .bulb-wrapper { position: absolute; left: 280px; top: 50px; z-index: 5; }
+        .bulb-svg { width: 65px; height: 85px; }
+        .bulb-glass { fill: #2c2a22; stroke: #111; stroke-width: 3.5; }
+        .scene.lit .bulb-glass { fill: #e8f5cb; filter: drop-shadow(0 0 15px #fffbb0); }
+        .bulb-base { fill: #555; stroke: #111; stroke-width: 3.5; }
 
-        /* المصباح - مطابق لملامح صورة 1000024018.jpg */
-        .bulb-wrapper {
-            position: absolute;
-            left: 280px;
-            top: 50px;
-            z-index: 5;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        #ropeCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 8; cursor: grab; }
+        #ropeCanvas:active { cursor: grabbing; }
 
-        .bulb-svg {
-            width: 65px;
-            height: 85px;
+        /* الدب غاضب أو عادي */
+        .bear-container {
+            position: absolute; right: 170px; top: 130px;
+            width: 200px; height: 180px; z-index: 4;
+            transform: translateX(200px);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15);
         }
+        /* يظهر الدب حسب الحالة */
+        .scene.bear-out .bear-container { transform: translateX(40px); }
+        .scene.door-rage .bear-container { transform: translateX(-60px); } /* يطلع جسمه كله */
 
-        .bulb-glass {
-            fill: #1e2213; /* مطفأ */
-            stroke: #222;
-            stroke-width: 3.5;
+        /* جسم الدب وعيونه المعصبة */
+        .bear-body {
+            position: absolute; left: 40px; top: 20px;
+            width: 120px; height: 140px; background-color: var(--bear-fur);
+            border-radius: 50% 50% 0 0; display: none;
         }
-        .scene.lit .bulb-glass {
-            fill: #e8f5cb; /* مشتعل نفس صورتك */
-        }
+        .scene.door-rage .bear-body { display: block; }
 
-        .bulb-base {
-            fill: #777;
-            stroke: #222;
-            stroke-width: 3.5;
+        .bear-eye {
+            position: absolute; width: 12px; height: 12px; background: red; border-radius: 50%; top: 40px;
         }
+        .bear-eye.left { left: 70px; }
+        .bear-eye.right { left: 95px; }
 
-        /* منطقة الحبل الفيزيائي (Canvas) لتأثير حبل حقيقي */
-        #ropeCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 6;
-            cursor: grab;
-        }
-        #ropeCanvas:active {
-            cursor: grabbing;
-        }
-
-        /* إيد الدب البطل */
+        /* إيد الدب */
         .bear-arm-container {
-            position: absolute;
-            right: 170px; /* خلف الباب مباشرة */
-            top: 170px;
-            width: 160px;
-            height: 60px;
-            z-index: 4; /* وراء الباد وخلف الحبل */
-            transform: translateX(160px);
-            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.15);
-            display: flex;
-            align-items: center;
+            position: absolute; left: 0; top: 50px;
+            width: 160px; height: 60px; display: flex; align-items: center;
         }
-
-        .scene.bear-out .bear-arm-container {
-            transform: translateX(0); /* تطلع الإيد بسرعة وتضرب الخيط */
-        }
-
-        .bear-arm {
-            width: 120px;
-            height: 50px;
-            background-color: var(--bear-fur);
-            border-radius: 25px 0 0 25px;
-        }
-
-        .bear-paw {
-            width: 45px;
-            height: 45px;
-            background-color: var(--bear-pad);
-            border: 4px solid var(--bear-fur);
-            border-radius: 50%;
-            margin-left: -20px;
-        }
+        .bear-arm { width: 130px; height: 48px; background-color: var(--bear-fur); border-radius: 24px 0 0 24px; }
+        .bear-paw { width: 45px; height: 45px; background-color: var(--bear-pad); border: 4px solid var(--bear-fur); border-radius: 50%; margin-left: -25px; }
     </style>
 </head>
 <body>
 
 <div class="scene" id="scene">
-    <div class="overlay"></div>
-
-    <!-- المصباح المعلق -->
     <div class="bulb-wrapper">
         <svg class="bulb-svg" viewBox="0 0 100 120">
-            <!-- زجاج المصباح -->
             <path class="bulb-glass" d="M 50 20 C 25 20, 20 65, 40 85 C 42 88, 45 92, 45 95 L 55 95 C 55 92, 58 88, 60 85 C 80 65, 75 20, 50 20 Z" />
-            <!-- قاعدة المصباح الدائرية الجوا -->
             <rect class="bulb-base" x="40" y="95" width="20" height="15" rx="2" />
-            <rect class="bulb-base" x="43" y="110" width="14" height="6" rx="1" />
         </svg>
     </div>
 
-    <!-- نظام الحبل الفيزيائي المرن -->
     <canvas id="ropeCanvas"></canvas>
 
-    <!-- إيد الدب -->
-    <div class="bear-arm-container" id="bearArm">
-        <div class="bear-paw"></div>
-        <div class="bear-arm"></div>
+    <!-- الدب (جسم + إيد) -->
+    <div class="bear-container" id="bearContainer">
+        <div class="bear-body">
+            <div class="bear-eye left"></div>
+            <div class="bear-eye right"></div>
+        </div>
+        <div class="bear-arm-container">
+            <div class="bear-paw"></div>
+            <div class="bear-arm"></div>
+        </div>
     </div>
 
-    <!-- الباب الحاوي على عمق 3D عند الفتح -->
     <div class="door-container">
         <div class="door">
             <div class="door-panel"></div>
@@ -229,188 +140,170 @@
     const ctx = canvas.getContext('2d');
     const scene = document.getElementById('scene');
 
-    // إعداد أبعاد الكانفاس
-    function resizeCanvas() {
-        canvas.width = 600;
-        canvas.height = 420;
-    }
-    resizeCanvas();
+    canvas.width = 600; canvas.height = 420;
 
-    // نقطة تثبيت الخيط (تحت المصباح بمسافة مثل صورة 1000024018)
-    const pinX = 312;
-    const pinY = 160; 
-    const restLength = 110; // طول الحبل الافتراضي
-
-    // محاكاة فيزيائية للحبل (Verlet Integration) ليعطي مرونة حقيقية
-    const numPoints = 8;
+    const pinX = 312; const pinY = 150; const restLength = 120;
+    const numPoints = 10; // زيادة النقاط لنعومة أكثر
     let points = [];
     
     for(let i=0; i<numPoints; i++) {
         let pct = i / (numPoints - 1);
-        points.push({
-            x: pinX,
-            y: pinY + (pct * restLength),
-            oldX: pinX,
-            oldY: pinY + (pct * restLength),
-            pinned: i === 0
-        });
+        points.push({ x: pinX, y: pinY + (pct * restLength), oldX: pinX, oldY: pinY + (pct * restLength), pinned: i === 0 });
     }
 
     const segmentLength = restLength / (numPoints - 1);
-    const gravity = 0.6;
-    const bounce = 0.92;
+    let isDragging = false; let dragPoint = null;
+    let isLit = false; let gameState = "idle"; // idle, bear_trying, rage, resetting
+    let rageTimer = null;
 
-    let isDragging = false;
-    let dragPoint = null;
-    let isLit = false;
-    let isBusy = false;
-
-    // تحديث حركة الحبل فيزيائياً
     function updatePhysics() {
-        // حرك النقاط بالجاذبية
         for (let p of points) {
             if (p.pinned) continue;
-            let vx = (p.x - p.oldX) * 0.98; // احتكاك الهواء لميوعة الحركة
-            let vy = (p.y - p.oldY) * 0.98;
-            p.oldX = p.x;
-            p.oldY = p.y;
-            p.x += vx;
-            p.y += vy + gravity;
+            let vx = p.x - p.oldX;
+            let vy = p.y - p.oldY;
+            p.oldX = p.x; p.oldY = p.y;
+            p.x += vx * 0.85; // زيادة التخميد لعدم حدوث طفرات
+            p.y += vy * 0.85 + 0.5; // جاذبية خفيفة مستقرة
         }
 
-        // قيود المسافات بين العقد (تخلي الحبل متماسك ومرن)
-        for (let i = 0; i < 6; i++) {
+        // الحفاظ على تماسك الحبل
+        for (let i = 0; i < 10; i++) {
             for (let j = 0; j < points.length - 1; j++) {
-                let p1 = points[j];
-                let p2 = points[j+1];
-                let dx = p2.x - p1.x;
-                let dy = p2.y - p1.y;
+                let p1 = points[j]; let p2 = points[j+1];
+                let dx = p2.x - p1.x; let dy = p2.y - p1.y;
                 let dist = Math.sqrt(dx*dx + dy*dy);
+                if(dist === 0) continue;
                 let diff = segmentLength - dist;
-                let percent = (diff / dist) / 2;
-                let offsetX = dx * percent;
-                let offsetY = dy * percent;
-
-                if (!p1.pinned) { p1.x -= offsetX; p1.y -= offsetY; }
-                if (!p2.pinned) { p2.x += offsetX; p2.y += offsetY; }
+                let percent = (diff / dist) * 0.5;
+                if (!p1.pinned) { p1.x -= dx * percent; p1.y -= dy * percent; }
+                if (!p2.pinned) { p2.x += dx * percent; p2.y += dy * percent; }
             }
         }
 
-        // إذا كان المستخدم يسحب العقدة الأخيرة
         if (isDragging && dragPoint) {
-            // كشف السحب للأسفل لتشغيل الضوا
-            if (!isLit && !isBusy && dragPoint.y > (pinY + restLength + 35)) {
+            if (!isLit && gameState === "idle" && dragPoint.y > (pinY + restLength + 35)) {
                 triggerLightOn();
             }
         }
+
+        // ذكاء الدب ومحاولة السحب والتطفي
+        let endPoint = points[points.length - 1];
+        if (gameState === "bear_trying") {
+            // الدب يمد ايده لمكان الحبل الحالي
+            let targetX = endPoint.x;
+            // إذا كان الحبل قريب، الدب يلوحه ويطفي
+            if (targetX > 250) { 
+                if (Math.abs(endPoint.x - 260) < 25) {
+                    triggerLightOffNormal();
+                }
+            }
+        } else if (gameState === "rage") {
+            // الدب عصّب ويهجم على الحبل وين ما يكون غصباً عن المستخدم!
+            endPoint.x += (180 - endPoint.x) * 0.2;
+            endPoint.y += (250 - endPoint.y) * 0.2;
+            if (Math.abs(endPoint.x - 180) < 15) {
+                triggerLightOffRage();
+            }
+        }
     }
 
-    // رسم الحبل والمقبض الدائري الأسود الكيرفي
     function drawRope() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, points[0].y);
-        for(let i=1; i<points.length; i++) {
-            ctx.lineTo(points[i].x, points[i].y);
-        }
-        ctx.strokeStyle = '#222222';
-        ctx.lineWidth = 4.5;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(points[0].x, points[0].y);
+        for(let i=1; i<points.length; i++) { ctx.lineTo(points[i].x, points[i].y); }
+        ctx.strokeStyle = '#222'; ctx.lineWidth = 5; ctx.lineCap = 'round'; ctx.stroke();
 
-        // رسم العقدة/المقبض الأسود أسفل الحبل طبق الأصل
         let endPoint = points[points.length - 1];
-        ctx.beginPath();
-        ctx.arc(endPoint.x, endPoint.y, 9, 0, Math.PI * 2);
-        ctx.fillStyle = '#222222';
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(endPoint.x, endPoint.y, 9, 0, Math.PI * 2);
+        ctx.fillStyle = '#222'; ctx.fill();
     }
 
-    // الأنيميشن المستمر
     function loop() {
-        updatePhysics();
-        drawRope();
-        requestAnimationFrame(loop);
+        updatePhysics(); drawRope(); requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);
 
-    // كشف المسك والتحكم بالإصبع أو الماوس
     function getMousePos(e) {
         const rect = canvas.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        return {
-            x: (clientX - rect.left) * (canvas.width / rect.width),
-            y: (clientY - rect.top) * (canvas.height / rect.height)
-        };
+        return { x: (clientX - rect.left) * (600 / rect.width), y: (clientY - rect.top) * (420 / rect.height) };
     }
 
-    function startDrag(e) {
-        if (isBusy) return;
-        const pos = getMousePos(e);
-        let endPoint = points[points.length - 1];
-        // كشف إذا ضغطت قريباً من نهاية الحبل
-        let dx = pos.x - endPoint.x;
-        let dy = pos.y - endPoint.y;
-        if (Math.sqrt(dx*dx + dy*dy) < 30) {
-            isDragging = true;
-            dragPoint = endPoint;
-        }
-    }
+    canvas.addEventListener('mousedown', (e) => {
+        if (gameState === "rage" || gameState === "resetting") return;
+        const pos = getMousePos(e); let endPoint = points[points.length - 1];
+        if (Math.sqrt((pos.x - endPoint.x)**2 + (pos.y - endPoint.y)**2) < 40) { isDragging = true; dragPoint = endPoint; }
+    });
 
-    function moveDrag(e) {
+    window.addEventListener('mousemove', (e) => {
         if (!isDragging || !dragPoint) return;
         const pos = getMousePos(e);
-        // تقييد السحب حتى لا يتمددد الحبل بشكل مشوه
-        dragPoint.x = pos.x;
-        dragPoint.y = Math.max(pinY + 20, pos.y); 
-    }
+        dragPoint.x = Math.max(50, Math.min(550, pos.x)); // حرية الحركة يمين ويسار بالكامل للمراوغة
+        dragPoint.y = Math.max(pinY + 30, Math.min(380, pos.y));
+    });
 
-    function endDrag() {
-        isDragging = false;
-        dragPoint = null;
-    }
+    window.addEventListener('mouseup', () => { isDragging = false; dragPoint = null; });
+    canvas.addEventListener('touchstart', (e) => {
+        if (gameState === "rage" || gameState === "resetting") return;
+        const pos = getMousePos(e); let endPoint = points[points.length - 1];
+        if (Math.sqrt((pos.x - endPoint.x)**2 + (pos.y - endPoint.y)**2) < 50) { isDragging = true; dragPoint = endPoint; }
+    });
+    window.addEventListener('touchmove', (e) => {
+        if (!isDragging || !dragPoint) return;
+        const pos = getMousePos(e); dragPoint.x = pos.x; dragPoint.y = pos.y;
+    });
+    window.addEventListener('touchend', () => { isDragging = false; dragPoint = null; });
 
-    // التحكم بالماوس واللمس للهواتف
-    canvas.addEventListener('mousedown', startDrag);
-    window.addEventListener('mousemove', moveDrag);
-    window.addEventListener('mouseup', endDrag);
-
-    canvas.addEventListener('touchstart', startDrag);
-    window.addEventListener('touchmove', moveDrag);
-    window.addEventListener('touchend', endDrag);
-
-    // وظيفة تشغيل الإضاءة وحركة الدب والباب العكسية
     function triggerLightOn() {
-        isLit = true;
-        isBusy = true;
-        scene.classList.add('lit');
-        endDrag(); // إفلات الحبل تلقائياً عند التفعيل
-
-        // بعد لحظة، ينفتح الباب ويطلع الدب
+        isLit = true; scene.classList.add('lit'); gameState = "bear_trying";
+        
+        // الدب يفتح الباب العادي ويحاول يلوح الحبل
         setTimeout(() => {
-            scene.classList.add('door-open', 'bear-out');
+            if(gameState === "bear_trying") scene.classList.add('door-open', 'bear-out');
+        }, 300);
 
-            // الدب يوصل للنهاية وينتر الحبل
-            setTimeout(() => {
-                let endPoint = points[points.length - 1];
-                // الدب يدفع الحبل لليسار بقوة عشان يطفي
-                endPoint.x -= 50; 
-                
-                // إطفاء الإضاءة
-                isLit = false;
-                scene.classList.remove('lit');
+        // مؤقت الغضب: إذا مرّت 3 ثواني والمستخدم يراوغ ومبعد الحبل
+        rageTimer = setTimeout(() => {
+            if (isLit && gameState === "bear_trying") {
+                triggerRopeRage();
+            }
+        }, 3200);
+    }
 
-                // الدب يرجع والباب ينغلق
-                setTimeout(() => {
-                    scene.classList.remove('door-open', 'bear-out');
-                    isBusy = false;
-                }, 300);
+    function triggerLightOffNormal() {
+        isLit = false; gameState = "resetting";
+        scene.classList.remove('lit');
+        isDragging = false; dragPoint = null;
+        clearTimeout(rageTimer);
 
-            }, 450);
+        // نتر الحبل
+        points[points.length - 1].x -= 40;
 
+        setTimeout(() => {
+            scene.classList.remove('door-open', 'bear-out');
+            setTimeout(() => { gameState = "idle"; }, 300);
+        }, 200);
+    }
+
+    function triggerRopeRage() {
+        gameState = "rage";
+        isDragging = false; dragPoint = null; // يجبر المستخدم على فلتان الحبل غصباً عنه
+        scene.classList.remove('door-open', 'bear-out');
+        
+        // يفتح الباب بالكامل ويظهر جسم الدب المعصب
+        setTimeout(() => {
+            scene.classList.add('door-rage');
+        }, 150);
+    }
+
+    function triggerLightOffRage() {
+        isLit = false; gameState = "resetting";
+        scene.classList.remove('lit');
+
+        setTimeout(() => {
+            scene.classList.remove('door-rage');
+            setTimeout(() => { gameState = "idle"; }, 500);
         }, 400);
     }
 </script>
