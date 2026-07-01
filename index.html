@@ -363,7 +363,7 @@
     function moveDrag(e) {
         if (!isDragging || !dragPoint) return;
         const pos = getMousePos(e);
-        // تقييد السحب حتى لا يتمدد الحبل بشكل مشوه
+        // تقييد السحب حتى لا يتمددد الحبل بشكل مشوه
         dragPoint.x = pos.x;
         dragPoint.y = Math.max(pinY + 20, pos.y); 
     }
