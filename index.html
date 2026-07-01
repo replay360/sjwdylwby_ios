@@ -1,178 +1,257 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Page Lost</title>
-    <!-- خط Arvo مثل اللي بالصورة -->
-    <link href="https://fonts.googleapis.com/css2?family=Arvo:wght@400;700&display=swap" rel="stylesheet">
-    
+    <title>Impossible Light Bulb - Bear Toggle</title>
     <style>
+        :root {
+            --bg-color: #f3dfb6;
+            --door-color: #a18e78;
+            --door-dark: #8b7762;
+            --bear-fur: #784421;
+            --bear-pad: #deaa87;
+            --cord-color: #222;
+        }
+
         body {
             margin: 0;
             padding: 0;
-            background-color: #1f2326; /* الخلفية الغامقة المحيطة */
-            font-family: 'Arvo', serif;
+            background-color: #1a2632;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
+            font-family: sans-serif;
         }
 
-        /* حاوية الصفحة البيضاء مثل الصورة 1000023975.jpg */
-        .page_404 {
-            padding: 40px 20px;
-            background: #fff;
-            text-align: center;
-            max-width: 600px;
-            width: 100%;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        }
-
-        .page_404 h1 {
-            font-size: 80px;
-            margin: 0;
-            color: #333;
-        }
-
-        /* حاوية الأنميشن والرسم */
-        .four_zero_four_bg {
-            height: 300px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
+        /* حاوية المشهد الأساسي */
+        .scene {
             position: relative;
-            margin-bottom: 20px;
+            width: 500px;
+            height: 350px;
+            background-color: var(--bg-color);
+            border: 4px solid #fff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            overflow: hidden;
         }
 
-        /* تنسيق عناصر الـ SVG ليصير التفاعل وية اللمس واضح */
-        .interactive-part {
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        .interactive-part:hover {
-            filter: brightness(1.2);
-        }
-
-        .contant_box_404 {
-            margin-top: 20px;
-        }
-
-        .contant_box_404 h3 {
-            font-size: 24px;
-            margin: 10px 0;
-            color: #222;
-        }
-
-        .contant_box_404 p {
-            color: #777;
-            font-size: 14px;
+        /* الباب الجوزي */
+        .door {
+            position: absolute;
+            right: 0;
+            top: 40px;
+            width: 180px;
+            height: 310px;
+            background-color: var(--door-color);
+            border-left: 5px solid var(--door-dark);
+            box-sizing: border-box;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 10;
         }
 
-        /* الزر الأخضر مثل الكود بالصورة */
-        .Link_404 {
-            color: #fff !important;
-            padding: 10px 20px;
-            background: #39ac31;
-            margin: 20px 0;
-            display: inline-block;
-            text-decoration: none;
+        /* تفاصيل مستطيلات الباب */
+        .door-panel {
+            width: 100px;
+            height: 100px;
+            border: 4px solid var(--door-dark);
             border-radius: 4px;
-            font-weight: bold;
+        }
+
+        .door-knob {
+            position: absolute;
+            left: 15px;
+            top: 55%;
+            width: 20px;
+            height: 20px;
+            background-color: #e9c46a;
+            border-radius: 3px;
+        }
+
+        /* المصباح والخيط */
+        .bulb-container {
+            position: absolute;
+            left: 200px;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            z-index: 5;
+        }
+
+        /* حبل السحب وتأثير المرونة والاهتزاز */
+        .cord {
+            width: 4px;
+            height: 140px;
+            background-color: var(--cord-color);
+            transform-origin: top center;
+            transition: transform 0.1s ease;
+        }
+
+        /* الحركة الاهتزازية عند الإفلات */
+        @keyframes swing {
+            0% { transform: rotate(0deg); }
+            20% { transform: rotate(15deg); }
+            40% { transform: rotate(-10deg); }
+            60% { transform: rotate(5deg); }
+            80% { transform: rotate(-3deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .cord.swinging {
+            animation: swing 1s ease-out;
+        }
+
+        /* مقبض السحب (الدائرة الصغيرة أسفل الخيط) */
+        .cord-handle {
+            width: 16px;
+            height: 16px;
+            background-color: var(--cord-color);
+            border-radius: 50%;
+            margin-top: -2px;
+        }
+
+        /* المصباح SVG */
+        .bulb-svg {
+            width: 80px;
+            height: 100px;
+            margin-top: 20px;
+            transition: filter 0.3s ease;
+        }
+
+        /* إضاءة المصباح */
+        .scene.lit .bulb-svg {
+            filter: drop-shadow(0 0 25px #fffbb0);
+        }
+
+        .bulb-glass {
+            fill: #e1e7cd;
+            stroke: #222;
+            stroke-width: 3;
+            transition: fill 0.3s ease;
+        }
+
+        .scene.lit .bulb-glass {
+            fill: #fffbb0;
+        }
+
+        /* إيد الدب */
+        .bear-arm {
+            position: absolute;
+            right: 175px; /* يختفي ورا الباب بالبداية */
+            top: 160px;
+            width: 0px;
+            height: 50px;
+            background-color: var(--bear-fur);
+            border-radius: 25px 0 0 25px;
+            z-index: 8;
+            transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        /* كف الدب البارز */
+        .bear-paw {
+            width: 45px;
+            height: 45px;
+            background-color: var(--bear-pad);
+            border: 4px solid var(--bear-fur);
+            border-radius: 50%;
+            position: absolute;
+            left: -10px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        /* تحريك اليد عندما يشتغل الضوا */
+        .scene.lit .bear-arm {
+            width: 130px; /* تمدد اليد لتوصل للخيط */
+        }
+
+        .scene.lit .bear-paw {
+            opacity: 1;
         }
     </style>
 </head>
 <body>
 
-    <div class="page_404">
-        <h1>404</h1>
-        
-        <!-- هنا الرسمة التفاعلية بالكود بدون صور خارجية -->
-        <div class="four_zero_four_bg">
-            <svg width="250" height="250" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                <!-- الأرضية والحجر -->
-                <ellipse cx="100" cy="180" rx="80" ry="10" fill="#e0e0e0" />
-                <circle cx="40" cy="170" r="15" fill="#bdc3c7" />
-                <circle cx="42" cy="150" r="10" fill="#95a5a6" />
-                
-                <!-- جسم الشخصية الكهفية -->
-                <g id="caveman">
-                    <!-- الرجلين (تفاعلية) -->
-                    <g id="legs" class="interactive-part">
-                        <rect x="85" y="140" width="10" height="30" rx="4" fill="#d35400" />
-                        <rect x="105" y="140" width="10" height="30" rx="4" fill="#d35400" />
-                    </g>
-                    
-                    <!-- الجسم والملابس -->
-                    <path d="M 75 140 L 125 140 L 115 80 L 85 80 Z" fill="#f39c12" />
-                    <!-- نقاط الفرو بالملابس -->
-                    <circle cx="90" cy="100" r="3" fill="#2c3e50" />
-                    <circle cx="110" cy="120" r="4" fill="#2c3e50" />
-                    <circle cx="100" cy="95" r="3" fill="#2c3e50" />
-
-                    <!-- الرأس واللحية -->
-                    <circle cx="100" cy="65" r="20" fill="#f39c12" /> <!-- البشرة -->
-                    <path d="M 80 65 Q 100 95 120 65 Z" fill="#5c3a21" /> <!-- اللحية البرية -->
-                    <circle cx="93" cy="60" r="2" fill="#000" /> <!-- العين -->
-                    <circle cx="107" cy="60" r="2" fill="#000" /> <!-- العين -->
-
-                    <!-- الإيد اليسرى (صايرة ورا) -->
-                    <line x1="75" y1="90" x2="60" y2="110" stroke="#d35400" stroke-width="8" stroke-linecap="round" />
-
-                    <!-- الإيد اليمنى المتحركة والتفاعلية مالت الحبل -->
-                    <g id="right-arm" class="interactive-part">
-                        <line x1="120" y1="90" x2="140" y2="70" stroke="#d35400" stroke-width="8" stroke-linecap="round" id="arm-bone" />
-                    </g>
-                </g>
-
-                <!-- الحبل المربوط -->
-                <path d="M 140 70 Q 170 120 180 170" stroke="#2c3e50" stroke-width="4" fill="none" stroke-linecap="round" />
-                <rect x="170" y="160" width="20" height="20" fill="#7f8c8d" rx="2" />
-            </svg>
-        </div>
-        
-        <div class="contant_box_404">
-            <h3>Look like you're lost</h3>
-            <p>the page you are looking for not available!</p>
-            <a href="#" class="Link_404">Go to Home</a>
+<div class="scene" id="scene">
+    <!-- المصباح والحبل -->
+    <div class="bulb-container" id="bulbContainer">
+        <!-- رسمة المصباح SVG لتطابق الـ 2D الأنيق بالصورة -->
+        <svg class="bulb-svg" viewBox="0 0 100 120">
+            <!-- قاعدة المصباح -->
+            <path d="M35 80 h30 v15 h-30 z" fill="#b0b0b0" stroke="#222" stroke-width="3"/>
+            <path d="M40 95 h20 v8 h-20 z" fill="#777" stroke="#222" stroke-width="3"/>
+            <!-- زجاج المصباح -->
+            <path class="bulb-glass" d="M35 80 C 10 70, 10 20, 50 20 C 90 20, 90 70, 65 80 Z" />
+        </svg>
+        <!-- الخيط المرن -->
+        <div class="cord" id="cord">
+            <div class="cord-handle"></div>
         </div>
     </div>
 
-    <!-- كود الجافاسكربت للتفاعل والتحريك -->
-    <script>
-        const arm = document.getElementById('right-arm');
-        const legs = document.getElementById('legs');
+    <!-- إيد الدب المخفية خلف الباب -->
+    <div class="bear-arm" id="bearArm">
+        <div class="bear-paw"></div>
+    </div>
 
-        // تفاعل الإيد عند الضغط (تسوي حركة سريعة فوق وجوا)
-        arm.addEventListener('click', () => {
-            arm.style.transformOrigin = "120px 90px";
-            arm.style.transition = "transform 0.1s ease-in-out";
-            arm.style.transform = "rotate(-20deg)";
-            
-            setTimeout(() => {
-                arm.style.transform = "rotate(15deg)";
-            }, 100);
-            
-            setTimeout(() => {
-                arm.style.transform = "rotate(0deg)";
-            }, 200);
-        });
+    <!-- الباب -->
+    <div class="door">
+        <div class="door-panel"></div>
+        <div class="door-panel"></div>
+        <div class="door-knob"></div>
+    </div>
+</div>
 
-        // تفاعل الرجلين عند الضغط (تتحرك كأنو يطفر)
-        legs.addEventListener('click', () => {
-            legs.style.transformOrigin = "100px 140px";
-            legs.style.transition = "transform 0.1s ease-in-out";
-            legs.style.transform = "scaleY(0.7)";
+<script>
+    const scene = document.getElementById('scene');
+    const bulbContainer = document.getElementById('bulbContainer');
+    const cord = document.getElementById('cord');
+
+    let isLit = false;
+    let isBusy = false; // لمنع التكرار المزعج أثناء الحركة
+
+    // عند الضغط على الحبل أو المصباح لتشغيله
+    bulbContainer.addEventListener('click', () => {
+        if (isBusy) return;
+
+        if (!isLit) {
+            // 1. شغل الضوا
+            isLit = true;
+            scene.classList.add('lit');
             
+            // تأثير حركة بسيطة للحبل عند السحب
+            cord.style.transform = 'scaleY(1.1)';
+            setTimeout(() => cord.style.transform = 'scaleY(1)', 150);
+
+            // 2. بعد ثواني قليلة، الدب يضوج ويطلع إيده يطفي
+            isBusy = true;
             setTimeout(() => {
-                legs.style.transform = "scaleY(1.2) translateY(-10px)";
-            }, 100);
-            
-            setTimeout(() => {
-                legs.style.transform = "scaleY(1)";
-            }, 200);
-        });
-    </script>
+                // الدب يوصل للخيط ويطفي
+                isLit = false;
+                scene.classList.remove('lit');
+                
+                // تأثير اهتزاز مرن للخيط كأنو الدب نتره وغلّس (elastic swing)
+                cord.classList.add('swinging');
+                
+                // تنظيف كلاس الاهتزاز بعد ما يخلص الأنيميشن
+                setTimeout(() => {
+                    cord.classList.remove('swinging');
+                    isBusy = false;
+                }, 1000);
+
+            }, 800); // الوقت اللي ينتظره الدب قبل ما يمد ايده (800 ملي ثانية)
+        }
+    });
+</script>
+
 </body>
 </html>
