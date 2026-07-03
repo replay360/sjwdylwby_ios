@@ -1,312 +1,305 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Impossible Light Bulb - Angry Bear Edition</title>
+    <title>مخمّن الشعارات الأيقوني</title>
     <style>
         :root {
-            --bg-lit: #f5e4bc;
-            --bg-dark: #181510; /* الظلمة الحقيقية من صورتك */
-            --door-color: #9c8a75;
-            --door-dark: #847360;
-            --bear-fur: #784421;
-            --bear-pad: #deaa87;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #38bdf8;
+            --text-color: #f8fafc;
         }
 
         body {
-            margin: 0; padding: 0;
-            background-color: #0f141c;
-            display: flex; justify-content: center; align-items: center;
-            height: 100vh; overflow: hidden;
-            user-select: none; -webkit-user-select: none;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        .scene {
+        .game-container {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            transition: transform 0.3s ease;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .score-board {
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        /* حاوية الشعار مع تأثيرات الضبابية والبكسلة */
+        .image-container {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 25px auto;
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             position: relative;
-            width: 600px; height: 420px;
-            background-color: var(--bg-dark);
-            border: 4px solid #fff;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
             overflow: hidden;
-            transition: background-color 0.15s ease;
+            border: 2px solid rgba(255,255,255,0.1);
         }
 
-        .scene.lit { background-color: var(--bg-lit); }
-
-        /* الباب مجسم */
-        .door-container {
-            position: absolute; right: 0; top: 50px;
-            width: 210px; height: 370px;
-            z-index: 10; perspective: 1000px;
+        .logo-img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+            /* التأثير البدائي: بكسلة قوية + ضباب عالي */
+            filter: blur(12px) contrast(200%);
+            image-rendering: pixelated;
+            transition: filter 0.5s ease;
         }
 
-        .door {
-            width: 100%; height: 100%;
-            background-color: var(--door-color);
-            border-left: 4px solid var(--door-dark);
-            box-sizing: border-box; padding: 25px;
-            display: flex; flex-direction: column; justify-content: space-around; align-items: center;
-            transform-origin: right center;
-            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        /* الخيارات والإدخال */
+        .input-section {
+            margin-bottom: 20px;
         }
 
-        /* الباب ينفتح شوي بالإيد، وينفتح حيل من الدب يعصب */
-        .scene.door-open .door { transform: rotateY(-30deg); }
-        .scene.door-rage .door { transform: rotateY(-75deg); }
-
-        .door-panel { width: 130px; height: 130px; border: 4px solid var(--door-dark); border-radius: 4px; }
-        .door-knob { position: absolute; left: 15px; top: 52%; width: 22px; height: 22px; background-color: #f0cc6c; border-radius: 4px; }
-
-        /* المصباح */
-        .bulb-wrapper { position: absolute; left: 280px; top: 50px; z-index: 5; }
-        .bulb-svg { width: 65px; height: 85px; }
-        .bulb-glass { fill: #2c2a22; stroke: #111; stroke-width: 3.5; }
-        .scene.lit .bulb-glass { fill: #e8f5cb; filter: drop-shadow(0 0 15px #fffbb0); }
-        .bulb-base { fill: #555; stroke: #111; stroke-width: 3.5; }
-
-        #ropeCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 8; cursor: grab; }
-        #ropeCanvas:active { cursor: grabbing; }
-
-        /* الدب غاضب أو عادي */
-        .bear-container {
-            position: absolute; right: 170px; top: 130px;
-            width: 200px; height: 180px; z-index: 4;
-            transform: translateX(200px);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+        input[type="text"] {
+            width: 80%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid #475569;
+            background-color: #0f172a;
+            color: white;
+            font-size: 16px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s;
         }
-        /* يظهر الدب حسب الحالة */
-        .scene.bear-out .bear-container { transform: translateX(40px); }
-        .scene.door-rage .bear-container { transform: translateX(-60px); } /* يطلع جسمه كله */
 
-        /* جسم الدب وعيونه المعصبة */
-        .bear-body {
-            position: absolute; left: 40px; top: 20px;
-            width: 120px; height: 140px; background-color: var(--bear-fur);
-            border-radius: 50% 50% 0 0; display: none;
+        input[type="text"]:focus {
+            border-color: var(--accent-color);
         }
-        .scene.door-rage .bear-body { display: block; }
 
-        .bear-eye {
-            position: absolute; width: 12px; height: 12px; background: red; border-radius: 50%; top: 40px;
+        .btn {
+            padding: 12px 25px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            margin: 5px;
         }
-        .bear-eye.left { left: 70px; }
-        .bear-eye.right { left: 95px; }
 
-        /* إيد الدب */
-        .bear-arm-container {
-            position: absolute; left: 0; top: 50px;
-            width: 160px; height: 60px; display: flex; align-items: center;
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: #0f172a;
         }
-        .bear-arm { width: 130px; height: 48px; background-color: var(--bear-fur); border-radius: 24px 0 0 24px; }
-        .bear-paw { width: 45px; height: 45px; background-color: var(--bear-pad); border: 4px solid var(--bear-fur); border-radius: 50%; margin-left: -25px; }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+        }
+
+        /* قسم وسائل المساعدة */
+        .hints-section {
+            margin-top: 20px;
+            border-top: 1px solid #475569;
+            padding-top: 15px;
+        }
+
+        .hints-title {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+
+        .btn-hint {
+            background-color: #334155;
+            color: white;
+            font-size: 13px;
+            padding: 8px 12px;
+        }
+
+        .btn-hint:disabled {
+            background-color: #1e293b;
+            color: #64748b;
+            cursor: not-allowed;
+            border: 1px solid #334155;
+        }
+
+        .hint-text {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #fcd34d;
+            min-height: 20px;
+        }
+
+        /* أنيميشن عند الإجابة الخطأ */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .shake {
+            animation: shake 0.3s ease-in-out;
+        }
     </style>
 </head>
 <body>
 
-<div class="scene" id="scene">
-    <div class="bulb-wrapper">
-        <svg class="bulb-svg" viewBox="0 0 100 120">
-            <path class="bulb-glass" d="M 50 20 C 25 20, 20 65, 40 85 C 42 88, 45 92, 45 95 L 55 95 C 55 92, 58 88, 60 85 C 80 65, 75 20, 50 20 Z" />
-            <rect class="bulb-base" x="40" y="95" width="20" height="15" rx="2" />
-        </svg>
-    </div>
-
-    <canvas id="ropeCanvas"></canvas>
-
-    <!-- الدب (جسم + إيد) -->
-    <div class="bear-container" id="bearContainer">
-        <div class="bear-body">
-            <div class="bear-eye left"></div>
-            <div class="bear-eye right"></div>
-        </div>
-        <div class="bear-arm-container">
-            <div class="bear-paw"></div>
-            <div class="bear-arm"></div>
-        </div>
-    </div>
-
-    <div class="door-container">
-        <div class="door">
-            <div class="door-panel"></div>
-            <div class="door-panel"></div>
-            <div class="door-knob"></div>
-        </div>
-    </div>
-</div>
-
-<script>
-    const canvas = document.getElementById('ropeCanvas');
-    const ctx = canvas.getContext('2d');
-    const scene = document.getElementById('scene');
-
-    canvas.width = 600; canvas.height = 420;
-
-    const pinX = 312; const pinY = 150; const restLength = 120;
-    const numPoints = 10; // زيادة النقاط لنعومة أكثر
-    let points = [];
-    
-    for(let i=0; i<numPoints; i++) {
-        let pct = i / (numPoints - 1);
-        points.push({ x: pinX, y: pinY + (pct * restLength), oldX: pinX, oldY: pinY + (pct * restLength), pinned: i === 0 });
-    }
-
-    const segmentLength = restLength / (numPoints - 1);
-    let isDragging = false; let dragPoint = null;
-    let isLit = false; let gameState = "idle"; // idle, bear_trying, rage, resetting
-    let rageTimer = null;
-
-    function updatePhysics() {
-        for (let p of points) {
-            if (p.pinned) continue;
-            let vx = p.x - p.oldX;
-            let vy = p.y - p.oldY;
-            p.oldX = p.x; p.oldY = p.y;
-            p.x += vx * 0.85; // زيادة التخميد لعدم حدوث طفرات
-            p.y += vy * 0.85 + 0.5; // جاذبية خفيفة مستقرة
-        }
-
-        // الحفاظ على تماسك الحبل
-        for (let i = 0; i < 10; i++) {
-            for (let j = 0; j < points.length - 1; j++) {
-                let p1 = points[j]; let p2 = points[j+1];
-                let dx = p2.x - p1.x; let dy = p2.y - p1.y;
-                let dist = Math.sqrt(dx*dx + dy*dy);
-                if(dist === 0) continue;
-                let diff = segmentLength - dist;
-                let percent = (diff / dist) * 0.5;
-                if (!p1.pinned) { p1.x -= dx * percent; p1.y -= dy * percent; }
-                if (!p2.pinned) { p2.x += dx * percent; p2.y += dy * percent; }
-            }
-        }
-
-        if (isDragging && dragPoint) {
-            if (!isLit && gameState === "idle" && dragPoint.y > (pinY + restLength + 35)) {
-                triggerLightOn();
-            }
-        }
-
-        // ذكاء الدب ومحاولة السحب والتطفي
-        let endPoint = points[points.length - 1];
-        if (gameState === "bear_trying") {
-            // الدب يمد ايده لمكان الحبل الحالي
-            let targetX = endPoint.x;
-            // إذا كان الحبل قريب، الدب يلوحه ويطفي
-            if (targetX > 250) { 
-                if (Math.abs(endPoint.x - 260) < 25) {
-                    triggerLightOffNormal();
-                }
-            }
-        } else if (gameState === "rage") {
-            // الدب عصّب ويهجم على الحبل وين ما يكون غصباً عن المستخدم!
-            endPoint.x += (180 - endPoint.x) * 0.2;
-            endPoint.y += (250 - endPoint.y) * 0.2;
-            if (Math.abs(endPoint.x - 180) < 15) {
-                triggerLightOffRage();
-            }
-        }
-    }
-
-    function drawRope() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.beginPath(); ctx.moveTo(points[0].x, points[0].y);
-        for(let i=1; i<points.length; i++) { ctx.lineTo(points[i].x, points[i].y); }
-        ctx.strokeStyle = '#222'; ctx.lineWidth = 5; ctx.lineCap = 'round'; ctx.stroke();
-
-        let endPoint = points[points.length - 1];
-        ctx.beginPath(); ctx.arc(endPoint.x, endPoint.y, 9, 0, Math.PI * 2);
-        ctx.fillStyle = '#222'; ctx.fill();
-    }
-
-    function loop() {
-        updatePhysics(); drawRope(); requestAnimationFrame(loop);
-    }
-    requestAnimationFrame(loop);
-
-    function getMousePos(e) {
-        const rect = canvas.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        return { x: (clientX - rect.left) * (600 / rect.width), y: (clientY - rect.top) * (420 / rect.height) };
-    }
-
-    canvas.addEventListener('mousedown', (e) => {
-        if (gameState === "rage" || gameState === "resetting") return;
-        const pos = getMousePos(e); let endPoint = points[points.length - 1];
-        if (Math.sqrt((pos.x - endPoint.x)**2 + (pos.y - endPoint.y)**2) < 40) { isDragging = true; dragPoint = endPoint; }
-    });
-
-    window.addEventListener('mousemove', (e) => {
-        if (!isDragging || !dragPoint) return;
-        const pos = getMousePos(e);
-        dragPoint.x = Math.max(50, Math.min(550, pos.x)); // حرية الحركة يمين ويسار بالكامل للمراوغة
-        dragPoint.y = Math.max(pinY + 30, Math.min(380, pos.y));
-    });
-
-    window.addEventListener('mouseup', () => { isDragging = false; dragPoint = null; });
-    canvas.addEventListener('touchstart', (e) => {
-        if (gameState === "rage" || gameState === "resetting") return;
-        const pos = getMousePos(e); let endPoint = points[points.length - 1];
-        if (Math.sqrt((pos.x - endPoint.x)**2 + (pos.y - endPoint.y)**2) < 50) { isDragging = true; dragPoint = endPoint; }
-    });
-    window.addEventListener('touchmove', (e) => {
-        if (!isDragging || !dragPoint) return;
-        const pos = getMousePos(e); dragPoint.x = pos.x; dragPoint.y = pos.y;
-    });
-    window.addEventListener('touchend', () => { isDragging = false; dragPoint = null; });
-
-    function triggerLightOn() {
-        isLit = true; scene.classList.add('lit'); gameState = "bear_trying";
+    <div class="game-container" id="gameCard">
+        <h1>مخمّن شعارات الأندية ⚽</h1>
+        <div class="score-board">النظام: <span id="score">0</span> / 5</div>
         
-        // الدب يفتح الباب العادي ويحاول يلوح الحبل
-        setTimeout(() => {
-            if(gameState === "bear_trying") scene.classList.add('door-open', 'bear-out');
-        }, 300);
+        <div class="image-container">
+            <img src="https://upload.wikimedia.org/wikipedia/en/5/5c/Real_Madrid_CF_logo.svg" alt="شعار النادي" class="logo-img" id="logoImage">
+        </div>
 
-        // مؤقت الغضب: إذا مرّت 3 ثواني والمستخدم يراوغ ومبعد الحبل
-        rageTimer = setTimeout(() => {
-            if (isLit && gameState === "bear_trying") {
-                triggerRopeRage();
+        <div class="input-section">
+            <input type="text" id="guestInput" placeholder="اكتب اسم النادي هنا..." autocomplete="off">
+            <br><br>
+            <button class="btn btn-primary" onclick="checkAnswer()">تحقق من الإجابة</button>
+        </div>
+
+        <div class="hints-section">
+            <div class="hints-title">وسائل المساعدة المتاحة:</div>
+            <button class="btn btn-hint" id="hint1Btn" onclick="useHint1()">🔍 توضيح الشعار شوي</button>
+            <button class="btn btn-hint" id="hint2Btn" onclick="useHint2()">🔤 أول حرف</button>
+            <button class="btn btn-hint" id="hint3Btn" onclick="useHint3()">👤 لاعب معتزل</button>
+            <div class="hint-text" id="hintDisplay"></div>
+        </div>
+    </div>
+
+    <script>
+        // مصفوفة الأندية الـ 5 مع الروابط والمعلومات
+        const clubsData = [
+            {
+                names: ["ريال مدريد", "ريال", "real madrid"],
+                img: "https://upload.wikimedia.org/wikipedia/en/5/5c/Real_Madrid_CF_logo.svg",
+                firstLetter: "ر",
+                legend: "زين الدين زيدان"
+            },
+            {
+                names: ["برشلونة", "برشلونه", "barcelona"],
+                img: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_(crest).svg",
+                firstLetter: "ب",
+                legend: "رونالدينيو"
+            },
+            {
+                names: ["مانشستر يونايتد", "اليونايتد", "manchester united"],
+                img: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg",
+                firstLetter: "م",
+                legend: "ديفيد بيكهام"
+            },
+            {
+                names: ["ميلان", "اي سي ميلان", "ac milan"],
+                img: "https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg",
+                firstLetter: "م",
+                legend: "باولو مالديني"
+            },
+            {
+                names: ["بايرن ميونخ", "بايرن", "bayern munich"],
+                img: "https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg",
+                firstLetter: "ب",
+                legend: "أوليفر كان"
             }
-        }, 3200);
-    }
+        ];
 
-    function triggerLightOffNormal() {
-        isLit = false; gameState = "resetting";
-        scene.classList.remove('lit');
-        isDragging = false; dragPoint = null;
-        clearTimeout(rageTimer);
+        let currentIndex = 0;
+        let score = 0;
 
-        // نتر الحبل
-        points[points.length - 1].x -= 40;
+        const logoImage = document.getElementById('logoImage');
+        const guestInput = document.getElementById('guestInput');
+        const hintDisplay = document.getElementById('hintDisplay');
+        const scoreDisplay = document.getElementById('score');
+        const gameCard = document.getElementById('gameCard');
 
-        setTimeout(() => {
-            scene.classList.remove('door-open', 'bear-out');
-            setTimeout(() => { gameState = "idle"; }, 300);
-        }, 200);
-    }
+        // أزرار المساعدة
+        const hint1Btn = document.getElementById('hint1Btn');
+        const hint2Btn = document.getElementById('hint2Btn');
+        const hint3Btn = document.getElementById('hint3Btn');
 
-    function triggerRopeRage() {
-        gameState = "rage";
-        isDragging = false; dragPoint = null; // يجبر المستخدم على فلتان الحبل غصباً عنه
-        scene.classList.remove('door-open', 'bear-out');
-        
-        // يفتح الباب بالكامل ويظهر جسم الدب المعصب
-        setTimeout(() => {
-            scene.classList.add('door-rage');
-        }, 150);
-    }
+        function loadQuestion() {
+            if (currentIndex >= clubsData.length) {
+                // نهاية اللعبة
+                gameCard.innerHTML = `<h2>عاشت ايدك! 🎉</h2><p>خلصت الـ 5 أندية بنجاح.</p><h3>نتيجتك: ${score} من 5</h3><button class="btn btn-primary" onclick="location.reload()">إعادة اللعب</button>`;
+                return;
+            }
 
-    function triggerLightOffRage() {
-        isLit = false; gameState = "resetting";
-        scene.classList.remove('lit');
+            // إعادة تعيين الشكل والمساعدات
+            logoImage.src = clubsData[currentIndex].img;
+            logoImage.style.filter = "blur(14px) contrast(200%)"; // بكسلة وضباب عالي بالبداية
+            guestInput.value = "";
+            hintDisplay.innerText = "";
+            
+            hint1Btn.disabled = false;
+            hint2Btn.disabled = false;
+            hint3Btn.disabled = false;
+        }
 
-        setTimeout(() => {
-            scene.classList.remove('door-rage');
-            setTimeout(() => { gameState = "idle"; }, 500);
-        }, 400);
-    }
-</script>
+        function checkAnswer() {
+            const userAnswer = guestInput.value.trim().toLowerCase();
+            const currentClub = clubsData[currentIndex];
 
+            // التحقق إذا كان الجواب موجود بالأسماء المقبولة
+            const isCorrect = currentClub.names.some(name => name.toLowerCase() === userAnswer);
+
+            if (isCorrect) {
+                score++;
+                scoreDisplay.innerText = score;
+                // أنيميشن توضيح الشعار بالكامل قبل الانتقال للسؤال التالي
+                logoImage.style.filter = "blur(0px) contrast(100%)";
+                
+                setTimeout(() => {
+                    currentIndex++;
+                    loadQuestion();
+                }, 1200); // ينتظر ثانية وشوية حتى يشوف الشعار واضح
+            } else {
+                // تأثير اهتزاز الشاشة عند الخطأ
+                gameCard.classList.add('shake');
+                setTimeout(() => gameCard.classList.remove('shake'), 300);
+                alert("الجواب خطأ، حاول مرة ثانية أو استخدم وسيلة مساعدة!");
+            }
+        }
+
+        // وسيلة المساعدة 1: توضيح الشعار شوية (تقليل البلور)
+        function useHint1() {
+            logoImage.style.filter = "blur(6px) contrast(150%)";
+            hintDisplay.innerText = "تم توضيح الشعار قليلاً!";
+            hint1Btn.disabled = true;
+        }
+
+        // وسيلة المساعدة 2: أول حرف
+        function useHint2() {
+            hintDisplay.innerText = `أول حرف من اسم النادي هو: (${clubsData[currentIndex].firstLetter})`;
+            hint2Btn.disabled = true;
+        }
+
+        // وسيلة المساعدة 3: لاعب معتزل
+        function useHint3() {
+            hintDisplay.innerText = `لاعب أسطوري معتزل لعب بيهم: ${clubsData[currentIndex].legend}`;
+            hint3Btn.disabled = true;
+        }
+
+        // تشغيل أول سؤال تلقائياً عند فتح اللعبة
+        window.onload = loadQuestion;
+    </script>
 </body>
 </html>
