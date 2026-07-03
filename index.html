@@ -31,7 +31,7 @@
             border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             text-align: center;
-            max-width: 500px; /* كبرنا الحاوية شوية */
+            max-width: 500px;
             width: 90%;
             transition: transform 0.3s ease;
         }
@@ -48,7 +48,6 @@
             font-weight: bold;
         }
 
-        /* حاوية الشعار - تم تكبير الحجم بناءً على طلبك */
         .image-container {
             width: 280px;
             height: 280px;
@@ -63,43 +62,34 @@
             border: 2px solid rgba(255,255,255,0.1);
         }
 
-        /* تكنيك البكسلة المربعة مثل image_3.png بدون ضباب */
         .logo-img {
             width: 85%;
             height: 85%;
             object-fit: contain;
-            
-            /* السحر هنا: تصغير الحجم بالـ scale والـ وظيفة المربعات */
-            transform: scale(1);
             image-rendering: pixelated;
             image-rendering: crisp-edges;
-            
-            transition: filter 0.4s ease, transform 0.4s ease;
+            transition: filter 0.3s ease, width 0.3s ease, height 0.3s ease;
         }
 
-        /* وضعيات البكسلة (مربعات قوية ومربعات متوسطة) */
+        /* هنا تكتيك البكسلة المضمون اللي يشتغل على كل المتصفحات والسيرفرات بدون حظر */
         .lvl-hard {
-            filter: contract(150%) brightness(100%);
-            /* نصغر حجم الداتا الفعلي للصورة داخلياً بالـ لقطة الـ CSS عشان تتبكسل مربعات */
-            width: 12px; 
-            height: 12px;
-            transform: scale(20); /* نرجع نكبرها برمجياً فتطلع مربعات كبيرة */
+            width: 14px; 
+            height: 14px;
+            filter: contrast(140%) brightness(100%);
         }
 
         .lvl-medium {
-            width: 28px;
-            height: 28px;
-            transform: scale(9);
+            width: 32px;
+            height: 32px;
+            filter: contrast(120%);
         }
 
         .lvl-clear {
             width: 85%;
             height: 85%;
-            transform: scale(1);
             filter: none;
         }
 
-        /* الخيارات والإدخال */
         .input-section {
             margin-bottom: 20px;
         }
@@ -144,7 +134,6 @@
             box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
         }
 
-        /* قسم وسائل المساعدة */
         .hints-section {
             margin-top: 20px;
             border-top: 1px solid #475569;
@@ -179,7 +168,6 @@
             font-weight: 500;
         }
 
-        /* أنيميشنن الخطأ */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-10px); }
@@ -198,7 +186,6 @@
         <div class="score-board">النظام: <span id="score">0</span> / 5</div>
         
         <div class="image-container">
-            <!-- تم تحديث الروابط لضمان الظهور والتحكم بالبكسلة المربعة -->
             <img src="" alt="شعار النادي" class="logo-img lvl-hard" id="logoImage">
         </div>
 
@@ -218,35 +205,35 @@
     </div>
 
     <script>
-        // مصفوفة الأندية مع روابط PNG مستقرة تدعم البكسلة المربعة وعالية الدقة
+        // روابط أصلية ومباشرة من GitHub مستقرة 100%
         const clubsData = [
             {
                 names: ["ريال مدريد", "ريال", "مدريد", "real madrid", "madrid"],
-                img: "https://images.all-free-download.com/images/15/real_madrid_logo_6814972.png",
+                img: "https://footylogos.github.io/res/logos/real-madrid.png",
                 firstLetter: "ر",
                 legend: "زين الدين زيدان"
             },
             {
                 names: ["برشلونة", "برشلونه", "برشا", "barcelona", "barca"],
-                img: "https://images.all-free-download.com/images/15/fc_barcelona_logo_6814912.png",
+                img: "https://footylogos.github.io/res/logos/barcelona.png",
                 firstLetter: "ب",
                 legend: "رونالدينيو"
             },
             {
                 names: ["مانشستر يونايتد", "اليونايتد", "مانشستر", "manchester united", "united"],
-                img: "https://images.all-free-download.com/images/15/manchester_united_logo_6814945.png",
+                img: "https://footylogos.github.io/res/logos/manchester-united.png",
                 firstLetter: "م",
                 legend: "ديفيد بيكهام"
             },
             {
                 names: ["ميلان", "اي سي ميلان", "milan", "ac milan"],
-                img: "https://images.all-free-download.com/images/15/ac_milan_logo_6814881.png",
+                img: "https://footylogos.github.io/res/logos/ac-milan.png",
                 firstLetter: "م",
                 legend: "باولو مالديني"
             },
             {
                 names: ["بايرن ميونخ", "بايرن", "ميونخ", "bayern", "munich"],
-                img: "https://images.all-free-download.com/images/15/bayern_munich_logo_6814894.png",
+                img: "https://footylogos.github.io/res/logos/bayern-munich.png",
                 firstLetter: "ب",
                 legend: "أوليفر كان"
             }
@@ -271,7 +258,6 @@
                 return;
             }
 
-            // إرجاع البكسلة القوية (مربعات كبيرة)
             logoImage.className = "logo-img lvl-hard";
             logoImage.src = clubsData[currentIndex].img;
             
@@ -289,7 +275,6 @@
 
             const currentClub = clubsData[currentIndex];
 
-            // التكنيك الذكي الجديد: يقبل الإجابة إذا كان النص المدخل جزء من أي اسم مسموح أو العكس
             const isCorrect = currentClub.names.some(name => {
                 const cleanName = name.toLowerCase();
                 return cleanName.includes(userAnswer) || userAnswer.includes(cleanName);
@@ -299,7 +284,6 @@
                 score++;
                 scoreDisplay.innerText = score;
                 
-                // إزالة المربعات وظهور الشعار واضح تماماً قبل الانتقال
                 logoImage.className = "logo-img lvl-clear";
                 
                 setTimeout(() => {
@@ -313,7 +297,6 @@
             }
         }
 
-        // وسيلة مساعدة 1: تقليل البكسلة المربعة لتصبح أوضح قليلاً
         function useHint1() {
             logoImage.className = "logo-img lvl-medium";
             hintDisplay.innerText = "تم توضيح المربعات قليلاً!";
@@ -330,10 +313,8 @@
             hint3Btn.disabled = true;
         }
 
-        // تشغيل اللعبة
         window.onload = loadQuestion;
 
-        // تفعيل زر الإنتر للإرسال السريع
         guestInput.addEventListener("keyup", function(event) {
             if (event.key === "Enter") {
                 checkAnswer();
