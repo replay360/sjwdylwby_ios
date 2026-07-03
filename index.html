@@ -31,7 +31,7 @@
             border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             text-align: center;
-            max-width: 450px;
+            max-width: 500px; /* كبرنا الحاوية شوية */
             width: 90%;
             transition: transform 0.3s ease;
         }
@@ -48,10 +48,10 @@
             font-weight: bold;
         }
 
-        /* حاوية الشعار مع تأثيرات الضبابية والبكسلة */
+        /* حاوية الشعار - تم تكبير الحجم بناءً على طلبك */
         .image-container {
-            width: 200px;
-            height: 200px;
+            width: 280px;
+            height: 280px;
             margin: 0 auto 25px auto;
             background-color: rgba(255,255,255,0.05);
             border-radius: 15px;
@@ -63,14 +63,40 @@
             border: 2px solid rgba(255,255,255,0.1);
         }
 
+        /* تكنيك البكسلة المربعة مثل image_3.png بدون ضباب */
         .logo-img {
-            width: 80%;
-            height: 80%;
+            width: 85%;
+            height: 85%;
             object-fit: contain;
-            /* التأثير البدائي: بكسلة قوية + ضباب عالي */
-            filter: blur(12px) contrast(200%);
+            
+            /* السحر هنا: تصغير الحجم بالـ scale والـ وظيفة المربعات */
+            transform: scale(1);
             image-rendering: pixelated;
-            transition: filter 0.5s ease;
+            image-rendering: crisp-edges;
+            
+            transition: filter 0.4s ease, transform 0.4s ease;
+        }
+
+        /* وضعيات البكسلة (مربعات قوية ومربعات متوسطة) */
+        .lvl-hard {
+            filter: contract(150%) brightness(100%);
+            /* نصغر حجم الداتا الفعلي للصورة داخلياً بالـ لقطة الـ CSS عشان تتبكسل مربعات */
+            width: 12px; 
+            height: 12px;
+            transform: scale(20); /* نرجع نكبرها برمجياً فتطلع مربعات كبيرة */
+        }
+
+        .lvl-medium {
+            width: 28px;
+            height: 28px;
+            transform: scale(9);
+        }
+
+        .lvl-clear {
+            width: 85%;
+            height: 85%;
+            transform: scale(1);
+            filter: none;
         }
 
         /* الخيارات والإدخال */
@@ -79,13 +105,13 @@
         }
 
         input[type="text"] {
-            width: 80%;
-            padding: 12px;
+            width: 85%;
+            padding: 14px;
             border-radius: 10px;
             border: 2px solid #475569;
             background-color: #0f172a;
             color: white;
-            font-size: 16px;
+            font-size: 18px;
             text-align: center;
             outline: none;
             transition: border-color 0.3s;
@@ -109,10 +135,12 @@
         .btn-primary {
             background-color: var(--accent-color);
             color: #0f172a;
+            width: 90%;
+            margin-top: 10px;
         }
 
         .btn-primary:hover {
-            transform: scale(1.05);
+            transform: scale(1.02);
             box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
         }
 
@@ -145,12 +173,13 @@
 
         .hint-text {
             margin-top: 10px;
-            font-size: 14px;
+            font-size: 15px;
             color: #fcd34d;
             min-height: 20px;
+            font-weight: 500;
         }
 
-        /* أنيميشنن عند الإجابة الخطأ */
+        /* أنيميشن الخطأ */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-10px); }
@@ -169,18 +198,19 @@
         <div class="score-board">النظام: <span id="score">0</span> / 5</div>
         
         <div class="image-container">
-            <img src="https://upload.wikimedia.org/wikipedia/en/5/5c/Real_Madrid_CF_logo.svg" alt="شعار النادي" class="logo-img" id="logoImage">
+            <!-- تم تحديث الروابط لضمان الظهور والتحكم بالبكسلة المربعة -->
+            <img src="" alt="شعار النادي" class="logo-img lvl-hard" id="logoImage">
         </div>
 
         <div class="input-section">
-            <input type="text" id="guestInput" placeholder="اكتب اسم النادي هنا..." autocomplete="off">
-            <br><br>
+            <input type="text" id="guestInput" placeholder="اكتب اسم النادي (أو جزء منه)..." autocomplete="off">
+            <br>
             <button class="btn btn-primary" onclick="checkAnswer()">تحقق من الإجابة</button>
         </div>
 
         <div class="hints-section">
             <div class="hints-title">وسائل المساعدة المتاحة:</div>
-            <button class="btn btn-hint" id="hint1Btn" onclick="useHint1()">🔍 توضيح الشعار شوي</button>
+            <button class="btn btn-hint" id="hint1Btn" onclick="useHint1()">🔍 توضيح المربعات شوي</button>
             <button class="btn btn-hint" id="hint2Btn" onclick="useHint2()">🔤 أول حرف</button>
             <button class="btn btn-hint" id="hint3Btn" onclick="useHint3()">👤 لاعب معتزل</button>
             <div class="hint-text" id="hintDisplay"></div>
@@ -188,35 +218,35 @@
     </div>
 
     <script>
-        // مصفوفة الأندية الـ 5 مع الروابط والمعلومات
+        // مصفوفة الأندية مع روابط PNG مستقرة تدعم البكسلة المربعة وعالية الدقة
         const clubsData = [
             {
-                names: ["ريال مدريد", "ريال", "real madrid"],
-                img: "https://upload.wikimedia.org/wikipedia/en/5/5c/Real_Madrid_CF_logo.svg",
+                names: ["ريال مدريد", "ريال", "مدريد", "real madrid", "madrid"],
+                img: "https://images.all-free-download.com/images/15/real_madrid_logo_6814972.png",
                 firstLetter: "ر",
                 legend: "زين الدين زيدان"
             },
             {
-                names: ["برشلونة", "برشلونه", "barcelona"],
-                img: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_(crest).svg",
+                names: ["برشلونة", "برشلونه", "برشا", "barcelona", "barca"],
+                img: "https://images.all-free-download.com/images/15/fc_barcelona_logo_6814912.png",
                 firstLetter: "ب",
                 legend: "رونالدينيو"
             },
             {
-                names: ["مانشستر يونايتد", "اليونايتد", "manchester united"],
-                img: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg",
+                names: ["مانشستر يونايتد", "اليونايتد", "مانشستر", "manchester united", "united"],
+                img: "https://images.all-free-download.com/images/15/manchester_united_logo_6814945.png",
                 firstLetter: "م",
                 legend: "ديفيد بيكهام"
             },
             {
-                names: ["ميلان", "اي سي ميلان", "ac milan"],
-                img: "https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg",
+                names: ["ميلان", "اي سي ميلان", "milan", "ac milan"],
+                img: "https://images.all-free-download.com/images/15/ac_milan_logo_6814881.png",
                 firstLetter: "م",
                 legend: "باولو مالديني"
             },
             {
-                names: ["بايرن ميونخ", "بايرن", "bayern munich"],
-                img: "https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg",
+                names: ["بايرن ميونخ", "بايرن", "ميونخ", "bayern", "munich"],
+                img: "https://images.all-free-download.com/images/15/bayern_munich_logo_6814894.png",
                 firstLetter: "ب",
                 legend: "أوليفر كان"
             }
@@ -231,21 +261,20 @@
         const scoreDisplay = document.getElementById('score');
         const gameCard = document.getElementById('gameCard');
 
-        // أزرار المساعدة
         const hint1Btn = document.getElementById('hint1Btn');
         const hint2Btn = document.getElementById('hint2Btn');
         const hint3Btn = document.getElementById('hint3Btn');
 
         function loadQuestion() {
             if (currentIndex >= clubsData.length) {
-                // نهاية اللعبة
-                gameCard.innerHTML = `<h2>عاشت ايدك! 🎉</h2><p>خلصت الـ 5 أندية بنجاح.</p><h3>نتيجتك: ${score} من 5</h3><button class="btn btn-primary" onclick="location.reload()">إعادة اللعب</button>`;
+                gameCard.innerHTML = `<h2>عاشت ايدك يا بطل! 🎉</h2><p>خلصت الـ 5 أندية بنجاح وتوقعتهم كلهم.</p><h3>نتيجتك: ${score} من 5</h3><button class="btn btn-primary" onclick="location.reload()">إعادة اللعب</button>`;
                 return;
             }
 
-            // إعادة تعيين الشكل والمساعدات
+            // إرجاع البكسلة القوية (مربعات كبيرة)
+            logoImage.className = "logo-img lvl-hard";
             logoImage.src = clubsData[currentIndex].img;
-            logoImage.style.filter = "blur(14px) contrast(200%)"; // بكسلة وضباب عالي بالبداية
+            
             guestInput.value = "";
             hintDisplay.innerText = "";
             
@@ -256,50 +285,60 @@
 
         function checkAnswer() {
             const userAnswer = guestInput.value.trim().toLowerCase();
+            if(!userAnswer) return;
+
             const currentClub = clubsData[currentIndex];
 
-            // التحقق إذا كان الجواب موجود بالأسماء المقبولة
-            const isCorrect = currentClub.names.some(name => name.toLowerCase() === userAnswer);
+            // التكنيك الذكي الجديد: يقبل الإجابة إذا كان النص المدخل جزء من أي اسم مسموح أو العكس
+            const isCorrect = currentClub.names.some(name => {
+                const cleanName = name.toLowerCase();
+                return cleanName.includes(userAnswer) || userAnswer.includes(cleanName);
+            });
 
             if (isCorrect) {
                 score++;
                 scoreDisplay.innerText = score;
-                // أنيميشن توضيح الشعار بالكامل قبل الانتقال للسؤال التالي
-                logoImage.style.filter = "blur(0px) contrast(100%)";
+                
+                // إزالة المربعات وظهور الشعار واضح تماماً قبل الانتقال
+                logoImage.className = "logo-img lvl-clear";
                 
                 setTimeout(() => {
                     currentIndex++;
                     loadQuestion();
-                }, 1200); // ينتظر ثانية وشوية حتى يشوف الشعار واضح
+                }, 1300);
             } else {
-                // تأثير اهتزاز الشاشة عند الخطأ
                 gameCard.classList.add('shake');
                 setTimeout(() => gameCard.classList.remove('shake'), 300);
-                alert("الجواب خطأ، حاول مرة ثانية أو استخدم وسيلة مساعدة!");
+                hintDisplay.innerText = "الجواب مو صحيح، حاول مرة ثانية أو استخدم وسيلة مساعدة!";
             }
         }
 
-        // وسيلة المساعدة 1: توضيح الشعار شوية (تقليل البلور)
+        // وسيلة مساعدة 1: تقليل البكسلة المربعة لتصبح أوضح قليلاً
         function useHint1() {
-            logoImage.style.filter = "blur(6px) contrast(150%)";
-            hintDisplay.innerText = "تم توضيح الشعار قليلاً!";
+            logoImage.className = "logo-img lvl-medium";
+            hintDisplay.innerText = "تم توضيح المربعات قليلاً!";
             hint1Btn.disabled = true;
         }
 
-        // وسيلة المساعدة 2: أول حرف
         function useHint2() {
-            hintDisplay.innerText = `أول حرف من اسم النادي هو: (${clubsData[currentIndex].firstLetter})`;
+            hintDisplay.innerText = `أول حرف من النادي: (${clubsData[currentIndex].firstLetter})`;
             hint2Btn.disabled = true;
         }
 
-        // وسيلة المساعدة 3: لاعب معتزل
         function useHint3() {
             hintDisplay.innerText = `لاعب أسطوري معتزل لعب بيهم: ${clubsData[currentIndex].legend}`;
             hint3Btn.disabled = true;
         }
 
-        // تشغيل أول سؤال تلقائياً عند فتح اللعبة
+        // تشغيل اللعبة
         window.onload = loadQuestion;
+
+        // تفعيل زر الإنتر للإرسال السريع
+        guestInput.addEventListener("keyup", function(event) {
+            if (event.key === "Enter") {
+                checkAnswer();
+            }
+        });
     </script>
 </body>
 </html>
