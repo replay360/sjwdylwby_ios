@@ -62,31 +62,31 @@
             border: 2px solid rgba(255,255,255,0.1);
         }
 
-        .logo-img {
-            width: 85%;
-            height: 85%;
-            object-fit: contain;
-            image-rendering: pixelated;
-            image-rendering: crisp-edges;
-            transition: filter 0.3s ease, width 0.3s ease, height 0.3s ease;
+        /* تحجيم حاوية الـ SVG الداخلي لتأثير المربعات */
+        .logo-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: filter 0.3s ease, transform 0.3s ease;
         }
 
-        /* هنا تكتيك البكسلة المضمون اللي يشتغل على كل المتصفحات والسيرفرات بدون حظر */
+        .logo-wrapper svg {
+            width: 180px;
+            height: 180px;
+        }
+
+        /* تكتيك البكسلة المربعة النظيفة بالـ CSS للأشكال */
         .lvl-hard {
-            width: 14px; 
-            height: 14px;
-            filter: contrast(140%) brightness(100%);
+            filter: blur(16px) contrast(300%) hue-rotate(0deg);
         }
 
         .lvl-medium {
-            width: 32px;
-            height: 32px;
-            filter: contrast(120%);
+            filter: blur(7px) contrast(180%);
         }
 
         .lvl-clear {
-            width: 85%;
-            height: 85%;
             filter: none;
         }
 
@@ -186,7 +186,8 @@
         <div class="score-board">النظام: <span id="score">0</span> / 5</div>
         
         <div class="image-container">
-            <img src="" alt="شعار النادي" class="logo-img lvl-hard" id="logoImage">
+            <div id="logoWrapper" class="logo-wrapper lvl-hard">
+                </div>
         </div>
 
         <div class="input-section">
@@ -205,35 +206,79 @@
     </div>
 
     <script>
-        // روابط أصلية ومباشرة من GitHub مستقرة 100%
+        // مصفوفة الأندية مضاف إليها كود الـ SVG المباشر الموزون بألوان الأندية الأصلية
         const clubsData = [
             {
                 names: ["ريال مدريد", "ريال", "مدريد", "real madrid", "madrid"],
-                img: "https://footylogos.github.io/res/logos/real-madrid.png",
+                svg: `<svg viewBox="0 0 100 100">
+                        <circle cx="50" cy="55" r="35" fill="none" stroke="#FEF102" stroke-width="6"/>
+                        <circle cx="50" cy="55" r="30" fill="#FFFFFF" stroke="#00529F" stroke-width="2"/>
+                        <path d="M25 35 L75 75" stroke="#8A1538" stroke-width="12"/>
+                        <text x="50" y="62" font-size="22" font-family="Arial Black" font-weight="bold" fill="#00529F" text-anchor="middle">MC</text>
+                        <path d="M35 22 L50 10 L65 22 Z" fill="#FEF102" stroke="#8A1538" stroke-width="2"/>
+                      </svg>`,
                 firstLetter: "ر",
                 legend: "زين الدين زيدان"
             },
             {
                 names: ["برشلونة", "برشلونه", "برشا", "barcelona", "barca"],
-                img: "https://footylogos.github.io/res/logos/barcelona.png",
+                svg: `<svg viewBox="0 0 100 100">
+                        <path d="M20 20 C20 10, 80 10, 80 20 C80 50, 70 85, 50 95 C30 85, 20 50, 20 20 Z" fill="#A50044" stroke="#EDBB00" stroke-width="3"/>
+                        <path d="M20 45 L80 45 L50 95 Z" fill="#004D98"/>
+                        <path d="M20 45 L80 45 L80 20 L50 20 L20 20 Z" fill="#EDBB00"/>
+                        <rect x="25" y="23" width="22" height="18" fill="#FFFFFF"/>
+                        <path d="M36 23 L36 41 M25 32 L47 32" stroke="#A50044" stroke-width="3"/>
+                        <rect x="53" y="23" width="22" height="18" fill="#EDBB00"/>
+                        <path d="M58 23 L58 41 M64 23 L64 41 M70 23 L70 41" stroke="#000" stroke-width="2"/>
+                        <rect x="30" y="45" width="40" height="10" fill="#EDBB00"/>
+                        <text x="50" y="54" font-size="9" font-family="Arial" font-weight="bold" fill="#000" text-anchor="middle">FCB</text>
+                        <circle cx="50" cy="70" r="6" fill="#EDBB00" stroke="#000" stroke-width="1"/>
+                      </svg>`,
                 firstLetter: "ب",
                 legend: "رونالدينيو"
             },
             {
                 names: ["مانشستر يونايتد", "اليونايتد", "مانشستر", "manchester united", "united"],
-                img: "https://footylogos.github.io/res/logos/manchester-united.png",
+                svg: `<svg viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="45" fill="#DA291C" stroke="#FFE500" stroke-width="3"/>
+                        <circle cx="50" cy="50" r="35" fill="#FFE500"/>
+                        <rect x="25" y="40" width="50" height="20" fill="#DA291C"/>
+                        <text x="50" y="55" font-size="8" font-family="Arial Black" font-weight="bold" fill="#FFE500" text-anchor="middle">MANCHESTER</text>
+                        <text x="50" y="72" font-size="9" font-family="Arial Black" font-weight="bold" fill="#FFE500" text-anchor="middle">UNITED</text>
+                        <path d="M42 22 L50 32 L58 22 Z" fill="#DA291C"/>
+                      </svg>`,
                 firstLetter: "م",
                 legend: "ديفيد بيكهام"
             },
             {
                 names: ["ميلان", "اي سي ميلان", "milan", "ac milan"],
-                img: "https://footylogos.github.io/res/logos/ac-milan.png",
+                svg: `<svg viewBox="0 0 100 100">
+                        <ellipse cx="50" cy="50" rx="32" ry="45" fill="#FFFFFF" stroke="#E32021" stroke-width="4"/>
+                        <clipPath id="ovalClip"><ellipse cx="50" cy="50" rx="28" ry="41"/></clipPath>
+                        <g clip-path="url(#ovalClip)">
+                            <rect x="18" y="5" width="32" height="90" fill="#000000"/>
+                            <rect x="25" y="5" width="6" height="90" fill="#E32021"/>
+                            <rect x="37" y="5" width="6" height="90" fill="#E32021"/>
+                            <rect x="50" y="5" width="35" height="90" fill="#FFFFFF"/>
+                            <path d="M50 5 L50 95 M50 50 L85 50" stroke="#E32021" stroke-width="5"/>
+                            <rect x="30" y="12" width="40" height="15" fill="#FFFFFF"/>
+                            <text x="50" y="24" font-size="12" font-family="Arial Black" font-weight="bold" fill="#000" text-anchor="middle">ACM</text>
+                            <rect x="40" y="70" width="20" height="12" fill="#FFFFFF"/>
+                            <text x="50" y="80" font-size="10" font-family="Arial" fill="#000" text-anchor="middle">1899</text>
+                        </g>
+                      </svg>`,
                 firstLetter: "م",
                 legend: "باولو مالديني"
             },
             {
                 names: ["بايرن ميونخ", "بايرن", "ميونخ", "bayern", "munich"],
-                img: "https://footylogos.github.io/res/logos/bayern-munich.png",
+                svg: `<svg viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="45" fill="#DC052D" stroke="#FFFFFF" stroke-width="3"/>
+                        <circle cx="50" cy="50" r="32" fill="#0066B2" stroke="#FFFFFF" stroke-width="4"/>
+                        <path d="M35 35 L65 35 L50 65 Z M42 45 L58 45" stroke="#FFFFFF" stroke-width="3" fill="none"/>
+                        <text x="50" y="16" font-size="8" font-family="Arial Black" font-weight="bold" fill="#FFFFFF" text-anchor="middle">FC BAYERN</text>
+                        <text x="50" y="92" font-size="8" font-family="Arial Black" font-weight="bold" fill="#FFFFFF" text-anchor="middle">MUNCHEN</text>
+                      </svg>`,
                 firstLetter: "ب",
                 legend: "أوليفر كان"
             }
@@ -242,7 +287,7 @@
         let currentIndex = 0;
         let score = 0;
 
-        const logoImage = document.getElementById('logoImage');
+        const logoWrapper = document.getElementById('logoWrapper');
         const guestInput = document.getElementById('guestInput');
         const hintDisplay = document.getElementById('hintDisplay');
         const scoreDisplay = document.getElementById('score');
@@ -258,8 +303,9 @@
                 return;
             }
 
-            logoImage.className = "logo-img lvl-hard";
-            logoImage.src = clubsData[currentIndex].img;
+            // حقن الـ SVG بداخل الواجهة مباشرة
+            logoWrapper.className = "logo-wrapper lvl-hard";
+            logoWrapper.innerHTML = clubsData[currentIndex].svg;
             
             guestInput.value = "";
             hintDisplay.innerText = "";
@@ -284,7 +330,8 @@
                 score++;
                 scoreDisplay.innerText = score;
                 
-                logoImage.className = "logo-img lvl-clear";
+                // تصفية الـ SVG بالكامل
+                logoWrapper.className = "logo-wrapper lvl-clear";
                 
                 setTimeout(() => {
                     currentIndex++;
@@ -293,12 +340,12 @@
             } else {
                 gameCard.classList.add('shake');
                 setTimeout(() => gameCard.classList.remove('shake'), 300);
-                hintDisplay.innerText = "الجواب مو صحيح، حاول مرة ثانية أو استخدم وسيلة مساعدة!";
+                hintDisplay.innerText = "الجواب مو صحيح، حاول مرة ثانية!";
             }
         }
 
         function useHint1() {
-            logoImage.className = "logo-img lvl-medium";
+            logoWrapper.className = "logo-wrapper lvl-medium";
             hintDisplay.innerText = "تم توضيح المربعات قليلاً!";
             hint1Btn.disabled = true;
         }
