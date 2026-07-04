@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صانع تصاميم الحساني الاحترافي</title>
+    <title>صانع التصاميم الرياضية</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;800;900&display=swap" rel="stylesheet">
     
     <style>
@@ -29,17 +29,19 @@
             max-width: 420px;
         }
 
-        /* القالب الرئيسي */
+        /* حاوية التصميم الثابتة لمنع أي تشويه بالتحميل */
         .design-template {
             width: 400px;
             height: 500px;
+            min-width: 400px;
+            min-height: 500px;
             position: relative;
             overflow: hidden;
             background-color: #000;
             box-shadow: 0 20px 40px rgba(0,0,0,0.8);
         }
 
-        /* حاوية الصورة والتحكم بها */
+        /* حاوية الصورة الأساسية */
         .image-container {
             width: 100%;
             height: 100%;
@@ -47,6 +49,7 @@
             top: 0;
             left: 0;
             z-index: 1;
+            overflow: hidden;
         }
 
         .user-image {
@@ -55,19 +58,27 @@
             height: 100%;
             object-fit: cover;
             transform-origin: center center;
+            transition: filter 0.2s ease;
         }
 
-        /* تدريج ناعم يمنع الحواف الحادة تماماً بالأسفل ويموه الخلفية */
+        /* فلاتر احترافية بأسماء رسمية */
+        .f-hd { filter: contrast(1.25) brightness(1.05) saturate(1.1) sharp; }
+        .f-smooth { filter: brightness(1.08) contrast(0.95) saturate(1.05) blur(0.3px); }
+        .f-contrast { filter: contrast(1.35) saturate(1.25); }
+        .f-cinematic { filter: contrast(1.15) saturate(0.65) hue-rotate(-5deg); }
+        .f-warm { filter: sepia(0.2) contrast(1.15) saturate(1.1); }
+
+        /* تدريج ناعم لمنع الحواف الحادة */
         .bottom-smooth-shadow {
             position: absolute;
             bottom: 0;
             width: 100%;
             height: 65%;
-            background: linear-gradient(to top, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.7) 45%, transparent 100%);
+            background: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 45%, transparent 100%);
             z-index: 2;
         }
 
-        /* حقوق الحساني أعلى اليسار ناعمة وصغيرة وثابتة */
+        /* تصحيح مشكلة الحقوق المعكوسة من image_9.png */
         .rights-text {
             position: absolute;
             top: 15px;
@@ -75,21 +86,23 @@
             z-index: 10;
             font-size: 11px;
             font-weight: 800;
-            color: rgba(255, 255, 255, 0.85);
+            color: rgba(255, 255, 255, 0.9);
             letter-spacing: 0.5px;
             text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+            display: flex;
+            gap: 5px;
+            direction: ltr; /* لضمان ترتيب الكلمات بالشكل الصحيح دائماً */
         }
 
-        /* منطقة النصوص والمسافات المعدلة بدقة */
+        /* منطقة النصوص والمسافات المتناسقة */
         .text-wrap {
             position: absolute;
-            bottom: 25px; /* نزلت النصوص شوية لتحت */
+            bottom: 25px;
             width: 100%;
             z-index: 6;
             text-align: center;
             padding: 0 25px;
             box-sizing: border-box;
-            transition: all 0.3s ease;
         }
 
         .text-main {
@@ -97,7 +110,7 @@
             font-weight: 900;
             color: #ffffff;
             margin: 0;
-            line-height: 1.4; /* زيادة التباعد السطري */
+            line-height: 1.4;
             text-shadow: 0 2px 5px rgba(0,0,0,1);
         }
 
@@ -105,28 +118,25 @@
             font-size: 22px;
             font-weight: 900;
             color: #cc2027;
-            margin: 10px 0 0 0; /* زيادة البعد بين النص الفوق والتحت */
+            margin: 10px 0 0 0;
             line-height: 1.4;
             text-shadow: 0 2px 5px rgba(0,0,0,1);
         }
 
-        /* أيقونة الجرس */
         .alarm-icon {
             display: none;
             width: 44px;
             height: 44px;
             background: linear-gradient(to bottom, #ff2a35, #cc2027);
             border-radius: 12px;
-            margin: 0 auto 14px auto; /* مسافة متناسقة قبل النصوص */
+            margin: 0 auto 14px auto;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 4px 12px rgba(204,32,39,0.5), inset 0 1px 1px rgba(255,255,255,0.3);
+            box-shadow: 0 4px 12px rgba(204,32,39,0.5);
             border: 1px solid #b01a1f;
         }
 
-        /* ------------------ تفاصيل القوالب ------------------ */
-
-        /* 1. القالب الأول الجديد (إضاءة ونيون فخم بدون أشكال قبيحة) */
+        /* تفاصيل القوالب الثلاثة */
         .tmpl-first .glow-background {
             position: absolute;
             bottom: -30px;
@@ -138,10 +148,7 @@
         }
         .tmpl-first .text-sub { color: #ff4a4a; }
 
-        /* 2. القالب الثاني (لابورتا سابقاً - الحافة الدائرية السفلية المضيئة) */
-        .tmpl-second {
-            border-radius: 0 0 45px 45px;
-        }
+        .tmpl-second { border-radius: 0 0 45px 45px; }
         .tmpl-second .laporta-glow {
             position: absolute;
             bottom: 0;
@@ -163,7 +170,6 @@
         .tmpl-second .text-wrap { bottom: 35px; }
         .tmpl-second .text-sub { color: #ff3b3b; }
 
-        /* 3. القالب الثالث (رودري سابقاً - الشريط المستقيم المدمج بالخلفية) */
         .tmpl-third .rodri-bar {
             position: absolute;
             bottom: 0;
@@ -195,12 +201,11 @@
         .tmpl-third .text-wrap { bottom: 60px; }
         .tmpl-third .text-sub { color: #cc2027; }
 
-        /* أزرار اختيار القوالب السفلية */
+        /* الأزرار والواجهات النظيفة والرسمية */
         .template-selector {
             display: flex;
             gap: 10px;
             width: 100%;
-            justify-content: center;
         }
 
         .selector-btn {
@@ -214,7 +219,6 @@
             font-size: 13px;
             font-weight: bold;
             transition: 0.2s;
-            text-align: center;
         }
 
         .selector-btn.active {
@@ -222,13 +226,11 @@
             background: #cc2027;
         }
 
-        /* لوحة التحكم السفلية */
         .controls {
             background: #141419;
             padding: 20px;
             border-radius: 16px;
             width: 100%;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
             border: 1px solid #23232a;
             box-sizing: border-box;
         }
@@ -256,6 +258,32 @@
             box-sizing: border-box;
         }
 
+        .filter-container {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            flex: 1;
+            min-width: 75px;
+            background: #1a1a22;
+            border: 1px solid #2f2f3a;
+            color: #ccc;
+            padding: 8px 2px;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            border-color: #cc2027;
+            background: #23232f;
+            color: #fff;
+        }
+
         button.download-btn {
             width: 100%;
             padding: 12px;
@@ -267,7 +295,6 @@
             cursor: pointer;
             font-size: 16px;
             transition: 0.2s;
-            margin-top: 5px;
         }
 
         button.download-btn:hover {
@@ -279,36 +306,34 @@
 
     <div class="workspace">
         
-        <!-- 1. منطقة القالب المعروض -->
+        <!-- القالب المعروض بأبعاد بكسل صارمة -->
         <div class="design-template tmpl-first" id="templateContainer">
             
-            <div class="rights-text">الحساني | AL HASSANI</div>
+            <!-- تصحيح إنعكاس النص المذكور في الملاحظة -->
+            <div class="rights-text">
+                <span>AL HASSANI</span>
+                <span>|</span>
+                <span>الحساني</span>
+            </div>
 
-            <!-- إضاءة القالب الأول الفخم الجديد -->
             <div class="glow-background" id="firstGlow"></div>
-
-            <!-- تفاصيل القالب الثاني -->
             <div class="laporta-glow" id="lpGlow" style="display:none;"></div>
             <div class="laporta-bar" id="lpBar" style="display:none;">
                 <div class="b-red"></div>
                 <div class="b-blue"></div>
             </div>
 
-            <!-- تفاصيل القالب الثالث -->
             <div class="rodri-bar" id="rdBar" style="display:none;">
                 <div class="rodri-subbar-left"></div>
                 <div class="rodri-subbar-right"></div>
             </div>
 
-            <!-- حاوية صورة اللاعب -->
             <div class="image-container">
                 <img src="" id="playerImg" class="user-image" style="display: none;">
             </div>
 
-            <!-- التدريج والدمج الخلفي الناعم -->
             <div class="bottom-smooth-shadow"></div>
             
-            <!-- منطقة النصوص الموزعة بدقة وأبعاد مريحة -->
             <div class="text-wrap">
                 <div class="alarm-icon" id="alarmIcon">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
@@ -318,33 +343,44 @@
             </div>
         </div>
 
-        <!-- 2. أزرار اختيار الأسماء الجديدة بالتناوب -->
         <div class="template-selector">
             <button class="selector-btn active" onclick="changeStyle('first', this)">القالب الأول</button>
             <button class="selector-btn" onclick="changeStyle('second', this)">القالب الثاني</button>
             <button class="selector-btn" onclick="changeStyle('third', this)">القالب الثالث</button>
         </div>
 
-        <!-- 3. لوحة التحكم تحت التصميم مباشرة -->
         <div class="controls">
             <div class="control-group">
-                <label>اختر صورة اللاعب:</label>
+                <label>صورة اللاعب:</label>
                 <input type="file" id="imageInput" accept="image/*">
             </div>
+            
             <div class="control-group">
-                <label>تكبير/تصغير الصورة:</label>
+                <label>الفلاتر الاحترافية:</label>
+                <div class="filter-container">
+                    <button class="filter-btn active" onclick="applyFilter('none', this)">بدون فلتر</button>
+                    <button class="filter-btn" onclick="applyFilter('f-hd', this)">فلتر HD</button>
+                    <button class="filter-btn" onclick="applyFilter('f-smooth', this)">نعومة AI</button>
+                    <button class="filter-btn" onclick="applyFilter('f-contrast', this)">تباين عالٍ</button>
+                    <button class="filter-btn" onclick="applyFilter('f-cinematic', this)">سينمائي</button>
+                    <button class="filter-btn" onclick="applyFilter('f-warm', this)">دافئ</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>الحجم (تكبير / تصغير):</label>
                 <input type="range" id="scaleSlider" min="0.5" max="3" step="0.01" value="1">
             </div>
             <div class="control-group">
-                <label>تحريك عمودي (فوق/تحت):</label>
+                <label>الموقع العمودي (فوق / تحت):</label>
                 <input type="range" id="ySlider" min="-300" max="300" step="1" value="0">
             </div>
             <div class="control-group">
-                <label>العنوان الأول:</label>
+                <label>العنوان الرئيسي:</label>
                 <input type="text" id="textMainInput" value="بيدري رودري">
             </div>
             <div class="control-group">
-                <label>العنوان الثاني:</label>
+                <label>العنوان الفرعي:</label>
                 <input type="text" id="textSubInput" value="خارج الحسابات">
             </div>
             <button class="download-btn" id="downloadBtn">تحميل التصميم النهائي</button>
@@ -377,8 +413,8 @@
         let currentY = 0;
 
         const templateTexts = {
-            first: { main: 'بيدري رودري', sub: 'توهج جديد وإطلالة نيون فخمة' },
-            second: { main: 'لابورتا', sub: 'يتحدث عن الصفقات الجديدة' },
+            first: { main: 'بيدري رودري', sub: 'خارج الحسابات' },
+            second: { main: 'بيدري رودري', sub: 'خارج الحسابات' },
             third: { main: 'بيدري رودري', sub: 'خارج الحسابات' }
         };
 
@@ -420,6 +456,15 @@
             }
         });
 
+        function applyFilter(filterClass, btnElement) {
+            playerImg.classList.remove('f-hd', 'f-smooth', 'f-contrast', 'f-cinematic', 'f-warm');
+            if(filterClass !== 'none') {
+                playerImg.classList.add(filterClass);
+            }
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+        }
+
         function changeStyle(styleName, btnElement) {
             templateContainer.classList.remove('tmpl-first', 'tmpl-second', 'tmpl-third');
             
@@ -447,13 +492,18 @@
             btnElement.classList.add('active');
         }
 
+        /* دالة التحميل الذكية: تجبر الأبعاد على 400x500 وتمنع التشويه الحركي */
         downloadBtn.addEventListener('click', () => {
             html2canvas(templateContainer, {
                 useCORS: true,
-                scale: 3
+                scale: 3, 
+                width: 400,
+                height: 500,
+                scrollX: 0,
+                scrollY: 0
             }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = 'Al-Hassani-Perfect.png';
+                link.download = 'Al-Hassani-Design.png';
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             });
