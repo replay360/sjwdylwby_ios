@@ -3,370 +3,462 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ممخمّن الشعارات الأيقوني</title>
+    <title>صانع تصاميم الحساني الاحترافي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;800;900&display=swap" rel="stylesheet">
+    
     <style>
-        :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --accent-color: #38bdf8;
-            --text-color: #f8fafc;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
+            font-family: 'Cairo', sans-serif;
+            background-color: #0b0b0d;
+            color: #fff;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            overflow-x: hidden;
+            margin: 0;
+            padding: 10px;
         }
 
-        .game-container {
-            background-color: var(--card-bg);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            text-align: center;
-            max-width: 500px;
-            width: 90%;
-            transition: transform 0.3s ease;
-        }
-
-        h1 {
-            color: var(--accent-color);
-            margin-bottom: 20px;
-            font-size: 24px;
-        }
-
-        .score-board {
-            font-size: 18px;
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-
-        .image-container {
-            width: 280px;
-            height: 280px;
-            margin: 0 auto 25px auto;
-            background-color: rgba(255,255,255,0.05);
-            border-radius: 15px;
+        .workspace {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        /* القالب الرئيسي */
+        .design-template {
+            width: 400px;
+            height: 500px;
             position: relative;
             overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.1);
+            background-color: #000;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
         }
 
-        /* تحجيم حاوية الـ SVG الداخلي لتأثيرر المربعات */
-        .logo-wrapper {
+        /* حاوية الصورة والتحكم بها */
+        .image-container {
             width: 100%;
             height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: filter 0.3s ease, transform 0.3s ease;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
         }
 
-        .logo-wrapper svg {
-            width: 180px;
-            height: 180px;
+        .user-image {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform-origin: center center;
         }
 
-        /* تكتيك البكسلة المربعة النظيفة بالـ CSS للأشكال */
-        .lvl-hard {
-            filter: blur(16px) contrast(300%) hue-rotate(0deg);
+        /* تدريج ناعم يمنع الحواف الحادة تماماً بالأسفل ويموه الخلفية */
+        .bottom-smooth-shadow {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 65%;
+            background: linear-gradient(to top, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.7) 45%, transparent 100%);
+            z-index: 2;
         }
 
-        .lvl-medium {
-            filter: blur(7px) contrast(180%);
+        /* حقوق الحساني أعلى اليسار ناعمة وصغيرة وثابتة */
+        .rights-text {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 10;
+            font-size: 11px;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.85);
+            letter-spacing: 0.5px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9);
         }
 
-        .lvl-clear {
-            filter: none;
-        }
-
-        .input-section {
-            margin-bottom: 20px;
-        }
-
-        input[type="text"] {
-            width: 85%;
-            padding: 14px;
-            border-radius: 10px;
-            border: 2px solid #475569;
-            background-color: #0f172a;
-            color: white;
-            font-size: 18px;
+        /* منطقة النصوص والمسافات المعدلة بدقة */
+        .text-wrap {
+            position: absolute;
+            bottom: 25px; /* نزلت النصوص شوية لتحت */
+            width: 100%;
+            z-index: 6;
             text-align: center;
-            outline: none;
-            transition: border-color 0.3s;
+            padding: 0 25px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
         }
 
-        input[type="text"]:focus {
-            border-color: var(--accent-color);
+        .text-main {
+            font-size: 24px;
+            font-weight: 900;
+            color: #ffffff;
+            margin: 0;
+            line-height: 1.4; /* زيادة التباعد السطري */
+            text-shadow: 0 2px 5px rgba(0,0,0,1);
         }
 
-        .btn {
-            padding: 12px 25px;
-            border-radius: 10px;
-            border: none;
+        .text-sub {
+            font-size: 22px;
+            font-weight: 900;
+            color: #cc2027;
+            margin: 10px 0 0 0; /* زيادة البعد بين النص الفوق والتحت */
+            line-height: 1.4;
+            text-shadow: 0 2px 5px rgba(0,0,0,1);
+        }
+
+        /* أيقونة الجرس */
+        .alarm-icon {
+            display: none;
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(to bottom, #ff2a35, #cc2027);
+            border-radius: 12px;
+            margin: 0 auto 14px auto; /* مسافة متناسقة قبل النصوص */
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(204,32,39,0.5), inset 0 1px 1px rgba(255,255,255,0.3);
+            border: 1px solid #b01a1f;
+        }
+
+        /* ------------------ تفاصيل القوالب ------------------ */
+
+        /* 1. القالب الأول الجديد (إضاءة ونيون فخم بدون أشكال قبيحة) */
+        .tmpl-first .glow-background {
+            position: absolute;
+            bottom: -30px;
+            width: 100%;
+            height: 180px;
+            z-index: 3;
+            background: radial-gradient(circle, rgba(204,32,39,0.25) 0%, rgba(0,77,152,0.2) 50%, transparent 80%);
+            filter: blur(15px);
+        }
+        .tmpl-first .text-sub { color: #ff4a4a; }
+
+        /* 2. القالب الثاني (لابورتا سابقاً - الحافة الدائرية السفلية المضيئة) */
+        .tmpl-second {
+            border-radius: 0 0 45px 45px;
+        }
+        .tmpl-second .laporta-glow {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 40%;
+            background: linear-gradient(to top, rgba(10, 15, 52, 0.98) 0%, rgba(16, 26, 82, 0.85) 50%, transparent 100%);
+            z-index: 3;
+        }
+        .tmpl-second .laporta-bar {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 8px;
+            display: flex;
+            z-index: 4;
+        }
+        .tmpl-second .laporta-bar .b-red { flex: 1; background: #cc2027; }
+        .tmpl-second .laporta-bar .b-blue { flex: 1; background: #004d98; }
+        .tmpl-second .text-wrap { bottom: 35px; }
+        .tmpl-second .text-sub { color: #ff3b3b; }
+
+        /* 3. القالب الثالث (رودري سابقاً - الشريط المستقيم المدمج بالخلفية) */
+        .tmpl-third .rodri-bar {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 44px;
+            background: linear-gradient(to top, #050507 80%, rgba(5,5,7,0.2) 100%);
+            z-index: 4;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .tmpl-third .rodri-subbar-left {
+            width: 120px;
+            height: 10px;
+            background: #004d98;
+            transform: skewX(-35deg);
+            margin-left: -20px;
+            margin-bottom: 5px;
+        }
+        .tmpl-third .rodri-subbar-right {
+            width: 120px;
+            height: 10px;
+            background: #cc2027;
+            transform: skewX(35deg);
+            margin-right: -20px;
+            margin-bottom: 5px;
+        }
+        .tmpl-third .alarm-icon { display: flex; }
+        .tmpl-third .text-wrap { bottom: 60px; }
+        .tmpl-third .text-sub { color: #cc2027; }
+
+        /* أزرار اختيار القوالب السفلية */
+        .template-selector {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .selector-btn {
+            flex: 1;
+            background: #141419;
+            border: 2px solid #2f2f3a;
+            color: #fff;
+            padding: 10px 0;
+            border-radius: 8px;
             cursor: pointer;
-            font-weight: bold;
-            font-size: 16px;
-            transition: all 0.2s ease;
-            margin: 5px;
-        }
-
-        .btn-primary {
-            background-color: var(--accent-color);
-            color: #0f172a;
-            width: 90%;
-            margin-top: 10px;
-        }
-
-        .btn-primary:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
-        }
-
-        .hints-section {
-            margin-top: 20px;
-            border-top: 1px solid #475569;
-            padding-top: 15px;
-        }
-
-        .hints-title {
-            font-size: 14px;
-            color: #94a3b8;
-            margin-bottom: 10px;
-        }
-
-        .btn-hint {
-            background-color: #334155;
-            color: white;
             font-size: 13px;
-            padding: 8px 12px;
+            font-weight: bold;
+            transition: 0.2s;
+            text-align: center;
         }
 
-        .btn-hint:disabled {
-            background-color: #1e293b;
-            color: #64748b;
-            cursor: not-allowed;
-            border: 1px solid #334155;
+        .selector-btn.active {
+            border-color: #cc2027;
+            background: #cc2027;
         }
 
-        .hint-text {
-            margin-top: 10px;
-            font-size: 15px;
-            color: #fcd34d;
-            min-height: 20px;
-            font-weight: 500;
+        /* لوحة التحكم السفلية */
+        .controls {
+            background: #141419;
+            padding: 20px;
+            border-radius: 16px;
+            width: 100%;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            border: 1px solid #23232a;
+            box-sizing: border-box;
         }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
+        .control-group {
+            margin-bottom: 15px;
         }
 
-        .shake {
-            animation: shake 0.3s ease-in-out;
+        .control-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .control-group input[type="text"], 
+        .control-group input[type="file"],
+        .control-group input[type="range"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #2f2f3a;
+            background: #1a1a22;
+            color: #fff;
+            box-sizing: border-box;
+        }
+
+        button.download-btn {
+            width: 100%;
+            padding: 12px;
+            background: #cc2027;
+            border: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.2s;
+            margin-top: 5px;
+        }
+
+        button.download-btn:hover {
+            background: #a1161b;
         }
     </style>
 </head>
 <body>
 
-    <div class="game-container" id="gameCard">
-        <h1>مخمّن شعارات الأندية ⚽</h1>
-        <div class="score-board">النظام: <span id="score">0</span> / 5</div>
+    <div class="workspace">
         
-        <div class="image-container">
-            <div id="logoWrapper" class="logo-wrapper lvl-hard">
+        <!-- 1. منطقة القالب المعروض -->
+        <div class="design-template tmpl-first" id="templateContainer">
+            
+            <div class="rights-text">الحساني | AL HASSANI</div>
+
+            <!-- إضاءة القالب الأول الفخم الجديد -->
+            <div class="glow-background" id="firstGlow"></div>
+
+            <!-- تفاصيل القالب الثاني -->
+            <div class="laporta-glow" id="lpGlow" style="display:none;"></div>
+            <div class="laporta-bar" id="lpBar" style="display:none;">
+                <div class="b-red"></div>
+                <div class="b-blue"></div>
+            </div>
+
+            <!-- تفاصيل القالب الثالث -->
+            <div class="rodri-bar" id="rdBar" style="display:none;">
+                <div class="rodri-subbar-left"></div>
+                <div class="rodri-subbar-right"></div>
+            </div>
+
+            <!-- حاوية صورة اللاعب -->
+            <div class="image-container">
+                <img src="" id="playerImg" class="user-image" style="display: none;">
+            </div>
+
+            <!-- التدريج والدمج الخلفي الناعم -->
+            <div class="bottom-smooth-shadow"></div>
+            
+            <!-- منطقة النصوص الموزعة بدقة وأبعاد مريحة -->
+            <div class="text-wrap">
+                <div class="alarm-icon" id="alarmIcon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
                 </div>
+                <h1 class="text-main" id="textMain">بيدري رودري</h1>
+                <h2 class="text-sub" id="textSub">خارج الحسابات</h2>
+            </div>
         </div>
 
-        <div class="input-section">
-            <input type="text" id="guestInput" placeholder="اكتب اسم النادي (أو جزء منه)..." autocomplete="off">
-            <br>
-            <button class="btn btn-primary" onclick="checkAnswer()">تحقق من الإجابة</button>
+        <!-- 2. أزرار اختيار الأسماء الجديدة بالتناوب -->
+        <div class="template-selector">
+            <button class="selector-btn active" onclick="changeStyle('first', this)">القالب الأول</button>
+            <button class="selector-btn" onclick="changeStyle('second', this)">القالب الثاني</button>
+            <button class="selector-btn" onclick="changeStyle('third', this)">القالب الثالث</button>
         </div>
 
-        <div class="hints-section">
-            <div class="hints-title">وسائل المساعدة المتاحة:</div>
-            <button class="btn btn-hint" id="hint1Btn" onclick="useHint1()">🔍 توضيح المربعات شوي</button>
-            <button class="btn btn-hint" id="hint2Btn" onclick="useHint2()">🔤 أول حرف</button>
-            <button class="btn btn-hint" id="hint3Btn" onclick="useHint3()">👤 لاعب معتزل</button>
-            <div class="hint-text" id="hintDisplay"></div>
+        <!-- 3. لوحة التحكم تحت التصميم مباشرة -->
+        <div class="controls">
+            <div class="control-group">
+                <label>اختر صورة اللاعب:</label>
+                <input type="file" id="imageInput" accept="image/*">
+            </div>
+            <div class="control-group">
+                <label>تكبير/تصغير الصورة:</label>
+                <input type="range" id="scaleSlider" min="0.5" max="3" step="0.01" value="1">
+            </div>
+            <div class="control-group">
+                <label>تحريك عمودي (فوق/تحت):</label>
+                <input type="range" id="ySlider" min="-300" max="300" step="1" value="0">
+            </div>
+            <div class="control-group">
+                <label>العنوان الأول:</label>
+                <input type="text" id="textMainInput" value="بيدري رودري">
+            </div>
+            <div class="control-group">
+                <label>العنوان الثاني:</label>
+                <input type="text" id="textSubInput" value="خارج الحسابات">
+            </div>
+            <button class="download-btn" id="downloadBtn">تحميل التصميم النهائي</button>
         </div>
+
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <script>
-        // مصفوفة الأندية مضاف إليها كود الـ SVG المباشر الموزون بألوان الأندية الأصلية
-        const clubsData = [
-            {
-                names: ["ريال مدريد", "ريال", "مدريد", "real madrid", "madrid"],
-                svg: `<svg viewBox="0 0 100 100">
-                        <circle cx="50" cy="55" r="35" fill="none" stroke="#FEF102" stroke-width="6"/>
-                        <circle cx="50" cy="55" r="30" fill="#FFFFFF" stroke="#00529F" stroke-width="2"/>
-                        <path d="M25 35 L75 75" stroke="#8A1538" stroke-width="12"/>
-                        <text x="50" y="62" font-size="22" font-family="Arial Black" font-weight="bold" fill="#00529F" text-anchor="middle">MC</text>
-                        <path d="M35 22 L50 10 L65 22 Z" fill="#FEF102" stroke="#8A1538" stroke-width="2"/>
-                      </svg>`,
-                firstLetter: "ر",
-                legend: "زين الدين زيدان"
-            },
-            {
-                names: ["برشلونة", "برشلونه", "برشا", "barcelona", "barca"],
-                svg: `<svg viewBox="0 0 100 100">
-                        <path d="M20 20 C20 10, 80 10, 80 20 C80 50, 70 85, 50 95 C30 85, 20 50, 20 20 Z" fill="#A50044" stroke="#EDBB00" stroke-width="3"/>
-                        <path d="M20 45 L80 45 L50 95 Z" fill="#004D98"/>
-                        <path d="M20 45 L80 45 L80 20 L50 20 L20 20 Z" fill="#EDBB00"/>
-                        <rect x="25" y="23" width="22" height="18" fill="#FFFFFF"/>
-                        <path d="M36 23 L36 41 M25 32 L47 32" stroke="#A50044" stroke-width="3"/>
-                        <rect x="53" y="23" width="22" height="18" fill="#EDBB00"/>
-                        <path d="M58 23 L58 41 M64 23 L64 41 M70 23 L70 41" stroke="#000" stroke-width="2"/>
-                        <rect x="30" y="45" width="40" height="10" fill="#EDBB00"/>
-                        <text x="50" y="54" font-size="9" font-family="Arial" font-weight="bold" fill="#000" text-anchor="middle">FCB</text>
-                        <circle cx="50" cy="70" r="6" fill="#EDBB00" stroke="#000" stroke-width="1"/>
-                      </svg>`,
-                firstLetter: "ب",
-                legend: "رونالدينيو"
-            },
-            {
-                names: ["مانشستر يونايتد", "اليونايتد", "مانشستر", "manchester united", "united"],
-                svg: `<svg viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="45" fill="#DA291C" stroke="#FFE500" stroke-width="3"/>
-                        <circle cx="50" cy="50" r="35" fill="#FFE500"/>
-                        <rect x="25" y="40" width="50" height="20" fill="#DA291C"/>
-                        <text x="50" y="55" font-size="8" font-family="Arial Black" font-weight="bold" fill="#FFE500" text-anchor="middle">MANCHESTER</text>
-                        <text x="50" y="72" font-size="9" font-family="Arial Black" font-weight="bold" fill="#FFE500" text-anchor="middle">UNITED</text>
-                        <path d="M42 22 L50 32 L58 22 Z" fill="#DA291C"/>
-                      </svg>`,
-                firstLetter: "م",
-                legend: "ديفيد بيكهام"
-            },
-            {
-                names: ["ميلان", "اي سي ميلان", "milan", "ac milan"],
-                svg: `<svg viewBox="0 0 100 100">
-                        <ellipse cx="50" cy="50" rx="32" ry="45" fill="#FFFFFF" stroke="#E32021" stroke-width="4"/>
-                        <clipPath id="ovalClip"><ellipse cx="50" cy="50" rx="28" ry="41"/></clipPath>
-                        <g clip-path="url(#ovalClip)">
-                            <rect x="18" y="5" width="32" height="90" fill="#000000"/>
-                            <rect x="25" y="5" width="6" height="90" fill="#E32021"/>
-                            <rect x="37" y="5" width="6" height="90" fill="#E32021"/>
-                            <rect x="50" y="5" width="35" height="90" fill="#FFFFFF"/>
-                            <path d="M50 5 L50 95 M50 50 L85 50" stroke="#E32021" stroke-width="5"/>
-                            <rect x="30" y="12" width="40" height="15" fill="#FFFFFF"/>
-                            <text x="50" y="24" font-size="12" font-family="Arial Black" font-weight="bold" fill="#000" text-anchor="middle">ACM</text>
-                            <rect x="40" y="70" width="20" height="12" fill="#FFFFFF"/>
-                            <text x="50" y="80" font-size="10" font-family="Arial" fill="#000" text-anchor="middle">1899</text>
-                        </g>
-                      </svg>`,
-                firstLetter: "م",
-                legend: "باولو مالديني"
-            },
-            {
-                names: ["بايرن ميونخ", "بايرن", "ميونخ", "bayern", "munich"],
-                svg: `<svg viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="45" fill="#DC052D" stroke="#FFFFFF" stroke-width="3"/>
-                        <circle cx="50" cy="50" r="32" fill="#0066B2" stroke="#FFFFFF" stroke-width="4"/>
-                        <path d="M35 35 L65 35 L50 65 Z M42 45 L58 45" stroke="#FFFFFF" stroke-width="3" fill="none"/>
-                        <text x="50" y="16" font-size="8" font-family="Arial Black" font-weight="bold" fill="#FFFFFF" text-anchor="middle">FC BAYERN</text>
-                        <text x="50" y="92" font-size="8" font-family="Arial Black" font-weight="bold" fill="#FFFFFF" text-anchor="middle">MUNCHEN</text>
-                      </svg>`,
-                firstLetter: "ب",
-                legend: "أوليفر كان"
-            }
-        ];
+        const imageInput = document.getElementById('imageInput');
+        const playerImg = document.getElementById('playerImg');
+        const textMainInput = document.getElementById('textMainInput');
+        const textSubInput = document.getElementById('textSubInput');
+        const textMain = document.getElementById('textMain');
+        const textSub = document.getElementById('textSub');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const templateContainer = document.getElementById('templateContainer');
+        
+        const firstGlow = document.getElementById('firstGlow');
+        const lpGlow = document.getElementById('lpGlow');
+        const lpBar = document.getElementById('lpBar');
+        const rdBar = document.getElementById('rdBar');
+        const alarmIcon = document.getElementById('alarmIcon');
 
-        let currentIndex = 0;
-        let score = 0;
+        const scaleSlider = document.getElementById('scaleSlider');
+        const ySlider = document.getElementById('ySlider');
 
-        const logoWrapper = document.getElementById('logoWrapper');
-        const guestInput = document.getElementById('guestInput');
-        const hintDisplay = document.getElementById('hintDisplay');
-        const scoreDisplay = document.getElementById('score');
-        const gameCard = document.getElementById('gameCard');
+        let currentScale = 1;
+        let currentY = 0;
 
-        const hint1Btn = document.getElementById('hint1Btn');
-        const hint2Btn = document.getElementById('hint2Btn');
-        const hint3Btn = document.getElementById('hint3Btn');
+        const templateTexts = {
+            first: { main: 'بيدري رودري', sub: 'توهج جديد وإطلالة نيون فخمة' },
+            second: { main: 'لابورتا', sub: 'يتحدث عن الصفقات الجديدة' },
+            third: { main: 'بيدري رودري', sub: 'خارج الحسابات' }
+        };
 
-        function loadQuestion() {
-            if (currentIndex >= clubsData.length) {
-                gameCard.innerHTML = `<h2>عاشت ايدك يا بطل! 🎉</h2><p>خلصت الـ 5 أندية بنجاح وتوقعتهم كلهم.</p><h3>نتيجتك: ${score} من 5</h3><button class="btn btn-primary" onclick="location.reload()">إعادة اللعب</button>`;
-                return;
-            }
-
-            // حقن الـ SVG بداخل الواجهة مباشرة
-            logoWrapper.className = "logo-wrapper lvl-hard";
-            logoWrapper.innerHTML = clubsData[currentIndex].svg;
-            
-            guestInput.value = "";
-            hintDisplay.innerText = "";
-            
-            hint1Btn.disabled = false;
-            hint2Btn.disabled = false;
-            hint3Btn.disabled = false;
+        function updateImageTransform() {
+            playerImg.style.transform = `scale(${currentScale}) translateY(${currentY}px)`;
         }
 
-        function checkAnswer() {
-            const userAnswer = guestInput.value.trim().toLowerCase();
-            if(!userAnswer) return;
+        scaleSlider.addEventListener('input', (e) => {
+            currentScale = e.target.value;
+            updateImageTransform();
+        });
 
-            const currentClub = clubsData[currentIndex];
+        ySlider.addEventListener('input', (e) => {
+            currentY = e.target.value;
+            updateImageTransform();
+        });
 
-            const isCorrect = currentClub.names.some(name => {
-                const cleanName = name.toLowerCase();
-                return cleanName.includes(userAnswer) || userAnswer.includes(cleanName);
-            });
+        textMainInput.addEventListener('input', () => {
+            textMain.innerText = textMainInput.value;
+            const activeStyle = templateContainer.classList.contains('tmpl-second') ? 'second' : (templateContainer.classList.contains('tmpl-third') ? 'third' : 'first');
+            templateTexts[activeStyle].main = textMainInput.value;
+        });
+        
+        textSubInput.addEventListener('input', () => {
+            textSub.innerText = textSubInput.value;
+            const activeStyle = templateContainer.classList.contains('tmpl-second') ? 'second' : (templateContainer.classList.contains('tmpl-third') ? 'third' : 'first');
+            templateTexts[activeStyle].sub = textSubInput.value;
+        });
 
-            if (isCorrect) {
-                score++;
-                scoreDisplay.innerText = score;
-                
-                // تصفية الـ SVG بالكامل
-                logoWrapper.className = "logo-wrapper lvl-clear";
-                
-                setTimeout(() => {
-                    currentIndex++;
-                    loadQuestion();
-                }, 1300);
-            } else {
-                gameCard.classList.add('shake');
-                setTimeout(() => gameCard.classList.remove('shake'), 300);
-                hintDisplay.innerText = "الجواب مو صحيح، حاول مرة ثانية!";
-            }
-        }
-
-        function useHint1() {
-            logoWrapper.className = "logo-wrapper lvl-medium";
-            hintDisplay.innerText = "تم توضيح المربعات قليلاً!";
-            hint1Btn.disabled = true;
-        }
-
-        function useHint2() {
-            hintDisplay.innerText = `أول حرف من النادي: (${clubsData[currentIndex].firstLetter})`;
-            hint2Btn.disabled = true;
-        }
-
-        function useHint3() {
-            hintDisplay.innerText = `لاعب أسطوري معتزل لعب بيهم: ${clubsData[currentIndex].legend}`;
-            hint3Btn.disabled = true;
-        }
-
-        window.onload = loadQuestion;
-
-        guestInput.addEventListener("keyup", function(event) {
-            if (event.key === "Enter") {
-                checkAnswer();
+        imageInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    playerImg.src = e.target.result;
+                    playerImg.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
             }
         });
+
+        function changeStyle(styleName, btnElement) {
+            templateContainer.classList.remove('tmpl-first', 'tmpl-second', 'tmpl-third');
+            
+            firstGlow.style.display = 'none';
+            lpGlow.style.display = 'none'; lpBar.style.display = 'none';
+            rdBar.style.display = 'none'; alarmIcon.style.display = 'none';
+
+            textMainInput.value = templateTexts[styleName].main;
+            textSubInput.value = templateTexts[styleName].sub;
+            textMain.innerText = templateTexts[styleName].main;
+            textSub.innerText = templateTexts[styleName].sub;
+
+            if (styleName === 'first') {
+                templateContainer.classList.add('tmpl-first');
+                firstGlow.style.display = 'block';
+            } else if (styleName === 'second') {
+                templateContainer.classList.add('tmpl-second');
+                lpGlow.style.display = 'block'; lpBar.style.display = 'flex';
+            } else if (styleName === 'third') {
+                templateContainer.classList.add('tmpl-third');
+                rdBar.style.display = 'flex'; alarmIcon.style.display = 'flex';
+            }
+
+            document.querySelectorAll('.selector-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+        }
+
+        downloadBtn.addEventListener('click', () => {
+            html2canvas(templateContainer, {
+                useCORS: true,
+                scale: 3
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'Al-Hassani-Perfect.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        });
     </script>
+
 </body>
 </html>
