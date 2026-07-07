@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صانع التصاميم الرياضية</title>
+    <title>صانع التصاميم الرياضية الاحترافي</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;800;900&display=swap" rel="stylesheet">
     
     <style>
@@ -29,7 +29,7 @@
             max-width: 420px;
         }
 
-        /* حاوية التصميم الثابتةة لمنع أي تشويه بالتحميل */
+        /* حاوية التصميم الثابتة بأبعاد 400x500 لمنع أي تشويه */
         .design-template {
             width: 400px;
             height: 500px;
@@ -41,7 +41,7 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.8);
         }
 
-        /* حاوية الصورة الأساسية */
+        /* حاوية الصورة الأساسية للاعب */
         .image-container {
             width: 100%;
             height: 100%;
@@ -61,24 +61,24 @@
             transition: filter 0.2s ease;
         }
 
-        /* فلاتر احترافية بأسماء رسمية */
-        .f-hd { filter: contrast(1.25) brightness(1.05) saturate(1.1) sharp; }
+        /* الفلاتر السريعة المستقرة */
+        .f-hd { filter: contrast(1.25) brightness(1.05) saturate(1.1); }
         .f-smooth { filter: brightness(1.08) contrast(0.95) saturate(1.05) blur(0.3px); }
         .f-contrast { filter: contrast(1.35) saturate(1.25); }
         .f-cinematic { filter: contrast(1.15) saturate(0.65) hue-rotate(-5deg); }
         .f-warm { filter: sepia(0.2) contrast(1.15) saturate(1.1); }
 
-        /* تدريج ناعم لمنع الحواف الحادة */
+        /* الظل السفلي الكلاسيكي للقوالب */
         .bottom-smooth-shadow {
             position: absolute;
             bottom: 0;
             width: 100%;
             height: 65%;
-            background: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 45%, transparent 100%);
+            background: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, transparent 100%);
             z-index: 2;
         }
 
-        /* تصحيح مشكلة الحقوق المعكوسة من image_9.png */
+        /* الحقوق النصية الاحترافية */
         .rights-text {
             position: absolute;
             top: 15px;
@@ -91,10 +91,10 @@
             text-shadow: 0 1px 3px rgba(0,0,0,0.9);
             display: flex;
             gap: 5px;
-            direction: ltr; /* لضمان ترتيب الكلمات بالشكل الصحيح دائماً */
+            direction: ltr;
         }
 
-        /* منطقة النصوص والمسافات المتناسقة */
+        /* منطقة النصوص العامة */
         .text-wrap {
             position: absolute;
             bottom: 25px;
@@ -103,6 +103,7 @@
             text-align: center;
             padding: 0 25px;
             box-sizing: border-box;
+            transition: bottom 0.3s ease;
         }
 
         .text-main {
@@ -136,7 +137,9 @@
             border: 1px solid #b01a1f;
         }
 
-        /* تفاصيل القوالب الثلاثة */
+        /* ------------------ تفاصيل القوالب ------------------ */
+
+        /* القالب الأول */
         .tmpl-first .glow-background {
             position: absolute;
             bottom: -30px;
@@ -148,6 +151,7 @@
         }
         .tmpl-first .text-sub { color: #ff4a4a; }
 
+        /* القالب الثاني */
         .tmpl-second { border-radius: 0 0 45px 45px; }
         .tmpl-second .laporta-glow {
             position: absolute;
@@ -170,6 +174,7 @@
         .tmpl-second .text-wrap { bottom: 35px; }
         .tmpl-second .text-sub { color: #ff3b3b; }
 
+        /* القالب الثالث */
         .tmpl-third .rodri-bar {
             position: absolute;
             bottom: 0;
@@ -201,15 +206,83 @@
         .tmpl-third .text-wrap { bottom: 60px; }
         .tmpl-third .text-sub { color: #cc2027; }
 
-        /* الأزرار والواجهات النظيفة والرسمية */
+        /* القالب الرابع */
+        .tmpl-fourth .side-glow-left {
+            position: absolute;
+            top: 0; left: 0; width: 6px; height: 100%;
+            background: #004d98; z-index: 4;
+            box-shadow: 4px 0 20px rgba(0, 77, 152, 0.8);
+        }
+        .tmpl-fourth .side-glow-right {
+            position: absolute;
+            top: 0; right: 0; width: 6px; height: 100%;
+            background: #cc2027; z-index: 4;
+            box-shadow: -4px 0 20px rgba(204, 32, 39, 0.8);
+        }
+        .tmpl-fourth .text-sub { color: #ff5252; }
+
+        /* القالب الخامس */
+        .tmpl-fifth .bottom-smooth-shadow { display: none; }
+        .tmpl-fifth .kane-ambient {
+            position: absolute;
+            bottom: 0; width: 100%; height: 50%;
+            background: linear-gradient(to top, rgba(74,20,140,0.85) 0%, rgba(26,35,126,0.5) 60%, transparent 100%);
+            z-index: 2;
+        }
+        .tmpl-fifth .text-wrap { bottom: 35px; padding: 0 15px; }
+        .tmpl-fifth .text-main {
+            display: inline-block;
+            background-color: #b71c1c;
+            color: #fff;
+            padding: 4px 16px;
+            font-size: 22px;
+            text-shadow: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            margin-bottom: 8px;
+        }
+        .tmpl-fifth .text-sub {
+            color: #fff;
+            font-size: 24px;
+            background: none;
+            padding: 0;
+            text-shadow: 0 2px 8px rgba(0,0,0,1);
+        }
+
+        /* القالب السادس */
+        .tmpl-sixth .bottom-smooth-shadow { display: none; }
+        .tmpl-sixth .casado-gradient {
+            position: absolute;
+            bottom: 0; width: 100%; height: 45%;
+            background: linear-gradient(to top, #4a148c 0%, #7b1fa2 40%, transparent 100%);
+            opacity: 0.9;
+            z-index: 2;
+        }
+        .tmpl-sixth .text-wrap { bottom: 30px; }
+        .tmpl-sixth .text-main {
+            color: #fff;
+            font-size: 24px;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+            background: rgba(74, 20, 140, 0.6);
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 4px;
+        }
+        .tmpl-sixth .text-sub {
+            color: #fff;
+            font-size: 22px;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+            margin-top: 6px;
+        }
+
+        /* أزرار لوحة التحكم بالتسميات الجديدة السلسة */
         .template-selector {
-            display: flex;
-            gap: 10px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
             width: 100%;
         }
 
         .selector-btn {
-            flex: 1;
             background: #141419;
             border: 2px solid #2f2f3a;
             color: #fff;
@@ -219,6 +292,7 @@
             font-size: 13px;
             font-weight: bold;
             transition: 0.2s;
+            text-align: center;
         }
 
         .selector-btn.active {
@@ -306,17 +380,20 @@
 
     <div class="workspace">
         
-        <!-- القالب المعروض بأبعاد بكسل صارمة -->
         <div class="design-template tmpl-first" id="templateContainer">
             
-            <!-- تصحيح إنعكاس النص المذكور في الملاحظة -->
+            <!-- تم حذف كود اللوغو التجريبي المكسور من هنا نهائياً -->
+
+            <!-- الحقوق النصية -->
             <div class="rights-text">
                 <span>AL HASSANI</span>
                 <span>|</span>
                 <span>الحساني</span>
             </div>
 
+            <!-- عناصر القوالب الجمالية -->
             <div class="glow-background" id="firstGlow"></div>
+            
             <div class="laporta-glow" id="lpGlow" style="display:none;"></div>
             <div class="laporta-bar" id="lpBar" style="display:none;">
                 <div class="b-red"></div>
@@ -328,12 +405,21 @@
                 <div class="rodri-subbar-right"></div>
             </div>
 
+            <div class="side-glow-left" id="sideLeft" style="display:none;"></div>
+            <div class="side-glow-right" id="sideRight" style="display:none;"></div>
+            
+            <!-- طبقات الخلفيات للقوالب الجديدة المأخوذة من صورك -->
+            <div class="kane-ambient" id="kaneAmbient" style="display:none;"></div>
+            <div class="casado-gradient" id="casadoGradient" style="display:none;"></div>
+
+            <!-- حاوية صورة اللاعب -->
             <div class="image-container">
                 <img src="" id="playerImg" class="user-image" style="display: none;">
             </div>
 
-            <div class="bottom-smooth-shadow"></div>
+            <div class="bottom-smooth-shadow" id="baseShadow"></div>
             
+            <!-- منطقة النصوص الموزعة -->
             <div class="text-wrap">
                 <div class="alarm-icon" id="alarmIcon">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
@@ -343,12 +429,17 @@
             </div>
         </div>
 
+        <!-- أسماء الأزرار الجديدة المتسلسلة والمبسطة مالتك -->
         <div class="template-selector">
             <button class="selector-btn active" onclick="changeStyle('first', this)">القالب الأول</button>
             <button class="selector-btn" onclick="changeStyle('second', this)">القالب الثاني</button>
             <button class="selector-btn" onclick="changeStyle('third', this)">القالب الثالث</button>
+            <button class="selector-btn" onclick="changeStyle('fourth', this)">القالب الرابع</button>
+            <button class="selector-btn" onclick="changeStyle('fifth', this)">القالب الخامس</button>
+            <button class="selector-btn" onclick="changeStyle('sixth', this)">القالب السادس</button>
         </div>
 
+        <!-- لوحة التحكم -->
         <div class="controls">
             <div class="control-group">
                 <label>صورة اللاعب:</label>
@@ -401,10 +492,11 @@
         const templateContainer = document.getElementById('templateContainer');
         
         const firstGlow = document.getElementById('firstGlow');
-        const lpGlow = document.getElementById('lpGlow');
-        const lpBar = document.getElementById('lpBar');
-        const rdBar = document.getElementById('rdBar');
-        const alarmIcon = document.getElementById('alarmIcon');
+        const lpGlow = document.getElementById('lpGlow'); const lpBar = document.getElementById('lpBar');
+        const rdBar = document.getElementById('rdBar'); const alarmIcon = document.getElementById('alarmIcon');
+        const sideLeft = document.getElementById('sideLeft'); const sideRight = document.getElementById('sideRight');
+        const kaneAmbient = document.getElementById('kaneAmbient'); const casadoGradient = document.getElementById('casadoGradient');
+        const baseShadow = document.getElementById('baseShadow');
 
         const scaleSlider = document.getElementById('scaleSlider');
         const ySlider = document.getElementById('ySlider');
@@ -415,34 +507,40 @@
         const templateTexts = {
             first: { main: 'بيدري رودري', sub: 'خارج الحسابات' },
             second: { main: 'بيدري رودري', sub: 'خارج الحسابات' },
-            third: { main: 'بيدري رودري', sub: 'خارج الحسابات' }
+            third: { main: 'بيدري رودري', sub: 'خارج الحسابات' },
+            fourth: { main: 'بيدري رودري', sub: 'خارج الحسابات' },
+            fifth: { main: 'هاري كين', sub: 'إلى برشلونة؟' },
+            sixth: { main: 'أتلتيكو يطرق باب كاسادو', sub: 'وبرشلونة ينتظر القرار !!' }
         };
 
         function updateImageTransform() {
             playerImg.style.transform = `scale(${currentScale}) translateY(${currentY}px)`;
         }
 
-        scaleSlider.addEventListener('input', (e) => {
-            currentScale = e.target.value;
-            updateImageTransform();
-        });
-
-        ySlider.addEventListener('input', (e) => {
-            currentY = e.target.value;
-            updateImageTransform();
-        });
+        scaleSlider.addEventListener('input', (e) => { currentScale = e.target.value; updateImageTransform(); });
+        ySlider.addEventListener('input', (e) => { currentY = e.target.value; updateImageTransform(); });
 
         textMainInput.addEventListener('input', () => {
             textMain.innerText = textMainInput.value;
-            const activeStyle = templateContainer.classList.contains('tmpl-second') ? 'second' : (templateContainer.classList.contains('tmpl-third') ? 'third' : 'first');
-            templateTexts[activeStyle].main = textMainInput.value;
+            const currentStyle = getActiveStyleName();
+            templateTexts[currentStyle].main = textMainInput.value;
         });
         
         textSubInput.addEventListener('input', () => {
             textSub.innerText = textSubInput.value;
-            const activeStyle = templateContainer.classList.contains('tmpl-second') ? 'second' : (templateContainer.classList.contains('tmpl-third') ? 'third' : 'first');
-            templateTexts[activeStyle].sub = textSubInput.value;
+            const currentStyle = getActiveStyleName();
+            templateTexts[currentStyle].sub = textSubInput.value;
         });
+
+        function getActiveStyleName() {
+            if(templateContainer.classList.contains('tmpl-first')) return 'first';
+            if(templateContainer.classList.contains('tmpl-second')) return 'second';
+            if(templateContainer.classList.contains('tmpl-third')) return 'third';
+            if(templateContainer.classList.contains('tmpl-fourth')) return 'fourth';
+            if(templateContainer.classList.contains('tmpl-fifth')) return 'fifth';
+            if(templateContainer.classList.contains('tmpl-sixth')) return 'sixth';
+            return 'first';
+        }
 
         imageInput.addEventListener('change', function() {
             const file = this.files[0];
@@ -466,33 +564,32 @@
         }
 
         function changeStyle(styleName, btnElement) {
-            templateContainer.classList.remove('tmpl-first', 'tmpl-second', 'tmpl-third');
+            templateContainer.classList.remove('tmpl-first', 'tmpl-second', 'tmpl-third', 'tmpl-fourth', 'tmpl-fifth', 'tmpl-sixth');
             
-            firstGlow.style.display = 'none';
-            lpGlow.style.display = 'none'; lpBar.style.display = 'none';
+            firstGlow.style.display = 'none'; lpGlow.style.display = 'none'; lpBar.style.display = 'none';
             rdBar.style.display = 'none'; alarmIcon.style.display = 'none';
+            sideLeft.style.display = 'none'; sideRight.style.display = 'none';
+            kaneAmbient.style.display = 'none'; casadoGradient.style.display = 'none';
+            baseShadow.style.display = 'block'; 
 
             textMainInput.value = templateTexts[styleName].main;
             textSubInput.value = templateTexts[styleName].sub;
             textMain.innerText = templateTexts[styleName].main;
             textSub.innerText = templateTexts[styleName].sub;
 
-            if (styleName === 'first') {
-                templateContainer.classList.add('tmpl-first');
-                firstGlow.style.display = 'block';
-            } else if (styleName === 'second') {
-                templateContainer.classList.add('tmpl-second');
-                lpGlow.style.display = 'block'; lpBar.style.display = 'flex';
-            } else if (styleName === 'third') {
-                templateContainer.classList.add('tmpl-third');
-                rdBar.style.display = 'flex'; alarmIcon.style.display = 'flex';
-            }
+            templateContainer.classList.add('tmpl-' + styleName);
+
+            if (styleName === 'first') { firstGlow.style.display = 'block'; }
+            else if (styleName === 'second') { lpGlow.style.display = 'block'; lpBar.style.display = 'flex'; }
+            else if (styleName === 'third') { rdBar.style.display = 'flex'; alarmIcon.style.display = 'flex'; }
+            else if (styleName === 'fourth') { sideLeft.style.display = 'block'; sideRight.style.display = 'block'; }
+            else if (styleName === 'fifth') { kaneAmbient.style.display = 'block'; baseShadow.style.display = 'none'; }
+            else if (styleName === 'sixth') { casadoGradient.style.display = 'block'; baseShadow.style.display = 'none'; }
 
             document.querySelectorAll('.selector-btn').forEach(btn => btn.classList.remove('active'));
             btnElement.classList.add('active');
         }
 
-        /* دالة التحميل الذكية: تجبر الأبعاد على 400x500 وتمنع التشويه الحركي */
         downloadBtn.addEventListener('click', () => {
             html2canvas(templateContainer, {
                 useCORS: true,
