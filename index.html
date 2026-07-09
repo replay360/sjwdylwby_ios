@@ -15,6 +15,7 @@
             --accent-color: #22c55e;
             --border-color: #24242b;
             --news-accent: #cc2027;
+            --poster-accent: #e11d48; /* لون البوستر الجديد */
         }
 
         body {
@@ -293,8 +294,23 @@
             box-sizing: border-box;
         }
 
-        /* ------------------ استايلات قسم البوستر ------------------ */
-        .control-panel {
+        .control-group { margin-bottom: 15px; }
+        .control-group label { display: block; margin-bottom: 6px; font-size: 14px; color: #aaa; }
+        .control-group input[type="text"], 
+        .control-group input[type="file"],
+        .control-group input[type="range"] {
+            width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #2f2f3a; background: #1a1a22; color: #fff; box-sizing: border-box;
+        }
+
+        .filter-container { display: flex; gap: 6px; flex-wrap: wrap; }
+        .filter-btn { flex: 1; min-width: 75px; background: #1a1a22; border: 1px solid #2f2f3a; color: #ccc; padding: 8px 2px; font-size: 11px; font-weight: bold; border-radius: 6px; cursor: pointer; text-align: center; }
+        .filter-btn.active, .filter-btn:hover { border-color: var(--news-accent); background: #23232f; color: #fff; }
+        button.download-btn-news { width: 100%; padding: 12px; background: var(--news-accent); border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 16px; transition: 0.2s; }
+        button.download-btn-news:hover { background: #a1161b; }
+
+
+        /* ------------------ استايلات قسم البوستر الجديد (v9) ------------------ */
+        .control-panel-poster {
             background: var(--panel-bg);
             padding: 15px;
             border-radius: 14px;
@@ -303,10 +319,10 @@
             border: 1px solid var(--border-color);
         }
 
-        .control-panel h2 {
+        .control-panel-poster h2 {
             margin: 0 0 12px 0;
             font-size: 16px;
-            color: var(--accent-color);
+            color: var(--poster-accent);
             text-align: center;
         }
 
@@ -325,7 +341,7 @@
             display: block;
             margin-bottom: 4px;
             font-size: 11px;
-            color: #a1a1aa;
+            color: #94a3b8;
         }
 
         .input-group input {
@@ -333,24 +349,19 @@
             padding: 8px;
             border-radius: 6px;
             border: 1px solid var(--border-color);
-            background: #1c1c24;
+            background: #1e2538;
             color: #fff;
             font-size: 13px;
             box-sizing: border-box;
             outline: none;
         }
 
-        .input-group input[type="color"] {
-            padding: 2px;
-            height: 34px;
-        }
-
-        .btn-download {
+        .btn-download-poster {
             display: block;
             width: 100%;
             padding: 12px;
-            background: var(--accent-color);
-            color: #000;
+            background: var(--poster-accent);
+            color: #fff;
             border: none;
             border-radius: 8px;
             font-size: 14px;
@@ -369,84 +380,268 @@
 
         #match-poster {
             width: 100vw;
-            height: 100vw;
+            height: 150vw; /* نسبة أبعاد طولية 2:3 */
             max-width: 420px;
-            max-height: 420px;
+            max-height: 630px;
             position: relative;
             overflow: hidden;
-            background: #0d0d11;
+            background: #09101d;
         }
 
-        .bg-split { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; z-index: 1; }
-        .left-bg { width: 27%; background-color: #006233; border-top-left-radius: 80px; }
-        .center-bg { width: 46%; background-color: #0d0d11; }
-        .right-bg { width: 27%; background-color: #002366; border-top-right-radius: 80px; }
-        .bottom-shadow { position: absolute; bottom: 0; left: 0; width: 100%; height: 35%; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%); z-index: 6; pointer-events: none; }
+        .bg-geometric {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
 
-        .player-img { position: absolute; z-index: 5; background-size: contain; background-repeat: no-repeat; background-position: bottom center; }
-        #p-img-left { left: -12%; bottom: 0; width: 55%; height: 100%; }
-        #p-img-right { right: -12%; bottom: 0; width: 55%; height: 100%; }
+        .laser-left {
+            position: absolute;
+            top: -10%;
+            left: -20%;
+            width: 45%;
+            height: 120%;
+            background: linear-gradient(60deg, rgba(225, 29, 72, 0.6) 0%, rgba(0,0,0,0) 70%);
+            transform: rotate(-15deg);
+            border-right: 3px solid #e11d48;
+            filter: drop-shadow(0 0 15px #e11d48);
+        }
 
-        .poster-content { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4% 0 2% 0; box-sizing: border-box; text-align: center; }
-        .top-section { display: flex; flex-direction: column; align-items: center; width: 46%; margin-top: 2%; }
-        .tournament-logo { height: 9vw; max-height: 34px; object-fit: contain; margin-bottom: 2px; display: none; }
+        .laser-right {
+            position: absolute;
+            top: -10%;
+            right: -20%;
+            width: 45%;
+            height: 120%;
+            background: linear-gradient(-60deg, rgba(29, 78, 216, 0.6) 0%, rgba(0,0,0,0) 70%);
+            transform: rotate(15deg);
+            border-left: 3px solid #1d4ed8;
+            filter: drop-shadow(0 0 15px #1d4ed8);
+        }
 
-        .main-title { font-size: 5.5vw; font-weight: 900; color: #ffffff; margin: 0; white-space: nowrap; }
-        @media(min-width: 420px) { .main-title { font-size: 23px; } }
+        .bottom-shadow-deep {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 65%;
+            background: linear-gradient(to top, #060a12 0%, #060a12 35%, rgba(6,10,18,0.8) 55%, rgba(0,0,0,0) 100%);
+            z-index: 6;
+            pointer-events: none;
+        }
 
-        .sub-title { font-size: 2vw; color: #cccccc; margin: 2px 0; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        @media(min-width: 420px) { .sub-title { font-size: 8.5px; } }
-
-        .round-text { font-size: 3vw; color: #e5e7eb; font-weight: bold; margin-top: 1px; white-space: nowrap; }
-        @media(min-width: 420px) { .round-text { font-size: 13px; } }
-
-        .mid-section { width: 46%; }
-        .day-title { font-size: 7vw; font-weight: 900; margin: 0; color: #ffffff; white-space: nowrap; }
-        @media(min-width: 420px) { .day-title { font-size: 30px; } }
-
-        .date-title { font-size: 3.5vw; color: #dddddd; margin: 0; font-weight: bold; white-space: nowrap; }
-        @media(min-width: 420px) { .date-title { font-size: 14.5px; } }
-
-        .time-title { font-size: 9vw; font-weight: 900; color: #f1c40f; margin: 0; line-height: 1; text-shadow: 0 0 8px rgba(241, 196, 15, 0.25); }
-        @media(min-width: 420px) { .time-title { font-size: 38px; } }
-
-        .teams-badge { background: #ffffff; width: 62%; height: 15%; border-radius: 10px; display: flex; align-items: center; box-shadow: 0 8px 24px rgba(0,0,0,0.5); z-index: 12; }
-        .team-box { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .flag-box { width: 13vw; height: 8.5vw; max-width: 54px; max-height: 34px; object-fit: cover; border-radius: 4px; border: 1px solid #cbd5e1; }
-        .name-box { font-size: 4vw; font-weight: 900; color: #000000; margin-top: 3px; }
-        @media(min-width: 420px) { .name-box { font-size: 16px; } }
-        .center-line { width: 1px; height: 55%; background: #94a3b8; }
-
-        .bottom-section { width: 46%; z-index: 11; }
-        .stadium-title { font-size: 3.4vw; color: #ffffff; margin: 0 0 2px 0; font-weight: bold; white-space: nowrap; }
-        @media(min-width: 420px) { .stadium-title { font-size: 13.5px; } }
-        .live-title { font-size: 3.4vw; font-weight: bold; color: #e5e7eb; margin: 0; white-space: nowrap; }
-        @media(min-width: 420px) { .live-title { font-size: 13.5px; } }
-
-        .player-control-panel { width: 100%; background: var(--panel-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); box-sizing: border-box; display: flex; flex-direction: column; gap: 12px; }
-        .player-selector { display: flex; background: #1c1c24; border-radius: 8px; padding: 4px; border: 1px solid var(--border-color); }
+        .player-img {
+            position: absolute;
+            z-index: 5;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: bottom center;
+        }
         
-        .selector-btn { flex: 1; padding: 8px; background: transparent; color: #a1a1aa; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; }
-        .selector-btn.active { background: var(--accent-color); color: #000; }
-
-        .slider-item { display: flex; flex-direction: column; gap: 4px; }
-        .slider-item label { font-size: 12px; color: #cbd5e1; display: flex; justify-content: space-between; }
-        .slider-item input { width: 100%; accent-color: var(--accent-color); cursor: pointer; }
-
-        /* العناصر المشتركة في اللوحات */
-        .control-group { margin-bottom: 15px; }
-        .control-group label { display: block; margin-bottom: 6px; font-size: 14px; color: #aaa; }
-        .control-group input[type="text"], 
-        .control-group input[type="file"],
-        .control-group input[type="range"] {
-            width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #2f2f3a; background: #1a1a22; color: #fff; box-sizing: border-box;
+        #p-img-left {
+            left: -10%;
+            bottom: 22%;
+            width: 65%;
+            height: 75%;
+        }
+        
+        #p-img-right {
+            right: -10%;
+            bottom: 22%;
+            width: 65%;
+            height: 75%;
         }
 
-        .filter-container { display: flex; gap: 6px; flex-wrap: wrap; }
-        .filter-btn { flex: 1; min-width: 75px; background: #1a1a22; border: 1px solid #2f2f3a; color: #ccc; padding: 8px 2px; font-size: 11px; font-weight: bold; border-radius: 6px; cursor: pointer; text-align: center; }
-        .filter-btn.active, .filter-btn:hover { border-color: var(--news-accent); background: #23232f; color: #fff; }
-        button.download-btn-news { width: 100%; padding: 12px; background: var(--news-accent); border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 16px; transition: 0.2s; }
-        button.download-btn-news:hover { background: #a1161b; }
+        .poster-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 0 4% 0;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .badges-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 12px;
+            z-index: 12;
+        }
+
+        .team-crest {
+            width: 16vw;
+            height: 16vw;
+            max-width: 68px;
+            max-height: 68px;
+            object-fit: contain;
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.6));
+        }
+
+        .vs-sign {
+            font-size: 5vw;
+            font-weight: 900;
+            color: #e11d48;
+            font-style: italic;
+        }
+        @media(min-width: 420px) { .vs-sign { font-size: 20px; } }
+
+        .match-day-title {
+            color: #ef4444;
+            font-size: 4.5vw;
+            font-weight: bold;
+            margin: 0 0 4px 0;
+            letter-spacing: 0.5px;
+        }
+        @media(min-width: 420px) { .match-day-title { font-size: 18px; } }
+
+        .teams-names-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .name-left {
+            color: #ffffff;
+            font-size: 8.5vw;
+            font-weight: 900;
+            margin: 0;
+        }
+        .name-right {
+            color: #ef4444;
+            font-size: 8.5vw;
+            font-weight: 900;
+            margin: 0;
+        }
+        .x-separator {
+            color: #e11d48;
+            font-size: 6vw;
+            font-weight: 300;
+        }
+        @media(min-width: 420px) { 
+            .name-left, .name-right { font-size: 36px; }
+            .x-separator { font-size: 24px; }
+        }
+
+        .info-border-box {
+            border: 1px solid #991b1b;
+            background: rgba(6, 10, 18, 0.6);
+            width: 86%;
+            padding: 8px 12px;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #e2e8f0;
+            font-size: 3.2vw;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        @media(min-width: 420px) { .info-item { font-size: 13px; } }
+
+        .icon-clock::before { content: "🕒"; font-size: 12px; }
+        .icon-stadium::before { content: "🏟️"; font-size: 12px; }
+
+        .vertical-divider {
+            width: 1px;
+            height: 16px;
+            background: #991b1b;
+        }
+
+        .footer-victory-text {
+            font-size: 2.5vw;
+            font-weight: bold;
+            color: #64748b;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin: 0;
+        }
+        @media(min-width: 420px) { .footer-victory-text { font-size: 10px; } }
+        
+        .footer-brand {
+            font-size: 2vw;
+            color: #e11d48;
+            margin-top: 2px;
+            letter-spacing: 1px;
+        }
+        @media(min-width: 420px) { .footer-brand { font-size: 9px; } }
+
+        .player-control-panel {
+            width: 100%;
+            background: var(--panel-bg);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .player-selector {
+            display: flex;
+            background: #1e2538;
+            border-radius: 8px;
+            padding: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .selector-btn {
+            flex: 1;
+            padding: 8px;
+            background: transparent;
+            color: #94a3b8;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .selector-btn.active {
+            background: var(--poster-accent);
+            color: #fff;
+        }
+
+        .slider-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .slider-item label {
+            font-size: 12px;
+            color: #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .slider-item input {
+            width: 100%;
+            accent-color: var(--poster-accent);
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -456,6 +651,7 @@
         <button class="nav-tab-btn" data-target="page-posters" onclick="switchMainPage('page-posters')">صانع بوسترات المباريات</button>
     </div>
 
+    <!-- ------------------ صفحة الأخبار ------------------ -->
     <div id="page-news" class="app-page active">
         <div class="workspace-news">
             <div class="design-template tmpl-first" id="templateContainer">
@@ -545,144 +741,126 @@
         </div>
     </div>
 
-
+    <!-- ------------------ صفحة البوستر الجديد (v9) ------------------ -->
     <div id="page-posters" class="app-page">
-        <div class="control-panel">
-            <h2>لوحة التحكم بالبوستر</h2>
-            
-            <div class="input-group">
-                <label>شعار البطولة (صورة يدوي)</label>
-                <input type="file" id="in-logo" accept="image/*">
-            </div>
+        <div class="control-panel-poster">
+            <h2>تعديل بيانات البوستر العالمي</h2>
 
-            <div class="input-group">
-                <label>اسم البطولة</label>
-                <input type="text" id="in-tour" value="كأس العالم">
-            </div>
-            <div class="input-group">
-                <label>التفاصيل</label>
-                <input type="text" id="in-sub" value="الولايات المتحدة الأمريكية - كندا - المكسيك 2026">
-            </div>
-            <div class="input-group">
-                <label>الدور</label>
-                <input type="text" id="in-rnd" value="دور ربع النهائي">
+            <div class="input-row">
+                <div class="input-group">
+                    <label>شعار المنتخب الأيسر</label>
+                    <input type="file" id="in-crest-l" accept="image/*">
+                </div>
+                <div class="input-group">
+                    <label>شعار المنتخب الأيمن</label>
+                    <input type="file" id="in-crest-r" accept="image/*">
+                </div>
             </div>
 
             <div class="input-row">
                 <div class="input-group">
-                    <label>اليوم</label>
-                    <input type="text" id="in-dy" value="الخميس">
-                </div>
-                <div class="input-group">
-                    <label>التاريخ</label>
-                    <input type="text" id="in-dt" value="09.07.2026">
-                </div>
-            </div>
-            <div class="input-group">
-                <label>الوقت</label>
-                <input type="text" id="in-tm" value="21:00">
-            </div>
-
-            <div class="input-row">
-                <div class="input-group">
-                    <label>المنتخب الأيسر (أخضر)</label>
-                    <input type="text" id="in-nl" value="المغرب">
-                    <input type="color" id="in-cl" value="#006233" style="margin-top:4px;">
-                    <label style="margin-top:4px;">العلم</label>
-                    <input type="file" id="in-fl" accept="image/*">
-                    <label style="margin-top:4px;">اللاعب</label>
+                    <label>المنتخب الأيسر</label>
+                    <input type="text" id="in-nl" value="العراق">
+                    <label style="margin-top:4px;">صورة اللاعب الأيسر</label>
                     <input type="file" id="in-pl" accept="image/*">
                 </div>
                 <div class="input-group">
-                    <label>المنتخب الأيمن (أزرق)</label>
-                    <input type="text" id="in-nr" value="فرنسا">
-                    <input type="color" id="in-cr" value="#002366" style="margin-top:4px;">
-                    <label style="margin-top:4px;">العلم</label>
-                    <input type="file" id="in-fr" accept="image/*">
-                    <label style="margin-top:4px;">اللاعب</label>
+                    <label>المنتخب الأيمن</label>
+                    <input type="text" id="in-nr" value="اندورا">
+                    <label style="margin-top:4px;">صورة اللاعب الأيمن</label>
                     <input type="file" id="in-pr" accept="image/*">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>عنوان المباراة الفرعي</label>
+                <input type="text" id="in-matchday" value="مباراة اليوم">
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label>التاريخ</label>
+                    <input type="text" id="in-dt" value="29 أيار 2026">
+                </div>
+                <div class="input-group">
+                    <label>الوقت</label>
+                    <input type="text" id="in-tm" value="7:00 PM">
                 </div>
             </div>
 
             <div class="input-row">
                 <div class="input-group">
                     <label>الملعب</label>
-                    <input type="text" id="in-std" value="ملعب بوسطن">
+                    <input type="text" id="in-std" value="ملعب جيرونا">
                 </div>
                 <div class="input-group">
-                    <label>الحقوق والتذييل</label>
+                    <label>الحقوق والتذييل السفلي</label>
                     <input type="text" id="in-brd" value="منقولة عبر صفحة الحساني">
                 </div>
             </div>
 
-            <button class="btn-download" onclick="exportPoster()">تحميل البوستر PNG</button>
+            <button class="btn-download-poster" onclick="exportPoster()">تحميل البوستر النهائي PNG</button>
         </div>
 
         <div class="poster-container">
             <div id="match-poster">
-                <div class="bg-split">
-                    <div class="left-bg" id="bg-l"></div>
-                    <div class="center-bg"></div>
-                    <div class="right-bg" id="bg-r"></div>
+                <div class="bg-geometric">
+                    <div class="laser-left"></div>
+                    <div class="laser-right"></div>
                 </div>
-
-                <div class="bottom-shadow"></div>
 
                 <div class="player-img" id="p-img-left"></div>
                 <div class="player-img" id="p-img-right"></div>
 
+                <div class="bottom-shadow-deep"></div>
+
                 <div class="poster-content">
-                    <div class="top-section">
-                        <img class="tournament-logo" id="t-logo" src="" alt="شعار البطولة">
-                        <div class="main-title" id="t-tour">كأس العالم</div>
-                        <div class="sub-title" id="t-sub">الولايات المتحدة الأمريكية - كندا - المكسيك 2026</div>
-                        <div class="round-text" id="t-rnd">دور ربع النهائي</div>
+                    <div class="badges-section">
+                        <img class="team-crest" id="m-crest-l" src="https://flagcdn.com/w320/iq.png" alt="شعار">
+                        <div class="vs-sign">X</div>
+                        <img class="team-crest" id="m-crest-r" src="https://flagcdn.com/w320/ad.png" alt="شعار">
                     </div>
 
-                    <div class="mid-section">
-                        <p class="day-title" id="t-dy">الخميس</p>
-                        <p class="date-title" id="t-dt">09.07.2026</p>
-                        <p class="time-title" id="t-tm">21:00</p>
+                    <p class="match-day-title" id="t-matchday">مباراة اليوم</p>
+
+                    <div class="teams-names-row">
+                        <div class="name-left" id="t-nl">العراق</div>
+                        <div class="x-separator">×</div>
+                        <div class="name-right" id="t-nr">اندورا</div>
                     </div>
 
-                    <div class="teams-badge">
-                        <div class="team-box">
-                            <img class="flag-box" id="m-fl" src="https://flagcdn.com/w320/ma.png" alt="علم">
-                            <div class="name-box" id="t-nl">المغرب</div>
-                        </div>
-                        <div class="center-line"></div>
-                        <div class="team-box">
-                            <img class="flag-box" id="m-fr" src="https://flagcdn.com/w320/fr.png" alt="علم">
-                            <div class="name-box" id="t-nr">فرنسا</div>
-                        </div>
+                    <div class="info-border-box">
+                        <div class="info-item" id="t-dt">29 أيار 2026</div>
+                        <div class="vertical-divider"></div>
+                        <div class="info-item"><span class="icon-clock"></span> <span id="t-tm">7:00 PM</span></div>
+                        <div class="vertical-divider"></div>
+                        <div class="info-item"><span class="icon-stadium"></span> <span id="t-std">ملعب جيرونا</span></div>
                     </div>
 
-                    <div class="bottom-section">
-                        <p class="stadium-title" id="t-std">ملعب بوسطن</p>
-                        <p class="live-title" id="t-brd">منقولة عبر صفحة الحساني</p>
-                    </div>
+                    <p class="footer-victory-text">TOGETHER FOR VICTORY</p>
+                    <div class="footer-brand" id="t-brd">منقولة عبر صفحة الحساني</div>
                 </div>
             </div>
 
             <div class="player-control-panel">
                 <div class="player-selector">
-                    <button type="button" class="selector-btn active" id="select-left" onclick="switchPlayer('left')">التحكم باللاعب الأيسر (الأخضر)</button>
-                    <button type="button" class="selector-btn" id="select-right" onclick="switchPlayer('right')">التحكم باللاعب الأيمن (الأزرق)</button>
+                    <button type="button" class="selector-btn active" id="select-left" onclick="switchPlayer('left')">التحكم باللاعب الأيسر</button>
+                    <button type="button" class="selector-btn" id="select-right" onclick="switchPlayer('right')">التحكم باللاعب الأيمن</button>
                 </div>
 
                 <div class="slider-item">
                     <label>الحجم (تكبير / تصغير): <span id="val-size">100%</span></label>
-                    <input type="range" id="slider-size" min="50" max="160" value="100">
+                    <input type="range" id="slider-size" min="50" max="180" value="100">
                 </div>
 
                 <div class="slider-item">
                     <label>الموقع الأفقي (يمين / يسار): <span id="val-x">0px</span></label>
-                    <input type="range" id="slider-x" min="-120" max="120" value="0">
+                    <input type="range" id="slider-x" min="-150" max="150" value="0">
                 </div>
 
                 <div class="slider-item">
                     <label>الموقع العمودي (فوق / تحت): <span id="val-y">0px</span></label>
-                    <input type="range" id="slider-y" min="-120" max="120" value="0">
+                    <input type="range" id="slider-y" min="-150" max="150" value="0">
                 </div>
             </div>
         </div>
@@ -857,10 +1035,10 @@
         });
 
 
-        // 3. إدارة ومتحكمات قسم بوسترات المباريات (كودك الأصلي المطور)
-        const links = [
-            { i: 'in-tour', o: 't-tour' }, { i: 'in-sub', o: 't-sub' }, { i: 'in-rnd', o: 't-rnd' },
-            { i: 'in-dy', o: 't-dy' }, { i: 'in-dt', o: 't-dt' }, { i: 'in-tm', o: 't-tm' },
+        // 3. إدارة ومتحكمات قسم بوسترات المباريات v9 الجديد
+        const posterLinks = [
+            { i: 'in-matchday', o: 't-matchday' }, 
+            { i: 'in-dt', o: 't-dt' }, { i: 'in-tm', o: 't-tm' },
             { i: 'in-nl', o: 't-nl' }, { i: 'in-nr', o: 't-nr' },
             { i: 'in-std', o: 't-std' }, { i: 'in-brd', o: 't-brd' }
         ];
@@ -871,32 +1049,25 @@
             right: { size: 100, x: 0, y: 0 }
         };
 
-        function savePosterToLocalStorage() {
+        function saveToLocalStorage() {
             const dataToSave = {
                 playerData: playerData,
-                colors: {
-                    left: document.getElementById('in-cl').value,
-                    right: document.getElementById('in-cr').value
-                },
                 texts: {}
             };
-            links.forEach(item => { dataToSave.texts[item.i] = document.getElementById(item.i).value; });
-            localStorage.setItem('poster_settings', JSON.stringify(dataToSave));
+            posterLinks.forEach(item => {
+                dataToSave.texts[item.i] = document.getElementById(item.i).value;
+            });
+            localStorage.setItem('poster_settings_v9_portrait', JSON.stringify(dataToSave));
         }
 
-        function loadPosterFromLocalStorage() {
-            const savedData = localStorage.getItem('poster_settings');
+        function loadFromLocalStorage() {
+            const savedData = localStorage.getItem('poster_settings_v9_portrait');
             if (savedData) {
                 const parsed = JSON.parse(savedData);
                 if (parsed.playerData) playerData = parsed.playerData;
-                if (parsed.colors) {
-                    document.getElementById('in-cl').value = parsed.colors.left;
-                    document.getElementById('bg-l').style.backgroundColor = parsed.colors.left;
-                    document.getElementById('in-cr').value = parsed.colors.right;
-                    document.getElementById('bg-r').style.backgroundColor = parsed.colors.right;
-                }
+                
                 if (parsed.texts) {
-                    links.forEach(item => {
+                    posterLinks.forEach(item => {
                         if (parsed.texts[item.i] !== undefined) {
                             document.getElementById(item.i).value = parsed.texts[item.i];
                             document.getElementById(item.o).innerText = parsed.texts[item.i];
@@ -904,35 +1075,33 @@
                     });
                 }
             }
-            ['local_logo', 'local_fl', 'local_fr', 'local_pl', 'local_pr'].forEach(key => {
+            ['v9_crest_l', 'v9_crest_r', 'v9_pl', 'v9_pr'].forEach(key => {
                 const savedImg = localStorage.getItem(key);
                 if (savedImg) {
-                    if (key === 'local_logo') { const imgEl = document.getElementById('t-logo'); imgEl.src = savedImg; imgEl.style.display = 'block'; }
-                    if (key === 'local_fl') document.getElementById('m-fl').src = savedImg;
-                    if (key === 'local_fr') document.getElementById('m-fr').src = savedImg;
-                    if (key === 'local_pl') document.getElementById('p-img-left').style.backgroundImage = `url('${savedImg}')`;
-                    if (key === 'local_pr') document.getElementById('p-img-right').style.backgroundImage = `url('${savedImg}')`;
+                    if (key === 'v9_crest_l') document.getElementById('m-crest-l').src = savedImg;
+                    if (key === 'v9_crest_r') document.getElementById('m-crest-r').src = savedImg;
+                    if (key === 'v9_pl') document.getElementById('p-img-left').style.backgroundImage = `url('${savedImg}')`;
+                    if (key === 'v9_pr') document.getElementById('p-img-right').style.backgroundImage = `url('${savedImg}')`;
                 }
             });
         }
 
-        links.forEach(item => {
+        posterLinks.forEach(item => {
             document.getElementById(item.i).addEventListener('input', (e) => {
                 document.getElementById(item.o).innerText = e.target.value;
-                savePosterToLocalStorage();
+                saveToLocalStorage();
             });
         });
-
-        document.getElementById('in-cl').addEventListener('input', (e) => { document.getElementById('bg-l').style.backgroundColor = e.target.value; savePosterToLocalStorage(); });
-        document.getElementById('in-cr').addEventListener('input', (e) => { document.getElementById('bg-r').style.backgroundColor = e.target.value; savePosterToLocalStorage(); });
 
         function switchPlayer(side) {
             currentPlayer = side;
             document.getElementById('select-left').classList.toggle('active', side === 'left');
             document.getElementById('select-right').classList.toggle('active', side === 'right');
+            
             document.getElementById('slider-size').value = playerData[side].size;
             document.getElementById('slider-x').value = playerData[side].x;
             document.getElementById('slider-y').value = playerData[side].y;
+
             updateLabels();
         }
 
@@ -940,10 +1109,16 @@
             const side = sideName || currentPlayer;
             const data = playerData[side];
             const el = document.getElementById(side === 'left' ? 'p-img-left' : 'p-img-right');
-            let baseWidth = 55; let baseHeight = 100;
+            
+            let baseWidth = 65;
+            let baseHeight = 75;
+            
             el.style.width = `${baseWidth * (data.size / 100)}%`;
             el.style.height = `${baseHeight * (data.size / 100)}%`;
-            let translateX = data.x; if(side === 'right') translateX = -translateX; 
+            
+            let translateX = data.x;
+            if(side === 'right') translateX = -translateX; 
+            
             el.style.transform = `translate(${translateX}px, ${-data.y}px)`;
         }
 
@@ -954,9 +1129,26 @@
             document.getElementById('val-y').innerText = data.y + 'px';
         }
 
-        document.getElementById('slider-size').addEventListener('input', (e) => { playerData[currentPlayer].size = parseInt(e.target.value); updateLabels(); applyStyles(); savePosterToLocalStorage(); });
-        document.getElementById('slider-x').addEventListener('input', (e) => { playerData[currentPlayer].x = parseInt(e.target.value); updateLabels(); applyStyles(); savePosterToLocalStorage(); });
-        document.getElementById('slider-y').addEventListener('input', (e) => { playerData[currentPlayer].y = parseInt(e.target.value); updateLabels(); applyStyles(); savePosterToLocalStorage(); });
+        document.getElementById('slider-size').addEventListener('input', (e) => {
+            playerData[currentPlayer].size = parseInt(e.target.value);
+            updateLabels();
+            applyStyles();
+            saveToLocalStorage();
+        });
+
+        document.getElementById('slider-x').addEventListener('input', (e) => {
+            playerData[currentPlayer].x = parseInt(e.target.value);
+            updateLabels();
+            applyStyles();
+            saveToLocalStorage();
+        });
+
+        document.getElementById('slider-y').addEventListener('input', (e) => {
+            playerData[currentPlayer].y = parseInt(e.target.value);
+            updateLabels();
+            applyStyles();
+            saveToLocalStorage();
+        });
 
         function setupImage(inId, outId, isBg, storageKey) {
             document.getElementById(inId).addEventListener('change', function(e) {
@@ -964,28 +1156,38 @@
                 if (file) {
                     const reader = new FileReader();
                     reader.onload = function(ev) {
-                        if (isBg) { document.getElementById(outId).style.backgroundImage = `url('${ev.target.result}')`; } 
-                        else { const imgEl = document.getElementById(outId); imgEl.src = ev.target.result; imgEl.style.display = 'block'; }
-                        try { localStorage.setItem(storageKey, ev.target.result); } catch(e) { console.log("حجم الصورة كبير على الكاش"); }
+                        if (isBg) {
+                            document.getElementById(outId).style.backgroundImage = `url('${ev.target.result}')`;
+                        } else {
+                            document.getElementById(outId).src = ev.target.result;
+                        }
+                        try {
+                            localStorage.setItem(storageKey, ev.target.result);
+                        } catch(e) {
+                            console.log("حجم الصورة المرفوعة كبير على الـ كاش المحلي، لكن ستعمل بالمعاينة والتصدير طبيعي جداً");
+                        }
                     };
                     reader.readAsDataURL(file);
                 }
             });
         }
         
-        setupImage('in-logo', 't-logo', false, 'local_logo');
-        setupImage('in-fl', 'm-fl', false, 'local_fl');
-        setupImage('in-fr', 'm-fr', false, 'local_fr');
-        setupImage('in-pl', 'p-img-left', true, 'local_pl');
-        setupImage('in-pr', 'p-img-right', true, 'local_pr');
+        setupImage('in-crest-l', 'm-crest-l', false, 'v9_crest_l');
+        setupImage('in-crest-r', 'm-crest-r', false, 'v9_crest_r');
+        setupImage('in-pl', 'p-img-left', true, 'v9_pl');
+        setupImage('in-pr', 'p-img-right', true, 'v9_pr');
 
         function exportPoster() {
             const poster = document.getElementById('match-poster');
             html2canvas(poster, {
-                useCORS: true, scale: 3, logging: false, width: poster.offsetWidth, height: poster.offsetHeight
+                useCORS: true,
+                scale: 3, 
+                logging: false,
+                width: poster.offsetWidth,
+                height: poster.offsetHeight
             }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `بوستر_مباراة_${document.getElementById('in-nl').value}_و_${document.getElementById('in-nr').value}.png`;
+                link.download = `بوستر_مباراة_العالمي_${document.getElementById('in-nl').value}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             });
@@ -993,19 +1195,16 @@
 
         // 4. تشغيل كافة الاسترجاعات التلقائية والتبويبات فور فتح الصفحة
         window.onload = function() {
-            // استرجاع الصفحة الأخيرة التي فتحها المستخدم
             const lastTab = localStorage.getItem('active_app_tab');
             if (lastTab) {
                 switchMainPage(lastTab);
             } else {
-                switchMainPage('page-news'); // افتراضي
+                switchMainPage('page-news'); 
             }
 
-            // تحميل كاش الأخبار والبوسترات
             loadNewsFromLocalStorage();
-            loadPosterFromLocalStorage();
+            loadFromLocalStorage();
             
-            // تهيئة استايلات اللاعبين للبوستر
             applyStyles('left');
             applyStyles('right');
         };
